@@ -1,21 +1,23 @@
 
 
 
+---------------------------ADMIN------------------------
 
-
-TblCourse
-
+TblSection
+sectionId= 1(AutoIncrement)
 Course = BSCS
 year level = 1st year
 section = section A
 
 
 BSIT
+sectionId= 2(AutoIncrement)
 Course = 1st year
 year level = section B
 section = B
 
 BSIT
+sectionId= 3(AutoIncrement)
 Course = 2nd year
 year level = section C
 section = B
@@ -85,9 +87,34 @@ Show All Teacher
 
 
 TBLSchedule
-ID number=0002
-Designation = Instructor 2
-CurriculumID =subject code
+Day = Monday //Teacher Choosed
+Hrs = 7am - 12pm (total 5 hrs) //Teacher Choosed
+TeacherID number=0002 //teacher ID
+
+
+section = sectionId= 3
+room code = Room3
+HrsAssign = 8-10
+CurriculumID =CP2 (-3hrs)
+
+
+section = sectionId= 3
+room code = Room3
+HrsAssign =11-12
+CurriculumID = CP1(-2hrs)
+
+
+
+(For Off Campus work Sunday-Saturday)
+room code = Room3
+HrsAssign=11-12
+CurriculumID = CP1(-2hrs)
+
+
+
+
+
+
 (Make sure that the subjectcode.Hrs Total is match on they choosed Hrs either 40 or 30 hrs)
 
 M - 7-9  
@@ -100,6 +127,17 @@ Sun - 7-9
 
 for regular = 30-40 maximum per week
 for part time= 12hrs maximum per week
+
+
+---------------------------FACULTY------------------------
+
+
+TBLSchedule
+-TeacherID number=0002 //teacher session id
+-Day = Monday
+-Hrs = 7am - 12pm (total 5 hrs)
+//Subject is for Weekdays
+
 
 
 
