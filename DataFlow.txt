@@ -1,0 +1,106 @@
+
+
+
+
+
+TblCourse
+
+Course = BSCS
+year level = 1st year
+section = section A
+
+
+BSIT
+Course = 1st year
+year level = section B
+section = B
+
+BSIT
+Course = 2nd year
+year level = section C
+section = B
+
+
+
+
+
+
+
+TblCurriculum
+subject code = CP2
+subject name =Capstone 2
+lab = 1
+lec = 0 
+Hrs = 3
+sem = 2nd
+year level = 4th year
+
+
+subject code = CP1
+subject name =Capstone 1
+lab = 0
+lec = 2 
+Hrs = 2
+sem = 1st
+year level = 3rd year
+
+
+
+
+TblFacultyMember
+ID number=0001
+Fname = James
+Mname= (optional)
+Lname= Pungay
+Designation = Instructor 
+
+
+ID number=0001
+Fname = James
+Mname= (optional)
+Lname= Pungay
+Designation = Instructor 1
+Password= Pungay(Default)
+
+
+ID number=0002
+Fname = Joshua		
+Mname= Raymundo	
+Lname= Padilla
+Designation = Instructor 2
+Password= Padilla (Default)
+
+
+ID number=0003
+Fname = Juan
+Mname= (optional)
+Lname= Dela cruz
+Designation = Part time (12hrs/week)
+Password= Dela cruz(Default)
+
+
+
+Show All Teacher 
+(choose specific teacher to assign their schedule)
+
+
+TBLSchedule
+ID number=0002
+Designation = Instructor 2
+CurriculumID =subject code
+(Make sure that the subjectcode.Hrs Total is match on they choosed Hrs either 40 or 30 hrs)
+
+M - 7-9  
+T - 7-9
+W - 7-9
+TH - 7-9
+F - 7-9
+Sat -7-9
+Sun - 7-9
+
+for regular = 30-40 maximum per week
+for part time= 12hrs maximum per week
+
+
+
+
