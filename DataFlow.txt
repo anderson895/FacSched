@@ -12,15 +12,15 @@ section = section A
 
 BSIT
 sectionId= 2(AutoIncrement)
-Course = 1st year
-year level = section B
+Course = BSIT
+year level = 1st year
 section = B
 
 BSIT
 sectionId= 3(AutoIncrement)
-Course = 2nd year
-year level = section C
-section = B
+Course = BSIT
+year level = 2nd year
+section = C
 
 
 
