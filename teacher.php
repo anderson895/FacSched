@@ -9,7 +9,7 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body class="bg-light">
+<body class="bg-dark">
 
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card shadow" style="width: 100%; max-width: 400px;">
