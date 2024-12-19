@@ -6,32 +6,35 @@ include "components/header.php";
 
 
 <div class="container mt-5">
-    <h1>List of sections</h1>
+    <h1>List of Subjects</h1>
 
     <!-- Add Section Button with Icon -->
-    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addSectionModal">
-        <i class="bi bi-plus-circle me-2"></i>Add Section
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
+        <i class="bi bi-plus-circle me-2"></i>Add Subject
     </button>
 
     <!-- Search Input with Icon -->
     <div class="input-group mb-3">
         <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search ...">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search...">
     </div>
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered" id="dataTable">
             <thead>
                 <tr>
-                    <th>Section ID</th>
-                    <th style="min-width: 150px;">Course</th>
-                    <th>Year Level</th>
-                    <th>Section</th>
+                    <th>Subject code</th>
+                    <th style="min-width: 150px;">Subject name</th>
+                    <th>lab</th>
+                    <th>lec</th>
+                    <th>Hrs</th>
+                    <th>Sem</th>
+                    <th>Year level</th>
                     <th style="width: 100px;">Action</th>
                 </tr>
             </thead>
             <tbody>
-           <?php include "backend/end-points/fetchAllSection.php";?>
+           <?php include "backend/end-points/fetchAllsubject.php";?>
             </tbody>
               <!-- Add more rows as needed -->
           
@@ -69,8 +72,8 @@ include "components/header.php";
 
 
 
-<!-- Add Section Modal -->
-<div class="modal fade" id="addSectionModal" tabindex="-1" aria-labelledby="addSectionModalLabel" aria-hidden="true">
+<!-- Add Subject Modal -->
+<div class="modal fade" id="addSubjectModal" tabindex="-1" aria-labelledby="aaddSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -83,25 +86,65 @@ include "components/header.php";
                 </div>
             </div>
 
-        <h5 class="modal-title" id="addSectionModalLabel">Add New Section</h5>
+        <h5 class="modal-title" id="aaddSubjectModalLabel">Add New Subject</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="addSectionForm">
+        <form id="addSubjectForm">
           <div class="mb-3 form-floating">
-            <input type="text" class="form-control" name="course" placeholder="" required>
-            <label for="course" class="form-label">Course</label>
+            <input type="text" class="form-control" name="subjectCode" placeholder="" required>
+            <label for="subjectCode" class="form-label">Subject code</label>
           </div>
           <div class="mb-3 form-floating">
-            <input type="text" class="form-control" name="year_level" placeholder="" required>
-            <label for="year_level" class="form-label">Year Level</label>
+            <input type="text" class="form-control" name="subjectName" placeholder="" required>
+            <label for="subjectName" class="form-label">Subject Name</label>
           </div>
+
+
           <div class="mb-3 form-floating">
-            <input type="text" class="form-control" name="section" placeholder="" required>
-            <label for="section" class="form-label">Section</label>
+            <input type="text" class="form-control" name="lab" placeholder="" required>
+            <label for="lab" class="form-label">Lab</label>
           </div>
-          <button type="submit" id="btnAddSection" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i>Add Section
+
+
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" name="lec" placeholder="" required>
+            <label for="lec" class="form-label">Lec</label>
+          </div>
+
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" name="hrs" placeholder="" required>
+            <label for="hrs" class="form-label">hrs</label>
+          </div>
+
+
+          <div class="mb-3 form-floating">
+            <select class="form-select" name="Sem" id="Sem" required>
+              <option value="" disabled selected>Select Semester</option>
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+            </select>
+            <label for="Sem" class="form-label">Semester</label>
+          </div>
+
+
+          
+          <div class="mb-3 form-floating">
+            <select class="form-select" name="yrlvl" id="yrlvl" required>
+              <option value="" disabled selected>Select Year Level</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+            <label for="yrlvl" class="form-label">Year Level</label>
+          </div>
+
+
+
+
+          <button type="submit" id="btnAddSubject" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>Add Subject
           </button>
         </form>
       </div>
@@ -120,7 +163,7 @@ include "components/header.php";
 
 
 <!-- update Section Modal -->
-<div class="modal fade" id="updateSectionModal" tabindex="-1" aria-labelledby="addSectionModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateSubjectModal" tabindex="-1" aria-labelledby="updateSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -133,27 +176,64 @@ include "components/header.php";
                 </div>
             </div>
 
-        <h5 class="modal-title" id="addSectionModalLabel">Update Section</h5>
+        <h5 class="modal-title" id="updateSubjectModalLabel">Update Subject</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="updateSectionForm">
+        <form id="updateSubjectForm">
 
-        <input hidden type="text" id="sectionId" name="sectionId">
-          <div class="mb-3 form-floating">
-            <input type="text" class="form-control" id="course" name="course" placeholder="" required>
-            <label for="course" class="form-label">Course</label>
+        <input hidden type="text" id="subjectId" name="subjectId">
+        <div class="mb-3 form-floating">
+            <input  type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="" required>
+            <label for="subjectCode" class="form-label">Subject code</label>
           </div>
           <div class="mb-3 form-floating">
-            <input type="text" class="form-control" id="year_level" name="year_level" placeholder="" required>
-            <label for="year_level" class="form-label">Year Level</label>
+            <input type="text" class="form-control" id="subjectName" name="subject_name" placeholder="" required>
+            <label for="subjectName" class="form-label">Subject Name</label>
           </div>
+
+
           <div class="mb-3 form-floating">
-            <input type="text" class="form-control" id="section" name="section" placeholder="" required>
-            <label for="section" class="form-label">Section</label>
+            <input type="text" class="form-control" id="lab_num" name="lab_num" placeholder="" required>
+            <label for="lab" class="form-label">Lab</label>
           </div>
+          
+
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" id="lec_num" name="lec_num" placeholder="" required>
+            <label for="lec" class="form-label">Lec</label>
+          </div>
+
+          <div class="mb-3 form-floating">
+            <input type="text" class="form-control" id="hours" name="hours" placeholder="" required>
+            <label for="hrs" class="form-label">hrs</label>
+          </div>
+
+
+          <div class="mb-3 form-floating">
+            <select class="form-select" id="semester" name="semester" required>
+              <option value="" disabled selected>Select Semester</option>
+              <option value="1">1st Semester</option>
+              <option value="2">2nd Semester</option>
+            </select>
+            <label for="Sem" class="form-label">Semester</label>
+          </div>
+
+
+          
+          <div class="mb-3 form-floating">
+            <select class="form-select" id="designated_year_level" name="designated_year_level" required>
+              <option value="" disabled selected>Select Year Level</option>
+              <option value="1">1st Year</option>
+              <option value="2">2nd Year</option>
+              <option value="3">3rd Year</option>
+              <option value="4">4th Year</option>
+            </select>
+            <label for="yrlvl" class="form-label">Year Level</label>
+          </div>
+
           <button type="submit" id="btnUpdateSection" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i>Update Section
+            <i class="bi bi-plus-circle me-2"></i>Update Subject
           </button>
         </form>
       </div>

@@ -31,7 +31,7 @@ $db = new global_class();
   <div class="sidebar" id="sidebar">
     <a href="#">Dashboard</a>
     <a href="section.php">Sections</a>
-    <a href="#">Curriculum</a>
+    <a href="curriculum.php">Curriculum</a>
     <a href="#">Teachers</a>
     <a href="logout.php">Logout</a>
   </div>
@@ -52,7 +52,7 @@ $db = new global_class();
             <a class="nav-link" href="section.php">Sections</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Curriculum</a>
+            <a class="nav-link" href="curriculum.php">Curriculum</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="#">Teachers</a>

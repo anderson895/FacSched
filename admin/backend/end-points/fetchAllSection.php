@@ -20,7 +20,7 @@
                                 data-sectionid="<?=$section['sectionId']?>"
                                 >Update</button>
 
-                                <button class="btn btn-danger btn-sm removeProduct" data-sectionid="<?=$section['sectionId']?>">Remove</button>
+                                <button class="btn btn-danger btn-sm removeSection" data-sectionid="<?=$section['sectionId']?>">Remove</button>
 
                         </div>
                     </td>

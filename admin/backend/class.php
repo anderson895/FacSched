@@ -10,6 +10,41 @@ class global_class extends db_connect
     }
 
 
+    public function addSubject($subjectCode, $subjectName, $lab, $lec, $hrs, $Sem, $yrlvl) {
+        // Prepare the SQL query
+        $query = $this->conn->prepare(
+            "INSERT INTO TblCurriculum (subject_code, subject_name, lab_num, lec_num, hours, semester, designated_year_level) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)"
+        );
+    
+        // Check if the query was prepared successfully
+        if ($query === false) {
+            return false; // Query preparation failed
+        }
+    
+        // Bind the parameters (s for string, i for integer)
+        $query->bind_param("ssssssi", $subjectCode, $subjectName, $lab, $lec, $hrs, $Sem, $yrlvl);
+    
+        // Execute the query
+        if ($query->execute()) {
+            echo "200"; // Success
+        } else {
+            return false; // Execution failed
+        }
+    
+        // Close the statement
+        $query->close();
+    }
+    
+
+
+
+
+
+
+
+
+
         public function addSection($course, $year_level, $section)
     {
         // Prepare the SQL query
@@ -54,6 +89,37 @@ class global_class extends db_connect
         }
         $query->close();
     }
+
+
+    public function updateSubject($subjectId, $subjectCode, $subject_name, $lab_num, $lec_num, $hours, $semester, $designated_year_level)
+    {
+        // Prepare the SQL update query
+        $query = $this->conn->prepare("UPDATE `tblcurriculum` 
+                                        SET `subject_code` = ?, 
+                                            `subject_name` = ?, 
+                                            `lab_num` = ?, 
+                                            `lec_num` = ?, 
+                                            `hours` = ?, 
+                                            `semester` = ?, 
+                                            `designated_year_level` = ?
+                                        WHERE `subject_id` = ?");
+        
+        if ($query === false) {
+            return false;
+        }
+    
+        // Bind the parameters to the prepared statement
+        $query->bind_param("sssssssi", $subjectCode, $subject_name, $lab_num, $lec_num, $hours, $semester, $designated_year_level, $subjectId);
+        
+        // Execute the query
+        if ($query->execute()) {
+            echo "200"; // Success
+        } else {
+            return false;
+        }
+    
+        $query->close();
+    }
     
 
     public function deleteSection($sectionId)
@@ -75,6 +141,26 @@ class global_class extends db_connect
         $query->close();
     }
 
+
+    public function deleteSubject($subject_id)
+    {
+        $query = $this->conn->prepare("UPDATE `tblcurriculum` SET `subject_status` = '0' WHERE `subject_id` = ?");
+    
+        if ($query === false) {
+            return false;
+        }
+    
+        $query->bind_param("i", $subject_id);
+    
+        // Execute the query
+        if ($query->execute()) {
+            echo "200"; // Success
+        } else {
+            return false;
+        }
+        $query->close();
+    }
+    
     
     public function fetch_all_Section()
     {
@@ -88,4 +174,18 @@ class global_class extends db_connect
             return $result;
         }
     }
+
+    public function fetch_all_Subject()
+    {
+        $query = $this->conn->prepare("SELECT * 
+        FROM `TblCurriculum`
+        where subject_status='1'
+        ");
+
+        if ($query->execute()) {
+            $result = $query->get_result();
+            return $result;
+        }
+    }
+
 }
