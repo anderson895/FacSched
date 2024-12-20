@@ -1,0 +1,39 @@
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+.card-body {
+    padding: 30px;
+}
+.form-control {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.form-control:focus {
+    border-color: #6a11cb;
+    box-shadow: 0 0 5px rgba(106, 17, 203, 0.5);
+}
+.btn-success {
+    background-color: #6a11cb;
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+.btn-success:hover {
+    background-color: #2575fc;
+}
+.card-title {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+.form-label {
+    font-weight: 600;
+}
+.form-check-label {
+    font-size: 0.9rem;
+}
+.text-center img {
+    max-width: 150px;
+}

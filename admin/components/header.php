@@ -45,7 +45,13 @@ $db = new global_class();
       <button class="navbar-toggler" type="button" id="toggleSidebar" aria-label="Toggle sidebar">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="#">Logo</a>
+      <a class="navbar-brand" href="#">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiQc01tubeOKno4VlBcUlZ-OEjad8ChfAYOw&s" alt="Logo" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+    </a>
+
+
+  
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">

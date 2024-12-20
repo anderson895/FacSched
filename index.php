@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="bg-dark">
+<?php include "function/PageLoader.php";?>
+
+
 <div class="d-flex vh-100 align-items-center justify-content-center">
     <div class="row g-4">
         <!-- Admin Card -->
