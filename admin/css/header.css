@@ -30,3 +30,29 @@
       margin-left: 0;
     }
   }
+
+
+
+
+
+  
+
+  /* Sidebar z-index */
+  .sidebar {
+    z-index: 1050; /* Sidebar above other content */
+  }
+
+  /* Navbar z-index */
+  .navbar {
+    z-index: 1060; /* Navbar on top of sidebar */
+  }
+
+  /* Main content z-index */
+  .content {
+    z-index: 100; /* Content behind sidebar and navbar */
+  }
+
+  /* Example for modal (optional) */
+  .modal {
+    z-index: 1100; /* Modal above everything else */
+  }

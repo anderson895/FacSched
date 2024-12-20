@@ -50,33 +50,33 @@ year level = 3rd year
 
 
 TblFacultyMember
-ID number=0001
+ID code =0001
 Fname = James
 Mname= (optional)
 Lname= Pungay
 Designation = Instructor 
 
 
-ID number=0001
-Fname = James
-Mname= (optional)
-Lname= Pungay
+ID code =0001
+fname = James
+mname = (optional)
+lname = Pungay
 Designation = Instructor 1
 Password= Pungay(Default)
 
 
-ID number=0002
-Fname = Joshua		
-Mname= Raymundo	
-Lname= Padilla
+ID code = 0002
+fname = Joshua		
+mname = Raymundo	
+lname = Padilla
 Designation = Instructor 2
 Password= Padilla (Default)
 
 
-ID number=0003
-Fname = Juan
-Mname= (optional)
-Lname= Dela cruz
+ID number= 0003
+fname = Juan
+mname = (optional)
+lname = Dela cruz
 Designation = Part time (12hrs/week)
 Password= Dela cruz(Default)
 

@@ -13,8 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hrs = $_POST['hrs'];
             $Sem = $_POST['Sem'];
             $yrlvl = $_POST['yrlvl'];
-
-            // Call the Login method and get the result
             $response = $db->addSubject($subjectCode, $subjectName,$lab,$lec,$hrs,$Sem,$yrlvl);
 
           return $response;
@@ -24,8 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $course = $_POST['course'];
             $year_level = $_POST['year_level'];
             $section = $_POST['section'];
-
-            // Call the Login method and get the result
             $response = $db->addSection($course, $year_level,$section);
 
           return $response;
@@ -36,8 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $course = $_POST['course'];
             $year_level = $_POST['year_level'];
             $section = $_POST['section'];
-
-            // Call the Login method and get the result
             $response = $db->UpdateSection($course, $year_level,$section,$sectionId);
 
           return $response;
@@ -53,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $semester = $_POST['semester'];
             $designated_year_level = $_POST['designated_year_level'];
 
-            // Call the Login method and get the result
             $response = $db->updateSubject($subjectId, $subjectCode,$subject_name,$lab_num,$lec_num,$hours,$semester,$designated_year_level);
 
           return $response;
@@ -61,27 +54,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else if ($_POST['requestType'] == 'deleteSection') {
             $sectionId = $_POST['sectionId'];
-           
-
-            // Call the Login method and get the result
             $response = $db->deleteSection($sectionId);
 
           return $response;
 
 
-        }else if ($_POST['requestType'] == 'deleteSubject') {
-            $subject_id = $_POST['subject_id'];
-           
+        }else if ($_POST['requestType'] == 'deleteSection') {
+          $sectionId = $_POST['sectionId'];
+          $response = $db->deleteSection($sectionId);
 
-            // Call the Login method and get the result
-            $response = $db->deleteSubject($subject_id);
+        return $response;
+
+
+        }else if ($_POST['requestType'] == 'deleteTeacher') {
+            $teacher_id = $_POST['teacher_id'];
+            $response = $db->deleteTeacher($teacher_id);
 
           return $response;
 
 
+        }else if ($_POST['requestType'] == 'addTeacher') {
+          $teacherCode = $_POST['teacherCode'];
+          $fname = $_POST['fname'];
+          $mname = $_POST['mname'];
+          $lname = $_POST['lname'];
+          $designation = $_POST['designation'];
+          $password = $lname;
+          $response = $db->addTeacher($teacherCode, $fname,$mname,$lname,$designation,$password);
+
+        return $response;
+
+
+        } else if ($_POST['requestType'] == 'updateTeacher') {
+          $teacher_id = $_POST['teacher_id'];
+          $teacherCode = $_POST['teacherCode'];
+          $fname = $_POST['fname'];
+          $mname = $_POST['mname'];
+          $lname = $_POST['lname'];
+          $designation = $_POST['designation'];
+          $password = $_POST['newpassword'];
+          $response = $db->updateTeacher($teacher_id,$teacherCode, $fname,$mname,$lname,$designation,$password);
+
+        return $response;
+
+
         }else {
-            echo 'Invalid request type';
-        }
+              echo 'Invalid request type';
+          }
 
 
         

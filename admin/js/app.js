@@ -92,6 +92,48 @@ $("#addSectionForm").submit(function (e) {
 
 
 
+  $('.removeTeacher').on('click', function () {
+    // Get the sectionId from the data attribute
+    var teacher_id = $(this).data('teacher_id');
+    // SweetAlert2 confirmation
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'Do you want to Archive this Teacher?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // AJAX call to delete the section
+            $.ajax({
+                url: "backend/end-points/controller.php",
+                type: 'POST',
+                data: {teacher_id: teacher_id,requestType:'deleteTeacher'}, 
+                success: function(response) {
+
+                    console.log(response);
+                    if (response == '200') {
+                        Swal.fire(
+                            'Deleted!',
+                            'The Teacher has been move to archived.',
+                            'success'
+                        ).then(() => {
+                            location.reload(); 
+                        });
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            'There was an issue deleting the section.',
+                            'error'
+                        );
+                    }
+                }
+            });
+        }
+    });
+});
 
 
 
@@ -368,4 +410,118 @@ $('.updateSubjectToggler').click(function (e) {
 
 
 
+  // addTeacherForm
+
+  $("#addTeacherForm").submit(function (e) {
+    e.preventDefault();
+    
+
+    $('.spinner').show();
+    $('#btnAddTeacher').prop('disabled', true);
+    
+    var formData = $(this).serializeArray(); 
+    formData.push({ name: 'requestType', value: 'addTeacher' });
+    var serializedData = $.param(formData);
+
+    // Perform the AJAX request
+    $.ajax({
+      type: "POST",
+      url: "backend/end-points/controller.php",
+      data: serializedData,
+      success: function (response) {
+
+        console.log(response)
+
+        if (response === "200") {
+          alertify.success('Added Successful');
+
+          setTimeout(function () {
+            location.reload();
+          }, 1000);
+
+        } else {
+          $('.spinner').hide();
+          $('#btnAddTeacher').prop('disabled', false);
+          alertify.error(response);
+        }
+      },
+      error: function () {
+        $('.spinner').hide();
+        $('#btnAddTeacher').prop('disabled', false);
+        alertify.error('An error occurred. Please try again.');
+      }
+    });
+  });
+
+
+
+
+
+
   
+
+
+  $('.updateTeacherToggler').click(function (e) { 
+    e.preventDefault();
+
+    var teacher_id = $(this).data('teacher_id'); 
+    var ID_code = $(this).data('id_code');
+    var fname = $(this).data('fname');
+    var mname = $(this).data('mname');
+    var lname = $(this).data('lname');
+    var designation = $(this).data('designation');
+
+
+    $('#teacher_id').val(teacher_id);
+    $('#teacherCode').val(ID_code);
+    $('#Teacher_Fname').val(fname);
+    $('#Teacher_Mname').val(mname);
+    $('#Teacher_Lname').val(lname);
+    $('#Teacher_designation').val(designation);
+
+});
+
+
+
+// updateTeacherForm
+$("#updateTeacherForm").submit(function (e) {
+  e.preventDefault();
+  
+
+  $('.spinner').show();
+  $('#btnUpdateTeacher').prop('disabled', true);
+  
+  var formData = $(this).serializeArray(); 
+  formData.push({ name: 'requestType', value: 'updateTeacher' });
+  var serializedData = $.param(formData);
+  // Perform the AJAX request
+  $.ajax({
+    type: "POST",
+    url: "backend/end-points/controller.php",
+    data: serializedData,
+    success: function (response) {
+
+      console.log(response)
+
+      if (response === "200") {
+        alertify.success('Update Successful');
+
+        setTimeout(function () {
+          location.reload();
+        }, 1000);
+
+      } else {
+        $('.spinner').hide();
+        $('#btnUpdateTeacher').prop('disabled', false);
+        console.log(response); 
+        alertify.error(response.message);
+      }
+    },
+    error: function () {
+      $('.spinner').hide();
+      $('#btnUpdateTeacher').prop('disabled', false);
+      alertify.error('An error occurred. Please try again.');
+    }
+  });
+});
+

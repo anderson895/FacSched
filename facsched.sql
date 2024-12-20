@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 19, 2024 at 07:39 PM
+-- Generation Time: Dec 20, 2024 at 10:00 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -86,7 +86,33 @@ CREATE TABLE `tblcurriculum` (
 --
 
 INSERT INTO `tblcurriculum` (`subject_id`, `subject_code`, `subject_name`, `lab_num`, `lec_num`, `hours`, `semester`, `designated_year_level`, `subject_status`) VALUES
-(3, 'CP2', 'Capstone 2', 1, 0, 3, 2, 4, 1);
+(3, 'CP2', 'Capstone ', 1, 0, 3, 2, 4, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblfacultymember`
+--
+
+CREATE TABLE `tblfacultymember` (
+  `teacher_id` int(11) NOT NULL,
+  `ID_code` varchar(60) NOT NULL,
+  `fname` varchar(60) NOT NULL,
+  `mname` varchar(60) NOT NULL,
+  `lname` varchar(60) NOT NULL,
+  `designation` varchar(60) NOT NULL,
+  `Password` varchar(60) DEFAULT NULL,
+  `teacher_status` int(11) NOT NULL DEFAULT 1 COMMENT '0=archive,1=active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblfacultymember`
+--
+
+INSERT INTO `tblfacultymember` (`teacher_id`, `ID_code`, `fname`, `mname`, `lname`, `designation`, `Password`, `teacher_status`) VALUES
+(1, '0002', 'Joshua', 'Raymundo', 'Padilla', 'Instructor II', '0002', 1),
+(2, '0003', 'Juan', '', 'Dela cruz', 'Part Time', 'Dela cruz', 0),
+(3, '0004', 'andy', '', 'padilla', 'Instructor II', 'padilla', 1);
 
 -- --------------------------------------------------------
 
@@ -135,6 +161,12 @@ ALTER TABLE `tblcurriculum`
   ADD PRIMARY KEY (`subject_id`);
 
 --
+-- Indexes for table `tblfacultymember`
+--
+ALTER TABLE `tblfacultymember`
+  ADD PRIMARY KEY (`teacher_id`);
+
+--
 -- Indexes for table `tblsection`
 --
 ALTER TABLE `tblsection`
@@ -161,6 +193,12 @@ ALTER TABLE `designation`
 --
 ALTER TABLE `tblcurriculum`
   MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `tblfacultymember`
+--
+ALTER TABLE `tblfacultymember`
+  MODIFY `teacher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblsection`
