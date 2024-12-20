@@ -30,7 +30,7 @@ class global_class extends db_connect
 
 
 
-            public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
+        public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
         {
             $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
                 WHERE `sched_teacher_id` = ? AND `sched_day` = ? 
@@ -62,9 +62,83 @@ class global_class extends db_connect
         }
 
 
+        public function UpdateSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime, $scheduleId)
+        {
+            // Check for overlapping schedules
+            if ($scheduleDay !== '' && $scheduleDay !== null) {
+                // Prepare query to check for overlapping schedules
+                $query = "
+                    SELECT * FROM `tblschedule`
+                    WHERE `sched_teacher_id` = '$teacher_id' 
+                    AND `sched_day` = '$scheduleDay' 
+                    AND `sched_id` != '$scheduleId' 
+                    AND (
+                        (`sched_start_Hrs` < '$scheduleStartTime' AND `sched_end_Hrs` > '$scheduleStartTime') 
+                        OR (`sched_start_Hrs` < '$scheduleEndTime' AND `sched_end_Hrs` > '$scheduleEndTime')
+                    )
+                ";
+            } else {
+                // Prepare query to check for overlapping schedules when no `scheduleDay` is provided
+                $query = "
+                    SELECT * FROM `tblschedule`
+                    WHERE `sched_teacher_id` = '$teacher_id' 
+                    AND `sched_id` != '$scheduleId' 
+                    AND (
+                        (`sched_start_Hrs` < '$scheduleStartTime' AND `sched_end_Hrs` > '$scheduleStartTime') 
+                        OR (`sched_start_Hrs` < '$scheduleEndTime' AND `sched_end_Hrs` > '$scheduleEndTime')
+                    )
+                ";
+            }
+        
+            // Execute the query
+            $result = $this->conn->query($query);
+            
+            // Check if any overlapping schedule exists
+            if ($result->num_rows > 0) {
+                echo "Schedule Date is Not Available"; // Overlap detected
+                return false;
+            }
+        
+            // Prepare the update query
+            $updateQuery = "
+                UPDATE `tblschedule`
+                SET `sched_start_Hrs` = '$scheduleStartTime', `sched_end_Hrs` = '$scheduleEndTime'
+            ";
+        
+            // Only include `sched_day` if `scheduleDay` is not empty
+            if ($scheduleDay !== '' && $scheduleDay !== null) {
+                $updateQuery .= ", `sched_day` = '$scheduleDay'";
+            }
+        
+            $updateQuery .= " WHERE `sched_teacher_id` = '$teacher_id' AND `sched_id` = '$scheduleId'";
+        
+            // Execute the update query
+            if ($this->conn->query($updateQuery)) {
+                echo "200"; // Success
+            } else {
+                echo "Error updating schedule";
+                return false;
+            }
+        
+            return true;
+        }
+        
+
+        
+        
+
+        
+
+        
+
+        
+
+        
 
 
-                public function CheckDayIfAlreadyTaken($teacher_id)
+
+
+        public function CheckDayIfAlreadyTaken($teacher_id)
         {
             $takenDays = [];
             $query = $this->conn->prepare("SELECT `sched_day` FROM `tblschedule` 
@@ -95,30 +169,29 @@ class global_class extends db_connect
 
 
 
-                public function fetch_schedule($teacher_id)
+        public function fetch_schedule($teacher_id)
         {
-            $query = $this->conn->prepare("SELECT `sched_day`, `sched_start_Hrs`, `sched_end_Hrs` FROM `tblschedule` WHERE `sched_teacher_id` = ?");
-            $query->bind_param("i", $teacher_id); 
-            
+            $query = $this->conn->prepare("SELECT * FROM `tblschedule` WHERE `sched_teacher_id` = ?");
+            $query->bind_param("i", $teacher_id); // Ensure the parameter type matches your DB schema
+        
             if ($query->execute()) {
                 $result = $query->get_result();
-                
+        
+                // Fetch all schedules into an array if rows exist
                 if ($result->num_rows > 0) {
-                    $schedules = [];
-                    while ($row = $result->fetch_assoc()) {
-                        $schedules[] = $row;  
-                    }
+                    $schedules = $result->fetch_all(MYSQLI_ASSOC);
                     $query->close();
-                    return $schedules;  
+                    return $schedules; // Return array of schedules
                 } else {
                     $query->close();
-                    return null;  
+                    return []; // Return an empty array instead of null for better handling
                 }
             } else {
                 $query->close();
-                return false;  
+                return false; // Return false on execution failure
             }
         }
+        
 
         
 
