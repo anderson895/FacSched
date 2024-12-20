@@ -51,22 +51,29 @@ class global_class extends db_connect
 
     public function LoginTeacher($teacher_code, $password)
     {
+
+        // Prepare the SQL query
         $query = $this->conn->prepare("SELECT * FROM `tblfacultymember` WHERE `ID_code` = ? AND `Password` = ? AND teacher_status = '1'");
+
+        // Bind the email and the hashed password
         $query->bind_param("ss", $teacher_code, $password);
+        
+        // Execute the query
         if ($query->execute()) {
             $result = $query->get_result();
             if ($result->num_rows > 0) {
                 $user = $result->fetch_assoc();
 
+                // Start the session and store user info
                 session_start();
                 $_SESSION['teacher_id'] = $user['teacher_id'];
 
-                return $user;
+                return $user;  // Return user data
             } else {
-                return false; 
+                return false;  // User not found or incorrect credentials
             }
         } else {
-            return false;
+            return false;  // Query failed to execute
         }
     }
 

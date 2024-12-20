@@ -92,6 +92,8 @@ Hrs = 7am - 12pm (total 5 hrs) //Teacher Choosed
 TeacherID number=0002 //teacher ID
 
 
+
+TBLSubjectSchedule
 section = sectionId= 3
 room code = Room3
 HrsAssign = 8-10

@@ -3,6 +3,13 @@ session_start();
 include('backend/class.php');
 
 $db = new global_class();
+
+
+$teacherDetails = $db->fetch_teacher_detail($_SESSION['teacher_id']);
+
+$teacher = $teacherDetails->fetch_assoc();
+
+
 ?>
 
 <head>
@@ -33,6 +40,7 @@ $db = new global_class();
     <div class="mb-6"></div>
     <a href="index.php">My Schedule</a>
     <a href="section.php">Set Schedule</a>
+    <a href="settings.php">Settings</a>
     <a href="logout.php">Logout</a>
     
   </div>
@@ -46,6 +54,7 @@ $db = new global_class();
       <a class="navbar-brand" href="#">
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiQc01tubeOKno4VlBcUlZ-OEjad8ChfAYOw&s" alt="Logo" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
     </a>
+    <h3 class="text-white">Welcome, <?=ucfirst($teacher['fname']);?></h3>
 
 
   
@@ -57,6 +66,10 @@ $db = new global_class();
           </li>
           <li class="nav-item">
             <a class="nav-link" href="set_schedule.php">Set Schedule</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="settings.php">Settings</a>
           </li>
         
 

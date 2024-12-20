@@ -80,25 +80,16 @@ class global_class extends db_connect
 
         public function addSection($course, $year_level, $section)
     {
-        // Prepare the SQL query
         $query = $this->conn->prepare("INSERT INTO `tblsection` (`course`, `year_level`, `section`) VALUES (?, ?, ?)");
-
-        // Check if the query was prepared successfully
         if ($query === false) {
-            return false; // Query preparation failed
+            return false; 
         }
-
-        // Bind the parameters (s for string)
         $query->bind_param("sss", $course, $year_level, $section);
-
-        // Execute the query
         if ($query->execute()) {
             echo "200"; // Success
         } else {
-            return false; // Query failed to execute
+            return false;
         }
-
-        // Close the prepared statement (optional but recommended)
         $query->close();
     }
 

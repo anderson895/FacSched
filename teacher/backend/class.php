@@ -9,5 +9,119 @@ class global_class extends db_connect
         $this->connect();
     }
 
+    public function fetch_teacher_detail($teacher_id) {
+        // Prepare the query with a placeholder for the teacher_id
+        $query = $this->conn->prepare("SELECT * 
+            FROM `tblfacultymember`
+            WHERE teacher_status='1' AND teacher_id = ?");
+        
+        // Bind the teacher_id parameter to the prepared statement
+        $query->bind_param("i", $teacher_id); // "i" is for integer type
+        
+        // Execute the query
+        if ($query->execute()) {
+            // Get the result
+            $result = $query->get_result();
+            return $result;
+        } else {
+            return false; // Handle the error if the query fails
+        }
+    }
+
+
+
+            public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
+        {
+            $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
+                WHERE `sched_teacher_id` = ? AND `sched_day` = ? 
+                AND ((`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?) 
+                OR (`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?))");
+                
+            $query->bind_param("ssssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleStartTime, $scheduleEndTime, $scheduleEndTime);
+            $query->execute();
+            $result = $query->get_result();
+            
+            if ($result->num_rows > 0) {
+                echo "Schedule Date is Not Available";
+                $query->close();
+                return false;
+            }
+            // If no overlap, proceed with inserting the new schedule
+            $query = $this->conn->prepare("INSERT INTO `tblschedule` (`sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`) 
+                VALUES (?, ?, ?, ?)");
+            if ($query === false) {
+                return false;
+            }
+            $query->bind_param("ssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime);
+            if ($query->execute()) {
+                echo "200"; // Success
+            } else {
+                return false;
+            }
+            $query->close();
+        }
+
+
+
+
+                public function CheckDayIfAlreadyTaken($teacher_id)
+        {
+            $takenDays = [];
+            $query = $this->conn->prepare("SELECT `sched_day` FROM `tblschedule` 
+                WHERE `sched_teacher_id` = ?");
+            $query->bind_param("s", $teacher_id);
+            
+            // Execute the query
+            $query->execute();
+            
+            // Get the result
+            $result = $query->get_result();
+            
+            // Fetch all the taken days
+            while ($row = $result->fetch_assoc()) {
+                $takenDays[] = $row['sched_day']; // Add the taken day to the array
+            }
+
+            // Close the query
+            $query->close();
+
+            return $takenDays; // Return the array of taken days
+        }
+
+        
+
+
+
+
+
+
+                public function fetch_schedule($teacher_id)
+        {
+            $query = $this->conn->prepare("SELECT `sched_day`, `sched_start_Hrs`, `sched_end_Hrs` FROM `tblschedule` WHERE `sched_teacher_id` = ?");
+            $query->bind_param("i", $teacher_id); 
+            
+            if ($query->execute()) {
+                $result = $query->get_result();
+                
+                if ($result->num_rows > 0) {
+                    $schedules = [];
+                    while ($row = $result->fetch_assoc()) {
+                        $schedules[] = $row;  
+                    }
+                    $query->close();
+                    return $schedules;  
+                } else {
+                    $query->close();
+                    return null;  
+                }
+            } else {
+                $query->close();
+                return false;  
+            }
+        }
+
+        
+
+
     
 }
