@@ -295,4 +295,41 @@ class global_class extends db_connect
         }
     }
 
+
+
+
+    public function fetch_schedule()
+{
+    $query = $this->conn->prepare("
+        SELECT 
+            tblschedule.sched_teacher_id, 
+            GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')) AS days,
+            GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY tblschedule.sched_day) AS schedule_times,
+            CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name
+        FROM tblschedule
+        LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
+        WHERE tblfacultymember.teacher_status = 1
+        GROUP BY tblschedule.sched_teacher_id
+    ");
+
+    if ($query->execute()) {
+        $result = $query->get_result();
+
+        if ($result->num_rows > 0) {
+            $schedules = $result->fetch_all(MYSQLI_ASSOC);
+            $query->close();
+            return $schedules; // Return array of schedules
+        } else {
+            $query->close();
+            return []; // Return an empty array instead of null for better handling
+        }
+    } else {
+        $query->close();
+        return false; // Return false on execution failure
+    }
+}
+
+    
+
+
 }
