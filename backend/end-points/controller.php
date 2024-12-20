@@ -5,20 +5,42 @@ $db = new global_class();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['requestType'])) {
-        if ($_POST['requestType'] == 'Login') {
-            $email = $_POST['email'];
+        if ($_POST['requestType'] == 'LoginTeacher') {
+            $teacher_code = $_POST['teacher_code'];
             $password = $_POST['password'];
 
             // Call the Login method and get the result
-            $user = $db->Login($email, $password);
+            $response = $db->LoginTeacher($teacher_code, $password);
 
             // Check if login was successful
-            if ($user) {
+            if ($response) {
                 // Convert the result to JSON format to echo as a response
                 echo json_encode([
                     'status' => 'success',
                     'message' => 'Login successful',
-                    'data' => $user
+                    'data' => $response
+                ]);
+            } else {
+                // Return JSON error response
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Invalid teacher code or Password'
+                ]);
+            }
+        }else if ($_POST['requestType'] == 'LoginAdmin') {
+            $email = $_POST['email'];
+            $password = $_POST['password'];
+
+            // Call the Login method and get the result
+            $response = $db->LoginAdmin($email, $password);
+
+            // Check if login was successful
+            if ($response) {
+                // Convert the result to JSON format to echo as a response
+                echo json_encode([
+                    'status' => 'success',
+                    'message' => 'Login successful',
+                    'data' => $response
                 ]);
             } else {
                 // Return JSON error response
@@ -27,17 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'message' => 'Invalid email or password'
                 ]);
             }
-
-
-
-
-
-
-
-
-
-
-            
         } else {
             echo json_encode([
                 'status' => 'error',

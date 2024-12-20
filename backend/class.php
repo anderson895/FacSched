@@ -10,7 +10,7 @@ class global_class extends db_connect
     }
 
 
-        public function Login($email, $password)
+        public function LoginAdmin($email, $password)
     {
 
         // Prepare the SQL query
@@ -35,6 +35,38 @@ class global_class extends db_connect
             }
         } else {
             return false;  // Query failed to execute
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    public function LoginTeacher($teacher_code, $password)
+    {
+        $query = $this->conn->prepare("SELECT * FROM `tblfacultymember` WHERE `ID_code` = ? AND `Password` = ? AND teacher_status = '1'");
+        $query->bind_param("ss", $teacher_code, $password);
+        if ($query->execute()) {
+            $result = $query->get_result();
+            if ($result->num_rows > 0) {
+                $user = $result->fetch_assoc();
+
+                session_start();
+                $_SESSION['teacher_id'] = $user['teacher_id'];
+
+                return $user;
+            } else {
+                return false; 
+            }
+        } else {
+            return false;
         }
     }
 

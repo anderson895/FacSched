@@ -23,9 +23,11 @@
     <div class="card shadow-lg" style="width: 100%; max-width: 400px;">
         <div class="card-body">
             <!-- Logo -->
-            <div class="text-center mb-4">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiQc01tubeOKno4VlBcUlZ-OEjad8ChfAYOw&s" alt="Logo" class="img-fluid mb-3">
-            </div>
+            <a href="index.php">
+                <div class="text-center mb-4">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSiQc01tubeOKno4VlBcUlZ-OEjad8ChfAYOw&s" alt="Logo" class="img-fluid mb-3">
+                </div>
+            </a>
 
             <!-- Spinner -->
             <div id="spinner" style="display:none;">
@@ -58,7 +60,7 @@
                     <input type="checkbox" class="form-check-input" id="rememberMe">
                     <label class="form-check-label" for="rememberMe">Remember me</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" id="btnLoginAdmin" class="btn btn-primary w-100">Login</button>
             </form>
         </div>
     </div>
