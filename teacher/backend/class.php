@@ -64,41 +64,7 @@ class global_class extends db_connect
 
         public function UpdateSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime, $scheduleId)
         {
-            // Check for overlapping schedules
-            if ($scheduleDay !== '' && $scheduleDay !== null) {
-                // Prepare query to check for overlapping schedules
-                $query = "
-                    SELECT * FROM `tblschedule`
-                    WHERE `sched_teacher_id` = '$teacher_id' 
-                    AND `sched_day` = '$scheduleDay' 
-                    AND `sched_id` != '$scheduleId' 
-                    AND (
-                        (`sched_start_Hrs` < '$scheduleStartTime' AND `sched_end_Hrs` > '$scheduleStartTime') 
-                        OR (`sched_start_Hrs` < '$scheduleEndTime' AND `sched_end_Hrs` > '$scheduleEndTime')
-                    )
-                ";
-            } else {
-                // Prepare query to check for overlapping schedules when no `scheduleDay` is provided
-                $query = "
-                    SELECT * FROM `tblschedule`
-                    WHERE `sched_teacher_id` = '$teacher_id' 
-                    AND `sched_id` != '$scheduleId' 
-                    AND (
-                        (`sched_start_Hrs` < '$scheduleStartTime' AND `sched_end_Hrs` > '$scheduleStartTime') 
-                        OR (`sched_start_Hrs` < '$scheduleEndTime' AND `sched_end_Hrs` > '$scheduleEndTime')
-                    )
-                ";
-            }
-        
-            // Execute the query
-            $result = $this->conn->query($query);
             
-            // Check if any overlapping schedule exists
-            if ($result->num_rows > 0) {
-                echo "Schedule Date is Not Available"; // Overlap detected
-                return false;
-            }
-        
             // Prepare the update query
             $updateQuery = "
                 UPDATE `tblschedule`
