@@ -1,23 +1,18 @@
 $(document).ready(function() {
-    var rowsPerPage = 5;  // Number of rows per page
+    var rowsPerPage = 5;
     var currentPage = 1;
-    var rows = $('#dataTable tbody tr');  // Get all table rows
-    var noResultsMessage = $('#noResultsMessage'); // Placeholder for no results message
+    var rows = $('#dataTable tbody tr');
+    var noResultsMessage = $('#noResultsMessage');
 
-    // Function to display rows based on current page and filter
     function displayTable() {
         var searchTerm = $('#searchInput').val().toLowerCase();
         var filteredRows = rows.filter(function() {
-            var rowText = $(this).text().toLowerCase();
-            return rowText.indexOf(searchTerm) !== -1;
+            return $(this).text().toLowerCase().indexOf(searchTerm) !== -1;
         });
 
         var totalPages = Math.ceil(filteredRows.length / rowsPerPage);
-
-        // Hide all rows first
         rows.hide();
 
-        // Show the correct rows based on the current page
         if (filteredRows.length > 0) {
             filteredRows.each(function(index) {
                 if (index >= (currentPage - 1) * rowsPerPage && index < currentPage * rowsPerPage) {
@@ -25,12 +20,11 @@ $(document).ready(function() {
                 }
             });
 
-            // Show pagination controls only if there are results
             var pagination = $('#pagination');
             pagination.empty();
 
-            // Previous Button
-            var prevPage = $('<li class="page-item"><a class="page-link" href="#" data-page="prev">Previous</a></li>');
+            var prevPage = $('<li class="page-item"><a class="page-link" href="#">Previous</a></li>');
+            if (currentPage === 1) prevPage.addClass('disabled');
             prevPage.click(function(e) {
                 e.preventDefault();
                 if (currentPage > 1) {
@@ -40,22 +34,21 @@ $(document).ready(function() {
             });
             pagination.append(prevPage);
 
-            // Page Number Links
             for (var i = 1; i <= totalPages; i++) {
-                var pageItem = $('<li class="page-item"><a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>');
-                if (i === currentPage) {
-                    pageItem.addClass('active');
-                }
-                pageItem.click(function(e) {
-                    e.preventDefault();
-                    currentPage = $(this).data("page");
-                    displayTable();
-                });
-                pagination.append(pageItem);
+                (function(page) {
+                    var pageItem = $('<li class="page-item"><a class="page-link" href="#">' + page + '</a></li>');
+                    if (page === currentPage) pageItem.addClass('active');
+                    pageItem.click(function(e) {
+                        e.preventDefault();
+                        currentPage = page;
+                        displayTable();
+                    });
+                    pagination.append(pageItem);
+                })(i);
             }
 
-            // Next Button
-            var nextPage = $('<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>');
+            var nextPage = $('<li class="page-item"><a class="page-link" href="#">Next</a></li>');
+            if (currentPage === totalPages) nextPage.addClass('disabled');
             nextPage.click(function(e) {
                 e.preventDefault();
                 if (currentPage < totalPages) {
@@ -65,21 +58,17 @@ $(document).ready(function() {
             });
             pagination.append(nextPage);
 
-            // Hide "No search results" message
             noResultsMessage.hide();
         } else {
-            // Hide pagination controls and show "No search results" message
             $('#pagination').empty();
             noResultsMessage.show();
         }
     }
 
-    // Initial display of the table
     displayTable();
 
-    // Search functionality
     $('#searchInput').on('input', function() {
-        currentPage = 1;  // Reset to first page on search
+        currentPage = 1;
         displayTable();
     });
 });
