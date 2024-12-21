@@ -9,8 +9,14 @@ include "components/header.php";
 
 
 
-    <?php if($remainingHours){ 
+    <?php 
+    
+    if($teacher['totalweekly_hrs']){ 
     echo "<h6 class='text-info'>Total Hours: " . $teacher['totalweekly_hrs'] . "Hrs</h6>";
+
+   }
+   
+   if($remainingHours){ 
     echo "<h6 class='text-info'>Remaining Available Hours: " . $remainingHours . "Hrs</h6>";
 
    }

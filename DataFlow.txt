@@ -144,3 +144,19 @@ TBLSchedule
 
 
 
+
+-----ADMIN SET ----------
+IF the teacher picks 30hrs
+The 30hrs should be divided 15hrs of teaching work  and 15hrs of admin work
+or 
+18hrs of teaching work and 12hrs of admin work
+Teaching work yung may subject syang tuturuan
+Admin work label lng as admin work sila na bahala dun
+
+
+IF the teacher picks 40hrs
+The 40hrs should be divided 15hrs of teaching work  and 15hrs of admin work and 10hrs off campus work
+or 
+18hrs of teaching work and 12hrs of admin work
+and 10hrs off campus work
+

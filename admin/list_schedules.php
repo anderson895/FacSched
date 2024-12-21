@@ -62,8 +62,9 @@ include "components/header.php";
 
                 <!-- Action Button -->
                 <!-- Button trigger modal -->
-                <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#assignSubjectModal">Assign</a>
-
+                <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#assignSubjectModal">Teaching work</a>
+                <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#">Other work</a>
+                <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
                 <!-- Horizontal separator -->
                 <hr class="my-3">
             <?php endforeach; ?>
@@ -87,6 +88,69 @@ include "components/header.php";
         </ul>
     </nav>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="olModal" tabindex="-1" aria-labelledby="assignSubjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="assignSubjectModalLabel">Overload</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+
+                <div class="mb-3">
+                        <label for="subjectName" class="form-label">Subject Name</label>
+                        <select class="form-control" id="subjectName">
+                            <option value="" disabled selected>Select subject name</option>
+                            <?php 
+                            // Fetch the list of days already taken by the teacher
+                            $fetch_all_Subject = $db->fetch_all_Subject();
+                            foreach ($fetch_all_Subject as $subject):?>
+                            <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subjectCode" class="form-label">Section</label>
+                        <select class="form-control" id="subjectCode">
+                            <option value="" disabled selected>Select Section</option>
+                            <?php
+                            $fetch_all_Section = $db->fetch_all_Section();
+                            foreach ($fetch_all_Section as $section):?>
+                            <option value="<?=$section['sectionId']?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="roomCode" class="form-label">Room Code</label>
+                        <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Assign</button>
+            
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
 
 <!-- Modal -->
 <div class="modal fade" id="assignSubjectModal" tabindex="-1" aria-labelledby="assignSubjectModalLabel" aria-hidden="true">
@@ -126,7 +190,20 @@ include "components/header.php";
                 <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
             </div>
 
+
+
+            <div class="mb-3">
+                <label for="roomCode" class="form-label">Type of works</label>
+                <select class="form-select" name="typeOfWorks" id="typeOfWorks" required>
+                    <option value="">Select type</option>
+                    <option value="Offcampus work">Offcampus work</option>
+                    <option value="Admin work">Admin work</option>
+                    <option value="Teaching work">Teaching work</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn btn-primary">Assign</button>
+            
         </form>
       </div>
     </div>
@@ -142,4 +219,3 @@ include "components/footer.php";
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="js/list_of_schedules.js"></script>
-<script src="js/displayTable.js"></script>

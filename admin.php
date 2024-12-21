@@ -46,7 +46,7 @@
                     <label for="email" class="form-label">Email</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="text" class="form-control" id="email" name="email" required placeholder="Enter your username">
+                        <input type="text" class="form-control" id="email" name="email" required placeholder="Enter your email">
                     </div>
                 </div>
                 <div class="mb-3">

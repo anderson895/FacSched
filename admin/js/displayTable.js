@@ -1,7 +1,7 @@
 $(document).ready(function() {
-    var rowsPerPage = 3;  // Number of cards per page
+    var rowsPerPage = 5;  // Number of rows per page
     var currentPage = 1;
-    var rows = $('#scheduleList .card-item');  // Get all schedule items
+    var rows = $('#dataTable tbody tr');  // Get all table rows
     var noResultsMessage = $('#noResultsMessage'); // Placeholder for no results message
 
     // Function to display rows based on current page and filter
@@ -30,7 +30,7 @@ $(document).ready(function() {
             pagination.empty();
 
             // Previous Button
-            var prevPage = $('<li class="page-item"><a class="page-link" href="#">Previous</a></li>');
+            var prevPage = $('<li class="page-item"><a class="page-link" href="#" data-page="prev">Previous</a></li>');
             prevPage.click(function(e) {
                 e.preventDefault();
                 if (currentPage > 1) {
@@ -42,20 +42,20 @@ $(document).ready(function() {
 
             // Page Number Links
             for (var i = 1; i <= totalPages; i++) {
-                var pageItem = $('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+                var pageItem = $('<li class="page-item"><a class="page-link" href="#" data-page="' + i + '">' + i + '</a></li>');
                 if (i === currentPage) {
                     pageItem.addClass('active');
                 }
                 pageItem.click(function(e) {
                     e.preventDefault();
-                    currentPage = parseInt($(this).text());
+                    currentPage = $(this).data("page");
                     displayTable();
                 });
                 pagination.append(pageItem);
             }
 
             // Next Button
-            var nextPage = $('<li class="page-item"><a class="page-link" href="#">Next</a></li>');
+            var nextPage = $('<li class="page-item"><a class="page-link" href="#" data-page="next">Next</a></li>');
             nextPage.click(function(e) {
                 e.preventDefault();
                 if (currentPage < totalPages) {
