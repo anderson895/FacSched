@@ -30,6 +30,63 @@ class global_class extends db_connect
 
 
 
+
+
+
+
+
+
+    public function GetAvailableHours($teacher_id)
+    {
+        // Step 1: Get the teacher's total weekly hours from tblfacultymember
+        $query = $this->conn->prepare("SELECT totalweekly_hrs FROM `tblfacultymember` WHERE `teacher_id` = ?");
+        $query->bind_param("s", $teacher_id);
+        $query->execute();
+        $result = $query->get_result();
+        
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $teacherWeeklyHours = (int)$row['totalweekly_hrs'];
+        } else {
+            echo "Teacher not found";
+            return false;
+        }
+        $query->close();
+    
+        // Step 2: Calculate the total hours already scheduled for the teacher
+        $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(HOUR, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_hours 
+            FROM `tblschedule` WHERE `sched_teacher_id` = ?");
+        $query->bind_param("s", $teacher_id);
+        $query->execute();
+        $result = $query->get_result();
+    
+        $currentScheduledHours = 0;
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $currentScheduledHours = (int)$row['total_hours'];
+        }
+        $query->close();
+    
+        // Step 3: Calculate the remaining available hours
+        $remainingHours = $teacherWeeklyHours - $currentScheduledHours;
+    
+        // Step 4: Return the remaining available hours
+        return $remainingHours;
+    }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
     public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
     {
         // Step 1: Check for schedule overlap (same logic as before)

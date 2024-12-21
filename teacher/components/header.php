@@ -6,9 +6,9 @@ $db = new global_class();
 
 
 $teacherDetails = $db->fetch_teacher_detail($_SESSION['teacher_id']);
-
 $teacher = $teacherDetails->fetch_assoc();
 
+$remainingHours = $db->GetAvailableHours($_SESSION['teacher_id']);
 
 ?>
 

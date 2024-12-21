@@ -8,8 +8,13 @@ include "components/header.php";
 <div class="container my-4">
 
 
-    <?php 
-    
+
+    <?php if($remainingHours){ 
+    echo "<h6 class='text-info'>Total Hours: " . $teacher['totalweekly_hrs'] . "Hrs</h6>";
+    echo "<h6 class='text-info'>Remaining Available Hours: " . $remainingHours . "Hrs</h6>";
+
+   }
+
     if(!$teacher['totalweekly_hrs']){ ?>
 
         <div class="row mb-4">

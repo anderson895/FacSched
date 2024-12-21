@@ -8,7 +8,7 @@ include "components/header.php";
 
     <!-- Search Bar -->
     <div class="mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search by Teachers Name">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search by Teacher's Name">
     </div>
 
     <!-- Cards Container -->
@@ -71,10 +71,6 @@ include "components/header.php";
     </div>
 </div>
 
-
-
-
-
 <?php  
     endforeach; 
 ?>
@@ -92,27 +88,6 @@ include "components/header.php";
     </nav>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <!-- Modal -->
 <div class="modal fade" id="assignSubjectModal" tabindex="-1" aria-labelledby="assignSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -122,13 +97,11 @@ include "components/header.php";
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <!-- Modal content goes here -->
-            <form>
-                    <div class="mb-3">
+        <form>
+            <div class="mb-3">
                 <label for="subjectName" class="form-label">Subject Name</label>
                 <select class="form-control" id="subjectName">
                     <option value="" disabled selected>Select subject name</option>
-
                     <?php 
                      // Fetch the list of days already taken by the teacher
                      $fetch_all_Subject = $db->fetch_all_Subject();
@@ -138,15 +111,14 @@ include "components/header.php";
                 </select>
             </div>
             <div class="mb-3">
-                <label for="subjectCode" class="form-label">Subject Code</label>
+                <label for="subjectCode" class="form-label">Section</label>
                 <select class="form-control" id="subjectCode">
-                    <option value="" disabled selected>Select subject code</option>
+                    <option value="" disabled selected>Select Section</option>
                     <?php
                     $fetch_all_Section = $db->fetch_all_Section();
                      foreach ($fetch_all_Section as $section):?>
                     <option value="<?=$section['sectionId']?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
                     <?php endforeach; ?>
-                    <!-- Add more options as needed -->
                 </select>
             </div>
             <div class="mb-3">
@@ -154,20 +126,12 @@ include "components/header.php";
                 <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
             </div>
 
-
-          <button type="submit" class="btn btn-primary">Assign</button>
+            <button type="submit" class="btn btn-primary">Assign</button>
         </form>
       </div>
     </div>
   </div>
 </div>
-
-
-
-
-
-
-
 
 
 <?php 
@@ -178,3 +142,4 @@ include "components/footer.php";
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="js/list_of_schedules.js"></script>
+<script src="js/displayTable.js"></script>

@@ -1,7 +1,7 @@
 $(document).ready(function() {
-    var rowsPerPage = 5;  // Number of rows per page
+    var rowsPerPage = 3;  // Number of cards per page
     var currentPage = 1;
-    var rows = $('#dataTable tbody tr');  // Get all table rows
+    var rows = $('#scheduleList .card-item');  // Get all schedule items
     var noResultsMessage = $('#noResultsMessage'); // Placeholder for no results message
 
     // Function to display rows based on current page and filter
@@ -29,6 +29,18 @@ $(document).ready(function() {
             var pagination = $('#pagination');
             pagination.empty();
 
+            // Previous Button
+            var prevPage = $('<li class="page-item"><a class="page-link" href="#">Previous</a></li>');
+            prevPage.click(function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayTable();
+                }
+            });
+            pagination.append(prevPage);
+
+            // Page Number Links
             for (var i = 1; i <= totalPages; i++) {
                 var pageItem = $('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
                 if (i === currentPage) {
@@ -36,11 +48,22 @@ $(document).ready(function() {
                 }
                 pageItem.click(function(e) {
                     e.preventDefault();
-                    currentPage = $(this).text();
+                    currentPage = parseInt($(this).text());
                     displayTable();
                 });
                 pagination.append(pageItem);
             }
+
+            // Next Button
+            var nextPage = $('<li class="page-item"><a class="page-link" href="#">Next</a></li>');
+            nextPage.click(function(e) {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    displayTable();
+                }
+            });
+            pagination.append(nextPage);
 
             // Hide "No search results" message
             noResultsMessage.hide();
@@ -59,5 +82,4 @@ $(document).ready(function() {
         currentPage = 1;  // Reset to first page on search
         displayTable();
     });
-
 });
