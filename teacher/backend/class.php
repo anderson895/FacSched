@@ -30,36 +30,85 @@ class global_class extends db_connect
 
 
 
-        public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
-        {
-            $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
-                WHERE `sched_teacher_id` = ? AND `sched_day` = ? 
-                AND ((`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?) 
-                OR (`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?))");
-                
-            $query->bind_param("ssssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleStartTime, $scheduleEndTime, $scheduleEndTime);
-            $query->execute();
-            $result = $query->get_result();
+    public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
+    {
+        // Step 1: Check for schedule overlap (same logic as before)
+        $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
+            WHERE `sched_teacher_id` = ? AND `sched_day` = ? 
+            AND ((`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?) 
+            OR (`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?))");
             
-            if ($result->num_rows > 0) {
-                echo "Schedule Date is Not Available";
-                $query->close();
-                return false;
-            }
-            // If no overlap, proceed with inserting the new schedule
-            $query = $this->conn->prepare("INSERT INTO `tblschedule` (`sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`) 
-                VALUES (?, ?, ?, ?)");
-            if ($query === false) {
-                return false;
-            }
-            $query->bind_param("ssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime);
-            if ($query->execute()) {
-                echo "200"; // Success
-            } else {
-                return false;
-            }
+        $query->bind_param("ssssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleStartTime, $scheduleEndTime, $scheduleEndTime);
+        $query->execute();
+        $result = $query->get_result();
+        
+        if ($result->num_rows > 0) {
+            echo "Schedule Date is Not Available";
             $query->close();
+            return false;
         }
+    
+        // Step 2: Get teacher's current total weekly hours
+        $query = $this->conn->prepare("SELECT totalweekly_hrs FROM `tblfacultymember` WHERE `teacher_id` = ?");
+        $query->bind_param("s", $teacher_id);
+        $query->execute();
+        $result = $query->get_result();
+        
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $teacherWeeklyHours = (int)$row['totalweekly_hrs'];
+        } else {
+            echo "Teacher not found";
+            return false;
+        }
+        $query->close();
+    
+        // Step 3: Calculate the total hours for the new schedule
+        $start = new DateTime($scheduleStartTime);
+        $end = new DateTime($scheduleEndTime);
+        $interval = $start->diff($end);
+        $newScheduleHours = $interval->h + ($interval->i / 60); // Convert to hours
+    
+        // Step 4: Get the teacher's current total scheduled hours
+        $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(HOUR, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_hours 
+            FROM `tblschedule` WHERE `sched_teacher_id` = ?");
+        $query->bind_param("s", $teacher_id);
+        $query->execute();
+        $result = $query->get_result();
+    
+        $currentScheduledHours = 0;
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $currentScheduledHours = (int)$row['total_hours'];
+        }
+        $query->close();
+    
+        // Step 5: Check if the total weekly hours will be exceeded
+        if (($currentScheduledHours + $newScheduleHours) > $teacherWeeklyHours) {
+            echo "Exceeds total weekly hours";
+            return false;
+        }
+    
+        // Step 6: If no overlap and total hours are within the limit, insert the new schedule
+        $query = $this->conn->prepare("INSERT INTO `tblschedule` (`sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`) 
+            VALUES (?, ?, ?, ?)");
+        if ($query === false) {
+            return false;
+        }
+        $query->bind_param("ssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime);
+        if ($query->execute()) {
+            echo "200"; // Success
+        } else {
+            return false;
+        }
+        $query->close();
+    }
+    
+
+
+
+
+
 
 
         public function UpdateSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime, $scheduleId)
@@ -94,9 +143,28 @@ class global_class extends db_connect
         
 
         
-
         
-
+        
+        public function ChooseWeeklyHrs($teacher_id,$weeklyHours)
+        {
+            
+            // Prepare the update query
+            $updateQuery = "
+                UPDATE `tblfacultymember` SET `totalweekly_hrs`='$weeklyHours' WHERE teacher_id ='$teacher_id'
+            ";
+        
+           
+        
+            // Execute the update query
+            if ($this->conn->query($updateQuery)) {
+                echo "200"; // Success
+            } else {
+                echo "Error updating schedule";
+                return false;
+            }
+        
+            return true;
+        }
         
 
         

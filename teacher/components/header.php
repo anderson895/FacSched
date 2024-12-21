@@ -39,7 +39,6 @@ $teacher = $teacherDetails->fetch_assoc();
   <div class="sidebar" id="sidebar">
     <div class="mb-6"></div>
     <a href="index.php">My Schedule</a>
-    <a href="section.php">Set Schedule</a>
     <a href="settings.php">Settings</a>
     <a href="logout.php">Logout</a>
     
@@ -63,9 +62,6 @@ $teacher = $teacherDetails->fetch_assoc();
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
             <a class="nav-link" href="index.php">My Schedule</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="set_schedule.php">Set Schedule</a>
           </li>
 
           <li class="nav-item">

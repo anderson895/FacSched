@@ -36,6 +36,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
 
 
+        }else if ($_POST['requestType'] == 'ChooseWeeklyHrs') {
+
+
+            $weeklyHours = $_POST['weeklyHours'];
+            $teacher_id = $_POST['teacher_id'];
+           
+            
+            // Call the UpdateSchedule function
+            $response = $db->ChooseWeeklyHrs($teacher_id,$weeklyHours);
+            
+            // Return the response
+            return $response;
+            
+            
+
+
         }
 
     }

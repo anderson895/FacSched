@@ -1,5 +1,9 @@
 
 
+
+
+
+
   // Populate modal with schedule data on button click
   $(".update-schedule-btn").click(function () {
     const day = $(this).data("day");
@@ -107,4 +111,45 @@ $("#frmSetSchedule").submit(function (e) {
       },
     });
     
+});
+
+
+
+
+
+$("#frmChooseWeeklyHrs").submit(function (e) {
+  e.preventDefault();
+
+  $('.spinner-border').show(); // Siguraduhing ito ay visible.
+  $('#btnSaveSchedule').prop('disabled', true);
+
+  var formData = $(this).serializeArray();
+  formData.push({ name: 'requestType', value: 'ChooseWeeklyHrs' });
+  var serializedData = $.param(formData);
+
+  $.ajax({
+    type: "POST",
+    url: "backend/end-points/controller.php",
+    data: serializedData,
+    success: function (response) {
+      console.log(response);
+
+      if (response.trim() === "200") {
+        alertify.success('Update Successful');
+        setTimeout(function () {
+          location.reload();
+        }, 1000);
+      } else {
+        alertify.error(response);
+      }
+    },
+    error: function () {
+      alertify.error('An error occurred while processing your request.');
+    },
+    complete: function () {
+      // Laging itago ang spinner at i-enable ang button sa `complete`
+      $('.spinner-border').hide();
+      $('#btnSaveSchedule').prop('disabled', false);
+    }
+  });
 });

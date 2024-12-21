@@ -32,6 +32,14 @@ class global_class extends db_connect
     
 
     public function addTeacher($teacherCode, $fname, $mname, $lname, $designation, $password) {
+
+
+        $totalweekly_hrs=null;
+
+        if($designation=='Part Time'){
+                $totalweekly_hrs = "12";
+        }
+
         // First, check if the teacher code already exists
         $checkQuery = $this->conn->prepare("SELECT COUNT(*) FROM tblfacultymember WHERE ID_code = ?");
         if ($checkQuery === false) {
@@ -52,15 +60,15 @@ class global_class extends db_connect
     
         // Prepare the insert query
         $query = $this->conn->prepare(
-            "INSERT INTO tblfacultymember (ID_code, fname, mname, lname, designation, Password) 
-            VALUES (?, ?, ?, ?, ?, ?)"
+            "INSERT INTO tblfacultymember (ID_code, fname, mname, lname, designation,totalweekly_hrs, Password) 
+            VALUES (?, ?, ?, ?, ?, ?,?)"
         );
         if ($query === false) {
             return false; // Query preparation failed
         }
     
         // Bind the parameters and execute the insert query
-        $query->bind_param("ssssss", $teacherCode, $fname, $mname, $lname, $designation, $password);
+        $query->bind_param("sssssss", $teacherCode, $fname, $mname, $lname, $designation,$totalweekly_hrs, $password);
         if ($query->execute()) {
             echo "200"; // Success
         } else {
