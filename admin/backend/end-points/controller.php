@@ -26,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           return $response;
 
-
         }else if ($_POST['requestType'] == 'UpdateSection') {
             $sectionId = $_POST['sectionId'];
             $course = $_POST['course'];
@@ -94,6 +93,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $designation = $_POST['designation'];
           $password = $_POST['newpassword'];
           $response = $db->updateTeacher($teacher_id,$teacherCode, $fname,$mname,$lname,$designation,$password);
+
+        return $response;
+
+
+        }else if ($_POST['requestType'] == 'AssignSched') {
+
+
+          // echo "<pre>";
+          // print_r($_POST);
+          // echo "</pre>";
+
+          $sched_id = $_POST['sched_id'];
+          $subject_id = $_POST['subject_id'];
+          $sectionId = $_POST['sectionId'];
+          $roomCode = $_POST['roomCode'];
+          $typeOfWorks = $_POST['typeOfWorks'];
+          $subtStartTimeAssign = $_POST['subtStartTimeAssign'];
+          $subtEndTimeAssign = $_POST['subtEndTimeAssign'];
+          $response = $db->AssignSched($sched_id, $subject_id,$sectionId,$roomCode,$typeOfWorks,$subtStartTimeAssign,$subtEndTimeAssign);
 
         return $response;
 

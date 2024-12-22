@@ -1,14 +1,13 @@
 <?php 
 include "components/header.php";
 ?>
-
 <div class="container mt-5">
     <!-- Title -->
-    <h2 class="text-center mb-4">List of Schedules</h2>
+    <h2 class="text-center mb-4 text-primary">List of Schedules</h2>
 
     <!-- Search Bar -->
-    <div class="mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search by Teacher's Name">
+    <div class="mb-4">
+        <input type="text" id="searchInput" class="form-control rounded-pill shadow-sm" placeholder="Search by Teacher's Name">
     </div>
 
     <!-- Cards Container -->
@@ -21,7 +20,7 @@ include "components/header.php";
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <!-- Display Teacher's Name -->
-                    <h5 class="card-title mb-3"><?= ucfirst($schedule['teacher_name']) ?></h5>
+                    <h5 class="card-title text-primary fw-bold"><?= ucfirst($schedule['teacher_name']) ?></h5>
 
                     <!-- Loop through the days and corresponding schedule times -->
                     <?php 
@@ -39,28 +38,30 @@ include "components/header.php";
                         $end_timestamp = strtotime($end_time);
                         $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
                     ?>
-                    <div class="d-flex justify-content-between mb-3 p-3" style="background-color: #f8f9fa; border-radius: 8px;">
-                        <span class="text-muted" style="font-weight: bold;"><?= ucfirst($day) ?>:</span>
+                    <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
+                        <span class="text-muted fw-semibold"><?= ucfirst($day) ?>:</span>
                         <span class="text-muted"><?= date('h:i A', strtotime($start_time)) ?> - <?= date('h:i A', strtotime($end_time)) ?></span>
                     </div>
 
-                    <p class="text-muted mb-3" style="font-size: 0.9rem;">Total Hours: <?=$total_hours?></p>
+                    
 
                     <!-- Assigned Subjects and Hours (Static details) -->
-                    <ul class="list-unstyled mb-3">
-                        <li class="d-flex justify-content-between align-items-center">
+                    <ul class="list-group mb-3">
+                        Remaining Hrs : <?=$total_hours?>
+                        <!-- <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span>BSIT11A , CP1 9:30am - 10:30am | Room 103</span>
                             <button class="btn btn-sm btn-outline-danger" type="button">×</button>
-                        </li>
-                        <li class="d-flex justify-content-between align-items-center">
-                            <span>BSIT11A , CP2 11:30am - 1:30pm | Room 103</span>
-                            <button class="btn btn-sm btn-outline-danger" type="button">×</button>
-                        </li>
+                        </li> -->
                     </ul>
 
-                    <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#assignSubjectModal">Teaching work</a>
-                    <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#">Other work</a>
-                    <a href="#" class="btn btn-outline-success btn-sm mb-2" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"
+                        data-totalHrs= '<?=$total_hours?>'
+                        data-sched_id='<?=$schedule['sched_id']?>'
+                        >Teaching Work </a>
+                        <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#">Other Work</a>
+                        <a href="#" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
+                    </div>
                     <hr class="my-3">
                     <?php endforeach; ?>
                 </div>
@@ -69,19 +70,124 @@ include "components/header.php";
         <?php endforeach; ?>
     </div>
 
-    <div id="noResultsMessage" class="alert alert-warning" style="display: none;">
+    <div id="noResultsMessage" class="alert alert-warning text-center" style="display: none;">
         No search results found.
     </div>
 
     <!-- Pagination -->
-    <nav>
+    <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center" id="pagination">
-            <li class="page-item" id="prevPage"><a class="page-link" href="#">Previous</a></li>
-            <ul class="pagination" id="pageNumbers"></ul> <!-- Page numbers will be inserted here -->
-            <li class="page-item" id="nextPage"><a class="page-link" href="#">Next</a></li>
+            <li class="page-item" id="prevPage">
+                <a class="page-link" href="#" aria-label="Previous">
+                    Previous
+                </a>
+            </li>
+            <ul class="pagination" id="pageNumbers"></ul>
+            <li class="page-item" id="nextPage">
+                <a class="page-link" href="#" aria-label="Next">
+                    Next
+                </a>
+            </li>
         </ul>
     </nav>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="assignSubjectModal" tabindex="-1" aria-labelledby="assignSubjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+
+      <div id="spinner" class="spinner" style="display:none;">
+                <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white bg-opacity-75">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+
+        <h5 class="modal-title" id="assignSubjectModalLabel">Assign Subject & Section</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="frmAssign">
+            <div class="mb-3">
+                <h6>Total Remaining Hrs : <span id='totalHrs'></span></h6>
+                <input hidden type="text" id="sched_id" name="sched_id">
+
+                <label for="subject_id" class="form-label">Subject Name</label>
+                <select class="form-control" id="subject_id" name="subject_id">
+                    <option value="" disabled selected>Select subject name</option>
+                    <?php 
+                     // Fetch the list of days already taken by the teacher
+                     $fetch_all_Subject = $db->fetch_all_Subject();
+                     foreach ($fetch_all_Subject as $subject):?>
+                    <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="subjectCode" class="form-label">Section</label>
+                <select class="form-control" id="sectionId" name="sectionId">
+                    <option value="" disabled selected>Select Section</option>
+                    <?php
+                    $fetch_all_Section = $db->fetch_all_Section();
+                     foreach ($fetch_all_Section as $section):?>
+                    <option value="<?=$section['sectionId']?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="roomCode" class="form-label">Room Code</label>
+                <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
+            </div>
+
+            <div class="mb-3">
+                <input hidden type="text" id="typeOfWorks" name="typeOfWorks" value="Teaching Work">
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="subtStartTimeAssign" class="form-label">Subject Start Time</label>
+                    <input type="time" class="form-control" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time">
+                </div>
+                <div class="col-md-6">
+                    <label for="subtEndTimeAssign" class="form-label">Subject End Time</label>
+                    <input type="time" class="form-control" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time">
+                </div>
+            </div>
+
+            <button type="submit" id="btnAssignSched" class="btn btn-primary">Assign</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -136,64 +242,6 @@ include "components/header.php";
 
 
 
-
-<!-- Modal -->
-<div class="modal fade" id="assignSubjectModal" tabindex="-1" aria-labelledby="assignSubjectModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="assignSubjectModalLabel">Assign Subject & Section</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-            <div class="mb-3">
-                <label for="subjectName" class="form-label">Subject Name</label>
-                <select class="form-control" id="subjectName">
-                    <option value="" disabled selected>Select subject name</option>
-                    <?php 
-                     // Fetch the list of days already taken by the teacher
-                     $fetch_all_Subject = $db->fetch_all_Subject();
-                     foreach ($fetch_all_Subject as $subject):?>
-                    <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="subjectCode" class="form-label">Section</label>
-                <select class="form-control" id="subjectCode">
-                    <option value="" disabled selected>Select Section</option>
-                    <?php
-                    $fetch_all_Section = $db->fetch_all_Section();
-                     foreach ($fetch_all_Section as $section):?>
-                    <option value="<?=$section['sectionId']?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="roomCode" class="form-label">Room Code</label>
-                <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
-            </div>
-
-
-
-            <div class="mb-3">
-                <label for="roomCode" class="form-label">Type of works</label>
-                <select class="form-select" name="typeOfWorks" id="typeOfWorks" required>
-                    <option value="">Select type</option>
-                    <option value="Offcampus work">Offcampus work</option>
-                    <option value="Admin work">Admin work</option>
-                    <option value="Teaching work">Teaching work</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Assign</button>
-            
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <?php 

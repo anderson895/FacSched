@@ -80,7 +80,7 @@ include "components/header.php";
     <div class="modal-content">
       <div class="modal-header">
 
-      <div id="spinner" class="spinner" style="display:none;">
+            <div id="spinner" class="spinner" style="display:none;">
                 <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white bg-opacity-75">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>

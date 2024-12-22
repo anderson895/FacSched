@@ -103,6 +103,39 @@ class global_class extends db_connect
 
 
 
+
+
+
+
+
+
+
+
+
+    public function AssignSched($sched_id, $subject_id,$sectionId,$roomCode,$typeOfWorks,$subtStartTimeAssign,$subtEndTimeAssign)
+    {
+        $query = $this->conn->prepare("INSERT INTO `tblworkschedule` (`ws_schedule_id`,`ws_sectionId`, `ws_roomCode`,`ws_CurriculumID`, `ws_subtStartTimeAssign`,ws_subtEndTimeAssign,`ws_typeOfWork`) VALUES (?,?,?, ?, ?,?,?)");
+        if ($query === false) {
+            return false; 
+        }
+        $query->bind_param("sssssss", $sched_id,$sectionId,$roomCode,$subject_id,$subtStartTimeAssign,$subtEndTimeAssign,$typeOfWorks);
+        if ($query->execute()) {
+            echo "200"; // Success
+        } else {
+            return false;
+        }
+        $query->close();
+    }
+
+
+
+
+
+
+
+
+
+
     public function UpdateSection($course, $year_level, $section, $sectionId)
     {
         $query = $this->conn->prepare("UPDATE `tblsection` SET `course` = ?, `year_level` = ?, `section` = ? WHERE `sectionId` = ?");
@@ -309,7 +342,8 @@ class global_class extends db_connect
     public function fetch_schedule()
 {
     $query = $this->conn->prepare("
-        SELECT 
+        SELECT
+            tblschedule.sched_id, 
             tblschedule.sched_teacher_id, 
             GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')) AS days,
             GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY tblschedule.sched_day) AS schedule_times,
@@ -326,14 +360,14 @@ class global_class extends db_connect
         if ($result->num_rows > 0) {
             $schedules = $result->fetch_all(MYSQLI_ASSOC);
             $query->close();
-            return $schedules; // Return array of schedules
+            return $schedules;
         } else {
             $query->close();
-            return []; // Return an empty array instead of null for better handling
+            return [];
         }
     } else {
         $query->close();
-        return false; // Return false on execution failure
+        return false;
     }
 }
 

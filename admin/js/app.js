@@ -1,3 +1,67 @@
+// teacher_id
+$(".TogglerAssignSubject").click(function (e) { 
+  e.preventDefault();
+
+  let sched_id = $(this).data('sched_id')
+  let totalHrs = $(this).attr('data-totalHrs')
+
+  $('#sched_id').val(sched_id);
+  $('#totalHrs').text(totalHrs);
+
+
+
+  console.log(totalHrs)  
+});
+
+
+$("#frmAssign").submit(function (e) { 
+  e.preventDefault();
+
+  $('.spinner').show();
+  $('#btnAssignSched').prop('disabled', true);
+
+  var formData = $(this).serializeArray(); 
+  formData.push({ name: 'requestType', value: 'AssignSched' });
+  var serializedData = $.param(formData);
+
+  $.ajax({
+    type: "POST",
+    url: "backend/end-points/controller.php",
+    data: serializedData,
+    success: function (response) {
+      console.log(response);
+      if (response === "200") {
+        alertify.success('Sched Added Successfully');
+        setTimeout(function () {
+          location.reload();
+        }, 1000);
+      } else {
+        $('.spinner').hide();
+        $('#btnAssignSched').prop('disabled', false);
+        alertify.error(response.message || 'An error occurred');
+      }
+    },
+    error: function (xhr, status, error) {
+      $('.spinner').hide();
+      $('#btnAssignSched').prop('disabled', false);
+      alertify.error('Request failed: ' + error);
+    }
+  });
+});
+
+
+
+
+
+
+
+// // teacher_id
+// $(document).on('click', '.TogglerAssignSubject', function (e) {
+//   e.preventDefault();
+//   // Your code here
+// });
+
+
 $("#addSubjectForm").submit(function (e) {
     e.preventDefault();
     
@@ -30,11 +94,6 @@ $("#addSubjectForm").submit(function (e) {
           $('#btnAddSubject').prop('disabled', false);
           alertify.error(response.message);
         }
-      },
-      error: function () {
-        $('.spinner').hide();
-        $('#btnLogin').prop('disabled', false);
-        alertify.error('An error occurred. Please try again.');
       }
     });
   });
@@ -487,7 +546,6 @@ $('.updateSubjectToggler').click(function (e) {
 $("#updateTeacherForm").submit(function (e) {
   e.preventDefault();
   
-
   $('.spinner').show();
   $('#btnUpdateTeacher').prop('disabled', true);
   
