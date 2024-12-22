@@ -11,7 +11,7 @@ include "components/header.php";
     </div>
 
     <!-- Cards Container -->
-    <div class="row" id="scheduleList">
+    <div class="row">
         <?php 
         $fetch_schedule = $db->fetch_schedule();
         foreach ($fetch_schedule as $schedule):  // Loop through all schedules
@@ -47,12 +47,19 @@ include "components/header.php";
 
                     <!-- Assigned Subjects and Hours (Static details) -->
                     <ul class="list-group mb-3">
-                        Remaining Hrs : <?=$total_hours?>
-                        <!-- <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>BSIT11A , CP1 9:30am - 10:30am | Room 103</span>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <strong>Remaining Hrs:</strong> <?=$total_hours?>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="mb-1"><strong><?=$schedule['course']?>, <?=$schedule['section']?>, <?=$schedule['year_level']?></strong></p>
+                                <p class="mb-0"><?= ucfirst($schedule['subject_name']) ?> - 9:30am - 10:30am</p>
+                                <small>Room 103</small>
+                            </div>
                             <button class="btn btn-sm btn-outline-danger" type="button">×</button>
-                        </li> -->
+                        </li>
                     </ul>
+
 
                     <div class="d-grid gap-2">
                         <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"

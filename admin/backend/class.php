@@ -342,16 +342,25 @@ class global_class extends db_connect
     public function fetch_schedule()
 {
     $query = $this->conn->prepare("
-        SELECT
-            tblschedule.sched_id, 
-            tblschedule.sched_teacher_id, 
-            GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')) AS days,
-            GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY tblschedule.sched_day) AS schedule_times,
-            CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name
-        FROM tblschedule
-        LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
-        WHERE tblfacultymember.teacher_status = 1
-        GROUP BY tblschedule.sched_teacher_id
+       SELECT
+    tblcurriculum.*,
+    tblsection.*,
+    tblschedule.sched_id, 
+    tblschedule.sched_teacher_id, 
+    GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')) AS days,
+    GROUP_CONCAT(
+        CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) 
+        ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+    ) AS schedule_times,
+    CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name
+FROM tblschedule
+LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
+LEFT JOIN tblworkschedule ON tblworkschedule.ws_schedule_id = tblschedule.sched_id
+LEFT JOIN tblcurriculum ON tblcurriculum.subject_id = tblworkschedule.ws_CurriculumID
+LEFT JOIN tblsection ON tblsection.sectionId = tblworkschedule.ws_schedule_id
+WHERE tblfacultymember.teacher_status = 1
+GROUP BY tblschedule.sched_teacher_id;
+
     ");
 
     if ($query->execute()) {
