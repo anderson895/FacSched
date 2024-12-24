@@ -12,70 +12,105 @@ include "components/header.php";
 
     <!-- Cards Container -->
     <div class="row">
-        <?php 
-        $fetch_schedule = $db->fetch_schedule();
-        foreach ($fetch_schedule as $schedule):  // Loop through all schedules
-        ?>
-        <div class="col-md-4 mb-4 card-item" data-teacher-name="<?= strtolower($schedule['teacher_name']) ?>">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <!-- Display Teacher's Name -->
-                    <h5 class="card-title text-primary fw-bold"><?= ucfirst($schedule['teacher_name']) ?></h5>
+    <?php 
+    $fetch_schedule = $db->fetch_schedule();
+    
+    foreach ($fetch_schedule as $schedule):  // Loop through all schedules
+    ?>
+    <div class="col-md-4 mb-4 card-item" data-teacher-name="<?= strtolower($schedule['teacher_name']) ?>">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <!-- Display Teacher's Name -->
+                <h5 class="card-title text-primary fw-bold"><?= ucfirst($schedule['teacher_name']) ?></h5>
 
-                    <!-- Loop through the days and corresponding schedule times -->
-                    <?php 
-                    $days = explode(',', $schedule['days']); // Days as an array
-                    $times = explode(',', $schedule['schedule_times']); // Times as an array
+                <!-- Process Days, Times, and Sched IDs -->
+                <?php 
+                $days = explode(',', $schedule['days']); // Days as an array
+                $times = explode(',', $schedule['schedule_times']); // Times as an array
+                $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
 
-                    foreach ($days as $index => $day):
-                        // Split the schedule times (start and end)
-                        $time_range = explode('-', $times[$index]);
-                        $start_time = $time_range[0];
-                        $end_time = $time_range[1];
+                foreach ($days as $index => $day):
+                    // Extract sched_id and day from sched_ids_per_day
+                    list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
 
-                        // Calculate total hours
-                        $start_timestamp = strtotime($start_time);
-                        $end_timestamp = strtotime($end_time);
-                        $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
-                    ?>
-                    <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
-                        <span class="text-muted fw-semibold"><?= ucfirst($day) ?>:</span>
-                        <span class="text-muted"><?= date('h:i A', strtotime($start_time)) ?> - <?= date('h:i A', strtotime($end_time)) ?></span>
-                    </div>
+                    // Split the schedule times (start and end)
+                    $time_range = explode('-', $times[$index]);
+                    $start_time = $time_range[0];
+                    $end_time = $time_range[1];
 
-                    
-
-                    <!-- Assigned Subjects and Hours (Static details) -->
-                    <ul class="list-group mb-3">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Remaining Hrs:</strong> <?=$total_hours?>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <p class="mb-1"><strong><?=$schedule['course']?>, <?=$schedule['section']?>, <?=$schedule['year_level']?></strong></p>
-                                <p class="mb-0"><?= ucfirst($schedule['subject_name']) ?> - 9:30am - 10:30am</p>
-                                <small>Room 103</small>
-                            </div>
-                            <button class="btn btn-sm btn-outline-danger" type="button">×</button>
-                        </li>
-                    </ul>
-
-
-                    <div class="d-grid gap-2">
-                        <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"
-                        data-totalHrs= '<?=$total_hours?>'
-                        data-sched_id='<?=$schedule['sched_id']?>'
-                        >Teaching Work </a>
-                        <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#">Other Work</a>
-                        <a href="#" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
-                    </div>
-                    <hr class="my-3">
-                    <?php endforeach; ?>
+                    // Calculate total hours
+                    $start_timestamp = strtotime($start_time);
+                    $end_timestamp = strtotime($end_time);
+                    $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
+                ?>
+                <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
+                    <span class="text-muted fw-semibold"><?= ucfirst($day) ?> (Sched ID: <?= $sched_id ?>):</span>
+                    <span class="text-muted"><?= date('h:i A', strtotime($start_time)) ?> - <?= date('h:i A', strtotime($end_time)) ?></span>
                 </div>
+
+            <!-- Assigned Subjects and Hours -->
+            <ul class="list-group mb-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <strong>Remaining Hrs:</strong> <?= $total_hours ?>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                <?php 
+                $fetch_workschedule = $db->fetch_workschedule($sched_id);
+
+                // Check if there are workschedules
+                if (!empty($fetch_workschedule)) {
+                    $has_assigned_work = false;
+                    foreach ($fetch_workschedule as $workschedule):
+
+                        // Check if ws_id exists for each workschedule
+                        if ($workschedule['ws_id']) { 
+                            $has_assigned_work = true; 
+                            
+                            // Format start and end times with AM/PM
+                            $start_time = date('h:i A', strtotime($workschedule['ws_subtStartTimeAssign']));
+                            $end_time = date('h:i A', strtotime($workschedule['ws_subtEndTimeAssign']));
+                            ?>
+                            
+                            <p class="mb-1"><strong><?= $workschedule['course'] ?>, <?= $workschedule['section'] ?>, <?= $workschedule['year_level'] ?></strong></p>
+                            <p class="mb-0"><?= ucfirst($workschedule['subject_name']) ?> - <?= $start_time ?> - <?= $end_time ?></p>
+                            <small><?= $workschedule['ws_roomCode'] ?></small>
+                        <?php }
+                    endforeach;
+                    
+                    if (!$has_assigned_work) {
+                        echo '<p>No assigned work schedule.</p>';
+                    }
+                } else {
+                    echo '<p>No work schedule assigned.</p>';
+                }
+                ?>
+            </div>
+
+
+                    <?php if (!empty($fetch_workschedule) && $has_assigned_work): ?>
+                        <button class="btn btn-sm btn-outline-danger" type="button">×</button>
+                    <?php endif; ?>
+
+                </li>
+            </ul>
+
+
+                <div class="d-grid gap-2">
+                    <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"
+                        data-totalHrs='<?= $total_hours ?>'
+                        data-sched_id='<?= $sched_id ?>'>Teaching Work</a>
+                    <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#">Other Work</a>
+                    <a href="#" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
+                </div>
+                <hr class="my-3">
+                <?php endforeach; ?>
             </div>
         </div>
-        <?php endforeach; ?>
     </div>
+    <?php endforeach; ?>
+</div>
+
 
     <div id="noResultsMessage" class="alert alert-warning text-center" style="display: none;">
         No search results found.

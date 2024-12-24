@@ -342,25 +342,17 @@ class global_class extends db_connect
     public function fetch_schedule()
 {
     $query = $this->conn->prepare("
-       SELECT
-    tblcurriculum.*,
-    tblsection.*,
-    tblschedule.sched_id, 
-    tblschedule.sched_teacher_id, 
-    GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')) AS days,
-    GROUP_CONCAT(
-        CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) 
-        ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
-    ) AS schedule_times,
-    CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name
-FROM tblschedule
-LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
-LEFT JOIN tblworkschedule ON tblworkschedule.ws_schedule_id = tblschedule.sched_id
-LEFT JOIN tblcurriculum ON tblcurriculum.subject_id = tblworkschedule.ws_CurriculumID
-LEFT JOIN tblsection ON tblsection.sectionId = tblworkschedule.ws_schedule_id
-WHERE tblfacultymember.teacher_status = 1
-GROUP BY tblschedule.sched_teacher_id;
-
+        SELECT
+            tblschedule.sched_id, 
+            tblschedule.sched_teacher_id, 
+            COALESCE(GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS days,
+            COALESCE(GROUP_CONCAT(CONCAT(tblschedule.sched_id, ':', tblschedule.sched_day) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS sched_ids_per_day,
+            COALESCE(GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS schedule_times,
+            CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name
+        FROM tblschedule
+        LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
+        WHERE tblfacultymember.teacher_status = 1
+        GROUP BY tblschedule.sched_teacher_id
     ");
 
     if ($query->execute()) {
@@ -368,8 +360,14 @@ GROUP BY tblschedule.sched_teacher_id;
 
         if ($result->num_rows > 0) {
             $schedules = $result->fetch_all(MYSQLI_ASSOC);
+
+            // Filter out empty schedules
+            $filtered_schedules = array_filter($schedules, function ($schedule) {
+                return !empty($schedule['days']) && !empty($schedule['schedule_times']) && !empty($schedule['sched_ids_per_day']);
+            });
+
             $query->close();
-            return $schedules;
+            return $filtered_schedules;
         } else {
             $query->close();
             return [];
@@ -380,6 +378,37 @@ GROUP BY tblschedule.sched_teacher_id;
     }
 }
 
+
+
+
+
+    public function fetch_workschedule($sched_id)
+    {
+        $query = "
+            SELECT *
+            FROM tblschedule
+            LEFT JOIN tblworkschedule ON tblschedule.sched_id = tblworkschedule.ws_schedule_id
+            LEFT JOIN tblsection ON tblsection.sectionId = tblworkschedule.ws_sectionId
+            LEFT JOIN tblcurriculum ON tblcurriculum.subject_id = tblworkschedule.ws_CurriculumID
+            WHERE tblschedule.sched_id = '$sched_id'
+        ";
+    
+        $result = $this->conn->query($query);
+    
+        if ($result) {
+            if ($result->num_rows > 0) {
+                $schedules = $result->fetch_all(MYSQLI_ASSOC);
+                $result->free();
+                return $schedules;
+            } else {
+                $result->free();
+                return [];
+            }
+        } else {
+            return false;
+        }
+    }
+    
     
 
 

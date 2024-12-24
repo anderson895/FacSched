@@ -10,7 +10,7 @@ $(".TogglerAssignSubject").click(function (e) {
 
 
 
-  console.log(totalHrs)  
+  console.log(sched_id)  
 });
 
 
