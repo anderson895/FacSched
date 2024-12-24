@@ -465,6 +465,28 @@ GROUP BY tblschedule.sched_teacher_id;
             return false;
         }
     }
+
+    public function DeleteWorkSchedule($ws_id) {
+        // Correct the query by removing quotes around the placeholder
+        $query = $this->conn->prepare("DELETE FROM `tblworkschedule` WHERE `ws_id` = ?");
+        
+        if ($query === false) {
+            return false;
+        }
+    
+        // Bind the integer parameter
+        $query->bind_param("i", $ws_id);
+        
+        // Execute the query
+        if ($query->execute()) {
+            echo "200"; // Success
+        } else {
+            return false;
+        }
+    
+        $query->close();
+    }
+    
     
     
 

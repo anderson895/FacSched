@@ -100,10 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }else if ($_POST['requestType'] == 'AssignSched') {
 
 
-          // echo "<pre>";
-          // print_r($_POST);
-          // echo "</pre>";
-
           $sched_id = $_POST['sched_id'];
           $subject_id = $_POST['subject_id'];
           $sectionId = $_POST['sectionId'];
@@ -112,6 +108,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $subtStartTimeAssign = $_POST['subtStartTimeAssign'];
           $subtEndTimeAssign = $_POST['subtEndTimeAssign'];
           $response = $db->AssignSched($sched_id, $subject_id,$sectionId,$roomCode,$typeOfWorks,$subtStartTimeAssign,$subtEndTimeAssign);
+
+        return $response;
+
+
+        }else if ($_POST['requestType'] == 'DeleteWorkSchedule') {
+
+
+          $ws_id = $_POST['ws_id'];
+          $response = $db->DeleteWorkSchedule($ws_id);
 
         return $response;
 

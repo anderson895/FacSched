@@ -1,3 +1,80 @@
+
+
+
+
+
+
+
+$(".togglerDeleteWorkSchedule").click(function (e) { 
+  e.preventDefault();
+
+  let ws_id= $(this).data('ws_id');
+
+  console.log(ws_id);
+
+
+   // SweetAlert2 confirmation
+   Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+    reverseButtons: true
+}).then((result) => {
+    if (result.isConfirmed) {
+        // AJAX call to delete the section
+        $.ajax({
+            url: "backend/end-points/controller.php",
+            type: 'POST',
+            data: {ws_id: ws_id,requestType:'DeleteWorkSchedule'}, // Send the sectionId to the server
+            success: function(response) {
+                // Handle the response from the server (e.g., refresh the page or show a success message)
+                if (response == '200') {
+                    Swal.fire(
+                        'Deleted!',
+                        'Remove Successful.',
+                        'success'
+                    ).then(() => {
+                        location.reload(); // Reload the page to reflect changes
+                    });
+                } else {
+
+                  console.log(response);
+
+                    Swal.fire(
+                        'Error!',
+                        'There was an issue deleting the section.',
+                        'error'
+                    );
+                }
+            }
+        });
+    }
+});
+
+  
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // teacher_id
 $(".TogglerAssignSubject").click(function (e) { 
   e.preventDefault();
@@ -6,7 +83,7 @@ $(".TogglerAssignSubject").click(function (e) {
   let totalHrs = $(this).attr('data-totalHrs')
 
   $('#sched_id').val(sched_id);
-  $('#totalHrs').text(totalHrs);frmAssign
+  $('#totalHrs').text(totalHrs);
 
 
 
