@@ -6,7 +6,7 @@ $(".TogglerAssignSubject").click(function (e) {
   let totalHrs = $(this).attr('data-totalHrs')
 
   $('#sched_id').val(sched_id);
-  $('#totalHrs').text(totalHrs);
+  $('#totalHrs').text(totalHrs);frmAssign
 
 
 

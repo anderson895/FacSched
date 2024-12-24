@@ -28,7 +28,11 @@ include "components/header.php";
                 $days = explode(',', $schedule['days']); // Days as an array
                 $times = explode(',', $schedule['schedule_times']); // Times as an array
                 $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
+                $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
 
+                // Ensure total hours work schedule is available and handle missing data
+                $total_hours_workschedule = explode(',', $schedule['total_hours_workschedule']);
+                
                 foreach ($days as $index => $day):
                     // Extract sched_id and day from sched_ids_per_day
                     list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
@@ -42,59 +46,64 @@ include "components/header.php";
                     $start_timestamp = strtotime($start_time);
                     $end_timestamp = strtotime($end_time);
                     $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
+
+                    // Get corresponding work schedule hours (default to 0 if not available)
+                    $work_schedule_hours = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
+                    $remaining_hours = $total_hours - $work_schedule_hours;
                 ?>
                 <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
                     <span class="text-muted fw-semibold"><?= ucfirst($day) ?> (Sched ID: <?= $sched_id ?>):</span>
                     <span class="text-muted"><?= date('h:i A', strtotime($start_time)) ?> - <?= date('h:i A', strtotime($end_time)) ?></span>
                 </div>
 
-            <!-- Assigned Subjects and Hours -->
-            <ul class="list-group mb-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <strong>Remaining Hrs:</strong> <?= $total_hours ?>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                <?php 
-                $fetch_workschedule = $db->fetch_workschedule($sched_id);
+                <!-- Assigned Subjects and Hours -->
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Total Scheduled Hours:</strong> <?= $total_hours ?> hrs
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <strong>Remaining Hrs:</strong> <?= $remaining_hours ?> hrs
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                        <?php 
+                        $fetch_workschedule = $db->fetch_workschedule($sched_id);
 
-                // Check if there are workschedules
-                if (!empty($fetch_workschedule)) {
-                    $has_assigned_work = false;
-                    foreach ($fetch_workschedule as $workschedule):
+                        // Check if there are workschedules
+                        if (!empty($fetch_workschedule)) {
+                            $has_assigned_work = false;
+                            foreach ($fetch_workschedule as $workschedule):
 
-                        // Check if ws_id exists for each workschedule
-                        if ($workschedule['ws_id']) { 
-                            $has_assigned_work = true; 
+                                // Check if ws_id exists for each workschedule
+                                if ($workschedule['ws_id']) { 
+                                    $has_assigned_work = true; 
+                                    
+                                    // Format start and end times with AM/PM
+                                    $start_time = date('h:i A', strtotime($workschedule['ws_subtStartTimeAssign']));
+                                    $end_time = date('h:i A', strtotime($workschedule['ws_subtEndTimeAssign']));
+                                    ?>
+                                    
+                                    <p class="mb-1"><strong><?= $workschedule['course'] ?>, <?= $workschedule['section'] ?>, <?= $workschedule['year_level'] ?></strong></p>
+                                    <p class="mb-0"><?= ucfirst($workschedule['subject_name']) ?> - <?= $start_time ?> - <?= $end_time ?></p>
+                                    <small><?= $workschedule['ws_roomCode'] ?></small>
+                                <?php }
+                            endforeach;
                             
-                            // Format start and end times with AM/PM
-                            $start_time = date('h:i A', strtotime($workschedule['ws_subtStartTimeAssign']));
-                            $end_time = date('h:i A', strtotime($workschedule['ws_subtEndTimeAssign']));
-                            ?>
-                            
-                            <p class="mb-1"><strong><?= $workschedule['course'] ?>, <?= $workschedule['section'] ?>, <?= $workschedule['year_level'] ?></strong></p>
-                            <p class="mb-0"><?= ucfirst($workschedule['subject_name']) ?> - <?= $start_time ?> - <?= $end_time ?></p>
-                            <small><?= $workschedule['ws_roomCode'] ?></small>
-                        <?php }
-                    endforeach;
-                    
-                    if (!$has_assigned_work) {
-                        echo '<p>No assigned work schedule.</p>';
-                    }
-                } else {
-                    echo '<p>No work schedule assigned.</p>';
-                }
-                ?>
-            </div>
-
+                            if (!$has_assigned_work) {
+                                echo '<p>No assigned work schedule.</p>';
+                            }
+                        } else {
+                            echo '<p>No work schedule assigned.</p>';
+                        }
+                        ?>
+                    </div>
 
                     <?php if (!empty($fetch_workschedule) && $has_assigned_work): ?>
                         <button class="btn btn-sm btn-outline-danger" type="button">×</button>
                     <?php endif; ?>
 
-                </li>
-            </ul>
-
+                    </li>
+                </ul>
 
                 <div class="d-grid gap-2">
                     <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"
@@ -110,6 +119,7 @@ include "components/header.php";
     </div>
     <?php endforeach; ?>
 </div>
+
 
 
     <div id="noResultsMessage" class="alert alert-warning text-center" style="display: none;">

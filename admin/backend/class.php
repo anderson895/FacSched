@@ -340,44 +340,101 @@ class global_class extends db_connect
 
 
     public function fetch_schedule()
-{
-    $query = $this->conn->prepare("
-        SELECT
-            tblschedule.sched_id, 
-            tblschedule.sched_teacher_id, 
-            COALESCE(GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS days,
-            COALESCE(GROUP_CONCAT(CONCAT(tblschedule.sched_id, ':', tblschedule.sched_day) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS sched_ids_per_day,
-            COALESCE(GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS schedule_times,
-            CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name
-        FROM tblschedule
-        LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
-        WHERE tblfacultymember.teacher_status = 1
-        GROUP BY tblschedule.sched_teacher_id
-    ");
+    {
+        $query = $this->conn->prepare("
+               SELECT
+    tblschedule.sched_teacher_id, 
+    IFNULL(GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS days,
+    IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_id, ':', tblschedule.sched_day) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS sched_ids_per_day,
+    IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS schedule_times,
+    IFNULL(GROUP_CONCAT(TIMESTAMPDIFF(HOUR, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS total_hours_per_day,
+    CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name,
 
-    if ($query->execute()) {
-        $result = $query->get_result();
+    -- Summing up total work schedule hours for the same ws_schedule_id
+    IFNULL(
+        GROUP_CONCAT(
+            IFNULL(
+                (SELECT SUM(TIMESTAMPDIFF(HOUR, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
+                 FROM tblworkschedule w
+                 WHERE w.ws_schedule_id = tblschedule.sched_id
+                 GROUP BY w.ws_schedule_id), 0
+            )
+            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+        ),
+        '0'  -- Default to 0 if there are no entries in tblworkschedule
+    ) AS total_hours_workschedule,
 
-        if ($result->num_rows > 0) {
-            $schedules = $result->fetch_all(MYSQLI_ASSOC);
+    -- Subtract total work schedule hours from total hours per day
+    IFNULL(
+        GROUP_CONCAT(
+            TIMESTAMPDIFF(HOUR, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) - 
+            COALESCE(
+                (SELECT SUM(TIMESTAMPDIFF(HOUR, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
+                 FROM tblworkschedule w
+                 WHERE w.ws_schedule_id = tblschedule.sched_id
+                 GROUP BY w.ws_schedule_id), 0
+            )
+            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+        ), 
+        NULL
+    ) AS remaining_hours_per_day
+FROM tblschedule
+LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
+WHERE tblfacultymember.teacher_status = 1
+GROUP BY tblschedule.sched_teacher_id;
 
-            // Filter out empty schedules
-            $filtered_schedules = array_filter($schedules, function ($schedule) {
-                return !empty($schedule['days']) && !empty($schedule['schedule_times']) && !empty($schedule['sched_ids_per_day']);
-            });
 
-            $query->close();
-            return $filtered_schedules;
+
+        ");
+    
+        if ($query->execute()) {
+            $result = $query->get_result();
+    
+            if ($result->num_rows > 0) {
+                $schedules = $result->fetch_all(MYSQLI_ASSOC);
+    
+                // Calculate total hours per day for each schedule
+                foreach ($schedules as &$schedule) {
+                    $days = explode(',', $schedule['days']); // Days as an array
+                    $times = explode(',', $schedule['schedule_times']); // Times as an array
+                    $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
+    
+                    $total_hours_per_day = []; // Initialize array to store total hours for each day
+    
+                    foreach ($days as $index => $day) {
+                        // Split the schedule times (start and end)
+                        $time_range = explode('-', $times[$index]);
+                        $start_time = $time_range[0];
+                        $end_time = $time_range[1];
+    
+                        // Calculate total hours for this schedule
+                        $start_timestamp = strtotime($start_time);
+                        $end_timestamp = strtotime($end_time);
+                        $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
+    
+                        // Add the total hours to the corresponding day in the array
+                        if (!isset($total_hours_per_day[$day])) {
+                            $total_hours_per_day[$day] = 0;
+                        }
+                        $total_hours_per_day[$day] += $total_hours;
+                    }
+    
+                    // Add total_hours_per_day to the schedule data
+                    $schedule['total_hours_per_day'] = $total_hours_per_day;
+                }
+    
+                $query->close();
+                return $schedules;
+            } else {
+                $query->close();
+                return [];
+            }
         } else {
             $query->close();
-            return [];
+            return false;
         }
-    } else {
-        $query->close();
-        return false;
     }
-}
-
+    
 
 
 
