@@ -11,7 +11,7 @@ include "components/header.php";
     </div>
 
     <!-- Cards Container -->
-    <div class="container my-5">
+<div class="container my-5">
     <div class="row">
         <?php 
         $fetch_schedule = $db->fetch_schedule();
@@ -29,7 +29,7 @@ include "components/header.php";
                     $times = explode(',', $schedule['schedule_times']); // Times as an array
                     $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
                     $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
-                    $total_hours_workschedule = explode(',', $schedule['total_hours_workschedule']);
+                    $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule hours
 
                     foreach ($days as $index => $day):
                         // Extract sched_id and day from sched_ids_per_day
@@ -45,9 +45,19 @@ include "components/header.php";
                         $end_timestamp = strtotime($end_time);
                         $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
 
+                                                // Calculate total scheduled hours in minutes
+                        $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
+
                         // Get corresponding work schedule hours (default to 0 if not available)
-                        $work_schedule_hours = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
-                        $remaining_hours = $total_hours - $work_schedule_hours;
+                        // Work schedule is stored as total minutes (from your DB query)
+                        $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
+
+                        // Calculate remaining minutes
+                        $remaining_minutes = $total_minutes - $work_schedule_minutes;
+
+                        // Convert remaining minutes to hours (optional: you can also keep it in minutes if preferred)
+                        $remaining_hours = round($remaining_minutes / 60, 2); // Convert to hours
+
                     ?>
                     <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
                         <span class="text-muted fw-semibold"><?= ucfirst($day) ?> (Sched ID: <?= $sched_id ?>):</span>
@@ -83,16 +93,13 @@ include "components/header.php";
                                                         </h5>
                                                         <?php if ($has_assigned_work): ?>
                                                         <button class="btn btn-sm btn-outline-danger togglerDeleteWorkSchedule" type="button"
-                                                        data-ws_id = '<?= $workschedule['ws_id']?>'
-                                                        >×</button>
+                                                        data-ws_id='<?= $workschedule['ws_id']?>'>×</button>
                                                         <?php endif; ?>
                                                     </div>
                                                     <p class="card-text mb-1"><?= ucfirst($workschedule['subject_name']) ?> - <?= $start_time ?> - <?= $end_time ?></p>
                                                     <small class="text-muted d-block mb-2"><?= $workschedule['ws_roomCode'] ?></small>
                                                 </div>
                                             </div>
-
-
                                 <?php }
                                     endforeach;
                                     
@@ -110,7 +117,7 @@ include "components/header.php";
                     <!-- Action Buttons -->
                     <div class="d-grid gap-2">
                         <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"
-                            data-totalHrs='<?= $total_hours ?>'
+                            data-remaining_hours='<?= $remaining_hours ?>'
                             data-sched_id='<?= $sched_id ?>'>Teaching Work</a>
                         <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#">Other Work</a>
                         <a href="#" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
@@ -123,6 +130,7 @@ include "components/header.php";
         <?php endforeach; ?>
     </div>
 </div>
+
 
 
 
@@ -186,7 +194,7 @@ include "components/header.php";
       <div class="modal-body">
         <form id="frmAssign">
             <div class="mb-3">
-                <h6>Total Remaining Hrs : <span id='totalHrs'></span></h6>
+                <h6>Total Remaining Hrs : <span id='remaining_hours'></span></h6>
                 <input hidden type="text" id="sched_id" name="sched_id">
 
                 <label for="subject_id" class="form-label">Subject Name</label>

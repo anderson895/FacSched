@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 22, 2024 at 03:26 AM
+-- Generation Time: Dec 24, 2024 at 09:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -207,7 +207,10 @@ CREATE TABLE `tblworkschedule` (
 --
 
 INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`) VALUES
-(2, 5, 3, 'room 101', 4, '10:21:00', '11:21:00', 'Teaching Work');
+(15, 5, 3, 'room 1', 3, '22:00:00', '23:30:00', 'Teaching Work'),
+(16, 5, 3, 'room 123', 4, '00:30:00', '01:30:00', 'Teaching Work'),
+(17, 5, 3, 'room 999', 4, '17:00:00', '17:30:00', 'Teaching Work'),
+(18, 16, 3, 'room 999', 4, '07:30:00', '08:30:00', 'Teaching Work');
 
 --
 -- Indexes for dumped tables
@@ -301,7 +304,7 @@ ALTER TABLE `tblsection`
 -- AUTO_INCREMENT for table `tblworkschedule`
 --
 ALTER TABLE `tblworkschedule`
-  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables

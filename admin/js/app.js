@@ -80,10 +80,10 @@ $(".TogglerAssignSubject").click(function (e) {
   e.preventDefault();
 
   let sched_id = $(this).data('sched_id')
-  let totalHrs = $(this).attr('data-totalHrs')
+  let remaining_hours = $(this).attr('data-remaining_hours')
 
   $('#sched_id').val(sched_id);
-  $('#totalHrs').text(totalHrs);
+  $('#remaining_hours').text(remaining_hours);
 
 
 
@@ -115,7 +115,7 @@ $("#frmAssign").submit(function (e) {
       } else {
         $('.spinner').hide();
         $('#btnAssignSched').prop('disabled', false);
-        alertify.error(response.message || 'An error occurred');
+        alertify.error(response);
       }
     },
     error: function (xhr, status, error) {

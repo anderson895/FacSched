@@ -112,23 +112,6 @@ class global_class extends db_connect
 
 
 
-    public function AssignSched($sched_id, $subject_id,$sectionId,$roomCode,$typeOfWorks,$subtStartTimeAssign,$subtEndTimeAssign)
-    {
-        $query = $this->conn->prepare("INSERT INTO `tblworkschedule` (`ws_schedule_id`,`ws_sectionId`, `ws_roomCode`,`ws_CurriculumID`, `ws_subtStartTimeAssign`,ws_subtEndTimeAssign,`ws_typeOfWork`) VALUES (?,?,?, ?, ?,?,?)");
-        if ($query === false) {
-            return false; 
-        }
-        $query->bind_param("sssssss", $sched_id,$sectionId,$roomCode,$subject_id,$subtStartTimeAssign,$subtEndTimeAssign,$typeOfWorks);
-        if ($query->execute()) {
-            echo "200"; // Success
-        } else {
-            return false;
-        }
-        $query->close();
-    }
-
-
-
 
 
 
@@ -339,22 +322,115 @@ class global_class extends db_connect
 
 
 
+
+    
+    public function AssignSched($sched_id, $subject_id, $sectionId, $roomCode, $typeOfWorks, $subtStartTimeAssign, $subtEndTimeAssign)
+    {
+        // Step 1: Fetch the total scheduled hours for the day and the schedule's start and end hours
+        $query = $this->conn->prepare("
+            SELECT 
+                tblschedule.sched_start_Hrs,
+                tblschedule.sched_end_Hrs,
+                IFNULL(TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs), 0) AS total_minutes_per_day,
+                IFNULL(
+                    (SELECT SUM(TIMESTAMPDIFF(MINUTE, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
+                     FROM tblworkschedule w
+                     WHERE w.ws_schedule_id = tblschedule.sched_id
+                     GROUP BY w.ws_schedule_id), 0
+                ) AS total_minutes_workschedule
+            FROM tblschedule
+            WHERE sched_id = ?
+        ");
+        $query->bind_param("s", $sched_id);
+        
+        if ($query->execute()) {
+            $result = $query->get_result();
+            if ($result->num_rows > 0) {
+                $schedule = $result->fetch_assoc();
+                
+                $sched_start_Hrs = $schedule['sched_start_Hrs'];
+                $sched_end_Hrs = $schedule['sched_end_Hrs'];
+                $total_minutes_per_day = $schedule['total_minutes_per_day'];
+                $total_minutes_workschedule = $schedule['total_minutes_workschedule'];
+                
+                // Step 2: Calculate remaining minutes available for work schedule
+                $remaining_minutes = $total_minutes_per_day - $total_minutes_workschedule;
+                
+                // Step 3: Calculate the minutes for the new assigned work
+                $start_timestamp = strtotime($subtStartTimeAssign);
+                $end_timestamp = strtotime($subtEndTimeAssign);
+                $new_work_minutes = abs($end_timestamp - $start_timestamp) / 60; // Convert to minutes
+    
+                // Step 4: Check if the new work schedule fits within the available time range
+                if ($start_timestamp >= strtotime($sched_start_Hrs) && $end_timestamp <= strtotime($sched_end_Hrs)) {
+                    // Step 5: Validate if new work schedule does not exceed the remaining time
+                    if ($new_work_minutes <= $remaining_minutes) {
+                        // Proceed with the assignment if within limits
+                        $query = $this->conn->prepare("INSERT INTO `tblworkschedule` (`ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`) 
+                                                        VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $query->bind_param("sssssss", $sched_id, $sectionId, $roomCode, $subject_id, $subtStartTimeAssign, $subtEndTimeAssign, $typeOfWorks);
+    
+                        if ($query->execute()) {
+                            echo "200"; // Success
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        echo "Work schedule exceeds available time for this day.";//Error:
+                        return false;
+                    }
+                } else {
+                    echo "Work schedule is out of the allowed class time range.";//Error:
+                    return false;
+                }
+            } else {
+                echo "Schedule not found.";//Error:
+                return false;
+            }
+            $query->close();
+        } else {
+            echo "Query execution failed."; //Error: 
+            return false;
+        }
+    }
+    
+    
+
+
+
     public function fetch_schedule()
     {
         $query = $this->conn->prepare("
-               SELECT
+             SELECT
     tblschedule.sched_teacher_id, 
     IFNULL(GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS days,
     IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_id, ':', tblschedule.sched_day) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS sched_ids_per_day,
     IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS schedule_times,
-    IFNULL(GROUP_CONCAT(TIMESTAMPDIFF(HOUR, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS total_hours_per_day,
+    
+    -- Calculate total hours and minutes per day
+    IFNULL(
+        GROUP_CONCAT(
+            TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+        ), 
+        NULL
+    ) AS total_minutes_per_day,
+
+    -- Calculate total hours per day from minutes, rounding to hours
+    IFNULL(
+        GROUP_CONCAT(
+            FLOOR(TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) / 60) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+        ), 
+        NULL
+    ) AS total_hours_per_day,
+    
+    -- Teacher name
     CONCAT(tblfacultymember.fname, ' ', tblfacultymember.mname, ' ', tblfacultymember.lname) AS teacher_name,
 
-    -- Summing up total work schedule hours for the same ws_schedule_id
+    -- Summing up total work schedule hours for the same ws_schedule_id, including minutes
     IFNULL(
         GROUP_CONCAT(
             IFNULL(
-                (SELECT SUM(TIMESTAMPDIFF(HOUR, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
+                (SELECT SUM(TIMESTAMPDIFF(MINUTE, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
                  FROM tblworkschedule w
                  WHERE w.ws_schedule_id = tblschedule.sched_id
                  GROUP BY w.ws_schedule_id), 0
@@ -362,26 +438,27 @@ class global_class extends db_connect
             ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
         ),
         '0'  -- Default to 0 if there are no entries in tblworkschedule
-    ) AS total_hours_workschedule,
+    ) AS total_minutes_workschedule,
 
-    -- Subtract total work schedule hours from total hours per day
+    -- Calculate remaining minutes per day by subtracting work schedule time from total scheduled time
     IFNULL(
         GROUP_CONCAT(
-            TIMESTAMPDIFF(HOUR, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) - 
+            (TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) - 
             COALESCE(
-                (SELECT SUM(TIMESTAMPDIFF(HOUR, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
+                (SELECT SUM(TIMESTAMPDIFF(MINUTE, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
                  FROM tblworkschedule w
                  WHERE w.ws_schedule_id = tblschedule.sched_id
                  GROUP BY w.ws_schedule_id), 0
-            )
+            )) / 60  -- Convert remaining minutes to hours
             ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
-        ), 
+        ),
         NULL
     ) AS remaining_hours_per_day
 FROM tblschedule
 LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
 WHERE tblfacultymember.teacher_status = 1
 GROUP BY tblschedule.sched_teacher_id;
+
 
 
 
