@@ -12,10 +12,12 @@
                                             $start_time = date('h:i A', strtotime($workschedule['ws_subtStartTimeAssign']));
                                             $end_time = date('h:i A', strtotime($workschedule['ws_subtEndTimeAssign']));
 
-                                            if($workschedule['ws_ol_request_status'] !="pending"){
-                                                $card_color="bg-light";
-                                            }else{
+                                            if($workschedule['ws_ol_request_status'] =="pending"){
                                                 $card_color="bg-warning";
+                                            }else if($workschedule['ws_ol_request_status'] =="accept"){
+                                                $card_color="bg-success text-white";
+                                            }else if($workschedule['ws_ol_request_status'] =="decline"){
+                                                $card_color="bg-danger text-white ";
                                             }
                                 ?>
                                            <div class="card shadow-sm mb-3 ">

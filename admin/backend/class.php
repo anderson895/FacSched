@@ -553,16 +553,16 @@ class global_class extends db_connect
     public function fetch_schedule()
     {
         $query = $this->conn->prepare("
-            SELECT
+           SELECT
     tblschedule.sched_teacher_id, 
-    IFNULL(GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS days,
-    IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_id, ':', tblschedule.sched_day) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS sched_ids_per_day,
-    IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')), NULL) AS schedule_times,
-    
+    IFNULL(GROUP_CONCAT(tblschedule.sched_day ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')), NULL) AS days,
+    IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_id, ':', tblschedule.sched_day) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')), NULL) AS sched_ids_per_day,
+    IFNULL(GROUP_CONCAT(CONCAT(tblschedule.sched_start_Hrs, ' - ', tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')), NULL) AS schedule_times,
+
     -- Calculate total hours and minutes per day
     IFNULL(
         GROUP_CONCAT(
-            TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+            TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
         ), 
         NULL
     ) AS total_minutes_per_day,
@@ -570,7 +570,7 @@ class global_class extends db_connect
     -- Calculate total hours per day from minutes, rounding to hours
     IFNULL(
         GROUP_CONCAT(
-            FLOOR(TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) / 60) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+            FLOOR(TIMESTAMPDIFF(MINUTE, tblschedule.sched_start_Hrs, tblschedule.sched_end_Hrs) / 60) ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
         ), 
         NULL
     ) AS total_hours_per_day,
@@ -596,7 +596,7 @@ class global_class extends db_connect
                  WHERE o.ows_schedule_id = tblschedule.sched_id
                  GROUP BY o.ows_schedule_id), 0
             )
-            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
         ),
         '0'  -- Default to 0 if there are no entries in tblworkschedule or tblotherworkschedule
     ) AS total_minutes_workschedule,
@@ -620,7 +620,7 @@ class global_class extends db_connect
                      GROUP BY o.ows_schedule_id), 0
                 )
             )) / 60  -- Convert remaining minutes to hours
-            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday')
+            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
         ),
         NULL
     ) AS remaining_hours_per_day
@@ -628,6 +628,7 @@ FROM tblschedule
 LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
 WHERE tblfacultymember.teacher_status = 1
 GROUP BY tblschedule.sched_teacher_id;
+
 
         ");
     

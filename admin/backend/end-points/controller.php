@@ -115,9 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }else if ($_POST['requestType'] == 'AssignSched_OverLoad') {
 
 
-          echo "<pre>";
-          print_r($_POST);
-          echo "</pre>";
           $sched_id = $_POST['sched_id'];
           $overload_work = $_POST['overload_work'];
           $subject_id = $_POST['subject_id'];

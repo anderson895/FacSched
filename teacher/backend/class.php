@@ -221,6 +221,29 @@ class global_class extends db_connect
         }
         
 
+
+
+        public function UpdateReq_status($ws_id,$ActionStatus)
+        {
+            
+            // Prepare the update query
+            $updateQuery = "
+                UPDATE `tblworkschedule`
+                SET `ws_ol_request_status` = '$ActionStatus' where ws_id = '$ws_id'
+            ";
+        
+            
+            if ($this->conn->query($updateQuery)) {
+                echo "200"; // Success
+            } else {
+                echo "Error updating schedule";
+                return false;
+            }
+        
+            return true;
+        }
+        
+
         
         
 
@@ -287,26 +310,18 @@ class global_class extends db_connect
 
         public function fetch_schedule($teacher_id)
         {
-            $query = $this->conn->prepare("SELECT * FROM `tblschedule` WHERE `sched_teacher_id` = ?");
-            $query->bind_param("i", $teacher_id); // Ensure the parameter type matches your DB schema
-        
-            if ($query->execute()) {
-                $result = $query->get_result();
-        
-                // Fetch all schedules into an array if rows exist
-                if ($result->num_rows > 0) {
-                    $schedules = $result->fetch_all(MYSQLI_ASSOC);
-                    $query->close();
-                    return $schedules; // Return array of schedules
-                } else {
-                    $query->close();
-                    return []; // Return an empty array instead of null for better handling
-                }
+            $query = "SELECT * FROM `tblschedule` WHERE `sched_teacher_id` = $teacher_id";
+            
+            $result = $this->conn->query($query); 
+            
+            if ($result && $result->num_rows > 0) {
+                $schedules = $result->fetch_all(MYSQLI_ASSOC);
+                return $schedules; // Return array of schedules
             } else {
-                $query->close();
-                return false; // Return false on execution failure
+                return [];
             }
         }
+        
 
 
 

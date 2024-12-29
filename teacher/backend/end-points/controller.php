@@ -52,6 +52,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
 
 
+        }else if ($_POST['requestType'] == 'UpdateReq_status') {
+            $ws_id = $_POST['ws_id'];
+            $ActionStatus = $_POST['ActionStatus'];
+            
+            
+            // Call the UpdateSchedule function
+            $response = $db->UpdateReq_status($ws_id,$ActionStatus);
+            
+            // Return the response
+            return $response;
+            
+            
+
+
         }
 
     }

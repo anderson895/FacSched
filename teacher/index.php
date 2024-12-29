@@ -47,7 +47,6 @@ include "components/header.php";
                                     <span class="btnSpinner spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
                                     Save
                                 </button>
-
                             </div>
                         </form>
 
@@ -306,6 +305,52 @@ include "components/header.php";
                     </div>
                 </div>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="togglerUpdateReq_status" tabindex="-1" aria-labelledby="togglerUpdateReq_statusLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="togglerUpdateReq_statusLabel">Warning</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+        <div class="modal-body text-center">
+            <h3>Are you sure you want to accept the overload?</h3>
+            <input hidden type="text" id="ws_id">
+        </div>
+        <div class="modal-footer">
+        <div class="mt-4">
+                      <button type="button"  class="btnUpdateReq_status btn btn-primary" data-ActionStatus="decline">
+                                    <span class="btnSpinner spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
+                                    Decline
+                        </button>
+                      <button type="submit" class="btnUpdateReq_status btn btn-primary" data-ActionStatus="accept">
+                                    <span class="btnSpinner spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
+                                    Accept
+               </button>
+
+            </div>
+           
+        </div>
+      
+    </div>
+  </div>
+</div>
 
 
 

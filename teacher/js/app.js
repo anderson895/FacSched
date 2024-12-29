@@ -3,6 +3,19 @@
 
 
 
+$('.togglerUpdateReq_status').click(function (e) { 
+  e.preventDefault();
+
+    
+  let ws_id = $(this).data('ws_id');
+  console.log(ws_id);
+  
+  $("#ws_id").val(ws_id);
+  $('#togglerUpdateReq_status').modal('show'); // Show the modal using the Bootstrap modal method
+
+});
+
+
 
   // Populate modal with schedule data on button click
   $(".update-schedule-btn").click(function () {
@@ -56,6 +69,37 @@ $("#frmUpdateSchedule").submit(function (e) {
         }
       },
     });
+});
+
+
+
+$(".btnUpdateReq_status").click(function (e) {
+    e.preventDefault();
+   let ActionStatus=  $(this).attr('data-ActionStatus');
+   let ws_id=  $('#ws_id').val();;
+  console.log(ws_id);
+
+
+    $.ajax({
+      type: "POST",
+        url: "backend/end-points/controller.php",
+        data: { requestType: 'UpdateReq_status', ActionStatus: ActionStatus,ws_id:ws_id},  
+        success: function (response) {
+        console.log(response)
+
+        if (response === "200") {
+          alertify.success('Added Successful');
+
+          setTimeout(function () {
+            location.reload();
+          }, 1000);
+
+        } else {
+          alertify.error(response);
+        }
+      },
+    });
+   
 });
 
 
