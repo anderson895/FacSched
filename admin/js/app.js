@@ -7,12 +7,8 @@
 
 $(".togglerDeleteWorkSchedule").click(function (e) { 
   e.preventDefault();
-
   let ws_id= $(this).data('ws_id');
-
   console.log(ws_id);
-
-
    // SweetAlert2 confirmation
    Swal.fire({
     title: 'Are you sure?',
@@ -53,10 +49,66 @@ $(".togglerDeleteWorkSchedule").click(function (e) {
         });
     }
 });
-
-  
 });
 
+
+
+
+
+
+
+
+
+
+
+$(".togglerDeleteWorkScheduleOther").click(function (e) { 
+  e.preventDefault();
+  let ows_id= $(this).data('ows_id');
+  console.log(ows_id);
+   // SweetAlert2 confirmation
+   Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you want to delete this?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'No, cancel!',
+    reverseButtons: true
+}).then((result) => {
+    if (result.isConfirmed) {
+        // AJAX call to delete the section
+        $.ajax({
+            url: "backend/end-points/controller.php",
+            type: 'POST',
+            data: {ows_id: ows_id,requestType:'DeleteWorkScheduleOther'}, // Send the sectionId to the server
+            success: function(response) {
+                // Handle the response from the server (e.g., refresh the page or show a success message)
+
+               
+
+                if (response == '200') {
+                    Swal.fire(
+                        'Deleted!',
+                        'Remove Successful.',
+                        'success'
+                    ).then(() => {
+                        location.reload(); // Reload the page to reflect changes
+                    });
+                } else {
+
+                  console.log(response);
+
+                    Swal.fire(
+                        'Error!',
+                        'There was an issue deleting the section.',
+                        'error'
+                    );
+                }
+            }
+        });
+    }
+});
+});
 
 
 
@@ -78,20 +130,37 @@ $(".togglerDeleteWorkSchedule").click(function (e) {
 // teacher_id
 $(".TogglerAssignSubject").click(function (e) { 
   e.preventDefault();
-
   let sched_id = $(this).data('sched_id')
   let remaining_hours = $(this).attr('data-remaining_hours')
-
   $('#sched_id').val(sched_id);
-  $('#remaining_hours').text(remaining_hours);
-
-
-
+  $('.remaining_hours').text(remaining_hours);
   console.log(sched_id)  
 });
 
 
-$("#frmAssign").submit(function (e) { 
+$(".TogglerAssignOtherWork").click(function (e) { 
+  e.preventDefault();
+  let sched_id = $(this).data('sched_id')
+  let remaining_hours = $(this).attr('data-remaining_hours')
+  $('#sched_id_other').val(sched_id);
+  $('.remaining_hours').text(remaining_hours);
+  console.log(sched_id)  
+});
+
+
+
+$(".TogglerAssignOverLoadWork").click(function (e) { 
+  e.preventDefault();
+  let sched_id = $(this).data('sched_id')
+  let remaining_hours = $(this).attr('data-remaining_hours')
+  $('#sched_id_OverLoad').val(sched_id);
+  $('.remaining_hours').text(remaining_hours);
+  console.log(sched_id)  
+});
+
+
+
+$("#frmAssign").submit(function (e) {
   e.preventDefault();
 
   $('.spinner').show();
@@ -127,6 +196,83 @@ $("#frmAssign").submit(function (e) {
 });
 
 
+
+
+$("#frmAssign_OverLoad").submit(function (e) {
+  e.preventDefault();
+
+  $('.spinner').show();
+  $('#btnAssignSched_OverLoad').prop('disabled', true);
+
+  var formData = $(this).serializeArray(); 
+  formData.push({ name: 'requestType', value: 'AssignSched_OverLoad' });
+  var serializedData = $.param(formData);
+
+  $.ajax({
+    type: "POST",
+    url: "backend/end-points/controller.php",
+    data: serializedData,
+    success: function (response) {
+      console.log(response);
+      if (response === "200") {
+        alertify.success('Sched Added Successfully');
+        setTimeout(function () {
+          location.reload();
+        }, 1000);
+      } else {
+        $('.spinner').hide();
+        $('#btnAssignSched_OverLoad').prop('disabled', false);
+        alertify.error(response);
+      }
+    },
+    error: function (xhr, status, error) {
+      $('.spinner').hide();
+      $('#btnAssignSched_OverLoad').prop('disabled', false);
+      alertify.error('Request failed: ' + error);
+    }
+  });
+});
+
+
+
+
+
+
+
+$("#frmAssignOther").submit(function (e) { 
+  e.preventDefault();
+
+  $('.spinner').show();
+  $('#btnAssignOtherSched').prop('disabled', true);
+
+  var formData = $(this).serializeArray(); 
+  formData.push({ name: 'requestType', value: 'AssignSchedOthers' });
+  var serializedData = $.param(formData);
+
+  $.ajax({
+    type: "POST",
+    url: "backend/end-points/controller.php",
+    data: serializedData,
+    success: function (response) {
+      console.log(response);
+      if (response === "200") {
+        alertify.success('Sched Added Successfully');
+        setTimeout(function () {
+          location.reload();
+        }, 1000);
+      } else {
+        $('.spinner').hide();
+        $('#btnAssignOtherSched').prop('disabled', false);
+        alertify.error(response);
+      }
+    },
+    error: function (xhr, status, error) {
+      $('.spinner').hide();
+      $('#btnAssignOtherSched').prop('disabled', false);
+      alertify.error('Request failed: ' + error);
+    }
+  });
+});
 
 
 

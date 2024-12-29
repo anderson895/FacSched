@@ -25,38 +25,46 @@ include "components/header.php";
 
                     <!-- Process Days, Times, and Sched IDs -->
                     <?php 
-                    $days = explode(',', $schedule['days']); // Days as an array
-                    $times = explode(',', $schedule['schedule_times']); // Times as an array
-                    $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
-                    $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
-                    $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule hours
-
-                    foreach ($days as $index => $day):
-                        // Extract sched_id and day from sched_ids_per_day
-                        list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
-
-                        // Split the schedule times (start and end)
-                        $time_range = explode('-', $times[$index]);
-                        $start_time = $time_range[0];
-                        $end_time = $time_range[1];
-
-                        // Calculate total hours
-                        $start_timestamp = strtotime($start_time);
-                        $end_timestamp = strtotime($end_time);
-                        $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
-
-                                                // Calculate total scheduled hours in minutes
-                        $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
-
-                        // Get corresponding work schedule hours (default to 0 if not available)
-                        // Work schedule is stored as total minutes (from your DB query)
-                        $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
-
-                        // Calculate remaining minutes
-                        $remaining_minutes = $total_minutes - $work_schedule_minutes;
-
-                        // Convert remaining minutes to hours (optional: you can also keep it in minutes if preferred)
-                        $remaining_hours = round($remaining_minutes / 60, 2); // Convert to hours
+                   $days = explode(',', $schedule['days']); // Days as an array
+                   $times = explode(',', $schedule['schedule_times']); // Times as an array
+                   $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
+                   $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
+                   $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule hours
+                   
+                   foreach ($days as $index => $day):
+                       // Extract sched_id and day from sched_ids_per_day
+                       list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
+                   
+                       // Split the schedule times (start and end)
+                       $time_range = explode('-', $times[$index]);
+                       $start_time = $time_range[0];
+                       $end_time = $time_range[1];
+                   
+                       // Calculate total hours
+                       $start_timestamp = strtotime($start_time);
+                       $end_timestamp = strtotime($end_time);
+                       $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
+                   
+                       // Calculate total scheduled hours in minutes
+                       $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
+                   
+                       // Get corresponding work schedule hours (default to 0 if not available)
+                       $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
+                   
+                       // Calculate remaining minutes
+                       $remaining_minutes = $total_minutes - $work_schedule_minutes;
+                   
+                       // Convert remaining minutes to hours (optional: you can also keep it in minutes if preferred)
+                       $remaining_hours = round($remaining_minutes / 60, 2); // Convert to hours
+                   
+                       // Check if remaining time should be displayed in hours or minutes
+                       if ($remaining_hours >= 1) {
+                           // If remaining hours are 1 or more, display hours
+                           $remaining_time = $remaining_hours . ' hour(s)';
+                       } else {
+                           // If remaining hours are less than 1, display minutes
+                           $remaining_time = $remaining_minutes . ' minute(s)';
+                       }
 
                     ?>
                     <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
@@ -70,47 +78,20 @@ include "components/header.php";
                             <strong>Total Scheduled Hours:</strong> <?= $total_hours ?> hrs
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Remaining Hrs:</strong> <?= $remaining_hours ?> hrs
+                            <strong>Remaining Hrs:</strong> <?= $remaining_hours >= 1 ? "$remaining_hours hour(s)" : "$remaining_minutes minute(s)"; ?>
                         </li>
+
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div class="container">
                                 <?php 
-                                $fetch_workschedule = $db->fetch_workschedule($sched_id);
-
-                                if (!empty($fetch_workschedule)) {
-                                    $has_assigned_work = false;
-                                    foreach ($fetch_workschedule as $workschedule):
-                                        if ($workschedule['ws_id']) { 
-                                            $has_assigned_work = true; 
-                                            $start_time = date('h:i A', strtotime($workschedule['ws_subtStartTimeAssign']));
-                                            $end_time = date('h:i A', strtotime($workschedule['ws_subtEndTimeAssign']));
+                                include "backend/end-points/schedule_list.php";
+                                include "backend/end-points/schedule_overload.php";
                                 ?>
-                                           <div class="card shadow-sm mb-3">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <h5 class="card-title mb-2">
-                                                            <strong><?= $workschedule['course'] ?>, <?= $workschedule['section'] ?>, <?= $workschedule['year_level'] ?></strong>
-                                                        </h5>
-                                                        <?php if ($has_assigned_work): ?>
-                                                        <button class="btn btn-sm btn-outline-danger togglerDeleteWorkSchedule" type="button"
-                                                        data-ws_id='<?= $workschedule['ws_id']?>'>×</button>
-                                                        <?php endif; ?>
-                                                    </div>
-                                                    <p class="card-text mb-1"><?= ucfirst($workschedule['subject_name']) ?> - <?= $start_time ?> - <?= $end_time ?></p>
-                                                    <small class="text-muted d-block mb-2"><?= $workschedule['ws_roomCode'] ?></small>
-                                                </div>
-                                            </div>
-                                <?php }
-                                    endforeach;
-                                    
-                                    if (!$has_assigned_work) {
-                                        echo '<p>No assigned work schedule.</p>';
-                                    }
-                                } else {
-                                    echo '<p>No work schedule assigned.</p>';
-                                }
-                                ?>
+                                
+                              
                             </div>
+
+                            
                         </li>
                     </ul>
 
@@ -119,8 +100,14 @@ include "components/header.php";
                         <a href="#" class="btn btn-outline-success btn-sm TogglerAssignSubject" data-bs-toggle="modal" data-bs-target="#assignSubjectModal"
                             data-remaining_hours='<?= $remaining_hours ?>'
                             data-sched_id='<?= $sched_id ?>'>Teaching Work</a>
-                        <a href="#" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#">Other Work</a>
-                        <a href="#" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#olModal">Overload</a>
+                        <a href="#" class="btn btn-outline-primary TogglerAssignOtherWork btn-sm" data-bs-toggle="modal" data-bs-target="#assignOtherWorkModal"
+                            data-remaining_hours='<?= $remaining_hours ?>'
+                            data-sched_id='<?= $sched_id ?>'
+                        >Other Work</a>
+                        <a href="#" class="btn btn-outline-danger btn-sm TogglerAssignOverLoadWork" data-bs-toggle="modal" data-bs-target="#olModal"
+                            data-remaining_hours='<?= $remaining_hours ?>'
+                            data-sched_id='<?= $sched_id ?>'
+                        >Overload</a>
                     </div>
                     <hr class="my-3">
                     <?php endforeach; ?>
@@ -179,7 +166,7 @@ include "components/header.php";
     <div class="modal-content">
       <div class="modal-header">
 
-      <div id="spinner" class="spinner" style="display:none;">
+            <div id="spinner" class="spinner" style="display:none;">
                 <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white bg-opacity-75">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -188,13 +175,13 @@ include "components/header.php";
             </div>
 
 
-        <h5 class="modal-title" id="assignSubjectModalLabel">Assign Subject & Section</h5>
+        <h5 class="modal-title" id="assignSubjectModalLabel">Assign Teaching Work</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <form id="frmAssign">
             <div class="mb-3">
-                <h6>Total Remaining Hrs : <span id='remaining_hours'></span></h6>
+                <h6>Total Remaining Hrs : <span class='remaining_hours'></span></h6>
                 <input hidden type="text" id="sched_id" name="sched_id">
 
                 <label for="subject_id" class="form-label">Subject Name</label>
@@ -220,7 +207,7 @@ include "components/header.php";
                 </select>
             </div>
             <div class="mb-3">
-                <label for="roomCode" class="form-label">Room Code</label>
+                <label for="roomCode" class="form-label">Room code</label>
                 <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
             </div>
 
@@ -253,25 +240,40 @@ include "components/header.php";
 
 
 
-
-
-
-
-
-<!-- Modal -->
+<!-- Modal For Overload Schedule-->
 <div class="modal fade" id="olModal" tabindex="-1" aria-labelledby="assignSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="assignSubjectModalLabel">Overload</h5>
+        <h5 class="modal-title" id="assignSubjectModalLabel">Assign Overload Works</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form id="frmAssign_OverLoad">
+
+            <div id="spinner" class="spinner" style="display:none;">
+                    <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white bg-opacity-75">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <input hidden type="text" name="typeOfWorks" value="Teaching Work">
+                </div>
+
+                <input hidden type="text" id="sched_id_OverLoad" name="sched_id">
+                <div hidden class="mb-3">
+                    <label for="overload_work" class="form-label">WS_STATUS</label>
+                    <input type="text" class="form-control" name="overload_work" value="overload_work">
+                </div>
+
 
                 <div class="mb-3">
                         <label for="subjectName" class="form-label">Subject Name</label>
-                        <select class="form-control" id="subjectName">
+                        <select class="form-control" id="subjectName" name="subject_id">
                             <option value="" disabled selected>Select subject name</option>
                             <?php 
                             // Fetch the list of days already taken by the teacher
@@ -282,8 +284,8 @@ include "components/header.php";
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="subjectCode" class="form-label">Section</label>
-                        <select class="form-control" id="subjectCode">
+                        <label for="subjectCode" class="form-label" >Section</label>
+                        <select class="form-control" id="subjectCode" name="sectionId">
                             <option value="" disabled selected>Select Section</option>
                             <?php
                             $fetch_all_Section = $db->fetch_all_Section();
@@ -293,17 +295,114 @@ include "components/header.php";
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="roomCode" class="form-label">Room Code</label>
+                        <label for="roomCode" class="form-label" >Room Code</label>
                         <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Assign</button>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="subtStartTimeAssign_OverLoad" class="form-label">Subject Start Time</label>
+                            <input type="time" class="form-control" id="subtStartTimeAssign_OverLoad" name="subtStartTimeAssign" placeholder="Enter Start Time">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="subtEndTimeAssign_OverLoad" class="form-label">Subject End Time</label>
+                            <input type="time" class="form-control" id="subtEndTimeAssign_OverLoad" name="subtEndTimeAssign" placeholder="Enter End Time">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnAssignSched_OverLoad" class="btn btn-primary">Assign</button>
             
         </form>
       </div>
     </div>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal FOr Other work -->
+<div class="modal fade" id="assignOtherWorkModal" tabindex="-1" aria-labelledby="assignOtherWorkModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+
+      <div id="spinner" class="spinner" style="display:none;">
+                <div class="d-flex justify-content-center align-items-center position-fixed top-0 start-0 w-100 h-100 bg-white bg-opacity-75">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+
+        <h5 class="modal-title" id="assignOtherWorkModalLabel">Assign Other Work</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="frmAssignOther">
+            <div class="mb-3">
+                <h6>Total Remaining Hrs : <span class='remaining_hours'></span></h6>
+                <input hidden type="text" id="sched_id_other" name="sched_id">
+            </div>
+           
+            <div class="mb-3">
+                <label for="roomCode" class="form-label">Location</label>
+                <input type="text" class="form-control" name="location" placeholder="Enter Location">
+            </div>
+
+
+            <div class="mb-3">
+                <label for="roomCode" class="form-label">Work Description</label>
+                <input type="text" class="form-control" name="work_description" placeholder="Enter Work Description">
+            </div>
+
+            <div class="mb-3">
+                <label for="typeOfWorks" class="form-label">Type of Work</label>
+                <select id="typeOfWorks" name="typeOfWorks" class="form-control">
+                    <option value="admin work">Admin Work</option>
+                    <option value="off campus work">Off Campus Work</option>
+                </select>
+            </div>
+
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="subtStartTimeAssign" class="form-label">Subject Start Time</label>
+                    <input type="time" class="form-control" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time">
+                </div>
+                <div class="col-md-6">
+                    <label for="subtEndTimeAssign" class="form-label">Subject End Time</label>
+                    <input type="time" class="form-control" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time">
+                </div>
+            </div>
+
+            <button type="submit" id="btnAssignOtherSched" class="btn btn-primary">Assign</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -112,11 +112,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         return $response;
 
 
+        }else if ($_POST['requestType'] == 'AssignSched_OverLoad') {
+
+
+          echo "<pre>";
+          print_r($_POST);
+          echo "</pre>";
+          $sched_id = $_POST['sched_id'];
+          $overload_work = $_POST['overload_work'];
+          $subject_id = $_POST['subject_id'];
+          $sectionId = $_POST['sectionId'];
+          $roomCode = $_POST['roomCode'];
+          $typeOfWorks = $_POST['typeOfWorks'];
+          $subtStartTimeAssign = $_POST['subtStartTimeAssign'];
+          $subtEndTimeAssign = $_POST['subtEndTimeAssign'];
+          $response = $db->AssignSched_OverLoad($sched_id, $subject_id,$sectionId,$roomCode,$typeOfWorks,$subtStartTimeAssign,$subtEndTimeAssign,$overload_work);
+
+        return $response;
+
+
+        }else if ($_POST['requestType'] == 'AssignSchedOthers') {
+
+
+          $sched_id = $_POST['sched_id'];
+          $location = $_POST['location'];
+          $work_description = $_POST['work_description'];
+
+          $typeOfWorks = $_POST['typeOfWorks'];
+          $subtStartTimeAssign = $_POST['subtStartTimeAssign'];
+          $subtEndTimeAssign = $_POST['subtEndTimeAssign'];
+          $response = $db->AssignSchedOthers($sched_id,$location,$work_description,$typeOfWorks,$subtStartTimeAssign,$subtEndTimeAssign);
+
+        return $response;
+
+
         }else if ($_POST['requestType'] == 'DeleteWorkSchedule') {
 
 
           $ws_id = $_POST['ws_id'];
           $response = $db->DeleteWorkSchedule($ws_id);
+
+        return $response;
+
+
+        }else if ($_POST['requestType'] == 'DeleteWorkScheduleOther') {
+
+
+          $ows_id = $_POST['ows_id'];
+          $response = $db->DeleteWorkScheduleOther($ows_id);
 
         return $response;
 
