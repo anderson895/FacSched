@@ -9,6 +9,31 @@ class global_class extends db_connect
         $this->connect();
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
     public function fetch_teacher_detail($teacher_id) {
         // Prepare the query with a placeholder for the teacher_id
         $query = $this->conn->prepare("SELECT * 
@@ -282,6 +307,72 @@ class global_class extends db_connect
                 return false; // Return false on execution failure
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        public function fetch_workschedule($sched_id)
+    {
+        $query = "
+            SELECT *
+            FROM tblschedule
+            LEFT JOIN tblworkschedule ON tblschedule.sched_id = tblworkschedule.ws_schedule_id
+            LEFT JOIN tblsection ON tblsection.sectionId = tblworkschedule.ws_sectionId
+            LEFT JOIN tblcurriculum ON tblcurriculum.subject_id = tblworkschedule.ws_CurriculumID
+            WHERE tblschedule.sched_id = '$sched_id'
+        ";
+    
+        $result = $this->conn->query($query);
+    
+        if ($result) {
+            if ($result->num_rows > 0) {
+                $schedules = $result->fetch_all(MYSQLI_ASSOC);
+                $result->free();
+                return $schedules;
+            } else {
+                $result->free();
+                return [];
+            }
+        } else {
+            return false;
+        }
+    }
+
+
+
+    public function fetch_workscheduleOther($sched_id)
+    {
+        $query = "
+            SELECT *
+            FROM tblschedule
+            LEFT JOIN tblotherworkschedule ON tblschedule.sched_id = tblotherworkschedule.ows_schedule_id
+            WHERE tblschedule.sched_id = '$sched_id'
+        ";
+    
+        $result = $this->conn->query($query);
+    
+        if ($result) {
+            if ($result->num_rows > 0) {
+                $schedules = $result->fetch_all(MYSQLI_ASSOC);
+                $result->free();
+                return $schedules;
+            } else {
+                $result->free();
+                return [];
+            }
+        } else {
+            return false;
+        }
+    }
         
 
         

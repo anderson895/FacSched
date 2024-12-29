@@ -69,12 +69,10 @@ include "components/header.php";
 
     <div class="row mt-4">
         <?php 
-
+        
         
         $fetch_schedule = $db->fetch_schedule($teacher['teacher_id']);
         $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-
-       
 
         // Check if there are any schedules
         if (!empty($fetch_schedule)) {
@@ -96,7 +94,22 @@ include "components/header.php";
                         <?php echo ucfirst($day); ?>
                     </div>
                     <div class="card-body">
+                    <div class="d-flex justify-content-end">
+    <button 
+        class="btn btn-primary btn-sm update-schedule-btn mb-3" 
+        data-bs-toggle="modal" 
+        data-bs-target="#updateScheduleModal" 
+        data-day="<?php echo $day; ?>" 
+        data-start="<?php echo $scheduleForDay['sched_start_Hrs']; ?>" 
+        data-end="<?php echo $scheduleForDay['sched_end_Hrs']; ?>"
+        data-sched_id="<?php echo $scheduleForDay['sched_id']; ?>"
+    >
+        <i class="bi bi-pencil-square"></i>
+    </button>
+</div>
+
                         <p id="schedule-<?php echo $day; ?>">
+                            
                             <?php 
                             $startTime = date('h:i A', strtotime($scheduleForDay['sched_start_Hrs']));
                             $endTime = date('h:i A', strtotime($scheduleForDay['sched_end_Hrs']));
@@ -116,19 +129,19 @@ include "components/header.php";
                                 echo "Total Hours: " . $hours . " hours";
                             }
                             ?>
+
+                            
                         </p>
                         <!-- Update Schedule Button -->
-                        <button 
-                            class="btn btn-warning btn-sm update-schedule-btn" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#updateScheduleModal" 
-                            data-day="<?php echo $day; ?>" 
-                            data-start="<?php echo $scheduleForDay['sched_start_Hrs']; ?>" 
-                            data-end="<?php echo $scheduleForDay['sched_end_Hrs']; ?>"
-                            data-sched_id="<?php echo $scheduleForDay['sched_id']; ?>"
-                            >
-                            Update Schedule
-                        </button>
+                        
+
+
+                        <?php 
+                                include "backend/end-points/schedule_list.php";
+                                ?>
+
+                        
+
                     </div>
                 </div>
             </div>

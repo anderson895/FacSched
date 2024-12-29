@@ -85,7 +85,6 @@ include "components/header.php";
                             <div class="container">
                                 <?php 
                                 include "backend/end-points/schedule_list.php";
-                                include "backend/end-points/schedule_overload.php";
                                 ?>
                                 
                               
