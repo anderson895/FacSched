@@ -91,16 +91,13 @@ include "components/header.php";
                             Admin Work: <i><?= isset($total_admin_work_time[$index]) ? round($total_admin_work_time[$index] / 60, 2) . ' hrs' : '0 hrs'; ?></i>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="container">
+                            <div class="container" style="max-height: 300px; overflow-y: auto;">
                                 <?php 
                                 include "backend/end-points/schedule_list.php";
                                 ?>
-                                
-                              
                             </div>
-
-                            
                         </li>
+
                     </ul>
 
                     <!-- Action Buttons -->

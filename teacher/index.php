@@ -88,8 +88,8 @@ include "components/header.php";
                 if ($scheduleForDay):
         ?>
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-header text-center">
+                <div class="card" >
+                    <div class="card-header text-center" >
                         <?php echo ucfirst($day); ?>
                     </div>
                     <div class="card-body">
@@ -133,11 +133,13 @@ include "components/header.php";
                         </p>
                         <!-- Update Schedule Button -->
                         
-
-
-                        <?php 
+                        <div class="container" style="height:300px; max-height: 300px; overflow-y: auto;">
+                            <?php 
                                 include "backend/end-points/schedule_list.php";
                                 ?>
+                            </div>
+
+                       
 
                         
 

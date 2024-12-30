@@ -41,7 +41,7 @@
                                     endforeach;
                                     
                                     if (!$has_assigned_work) {
-                                        echo '<p>No assigned work schedule.</p>';
+                                        echo '<p class="d-flex justify-content-center text-secondary">No assigned work schedule.</p>';
                                     }
                                 } else {
                                     echo '<p>No work schedule assigned.</p>';
