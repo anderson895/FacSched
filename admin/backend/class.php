@@ -430,85 +430,95 @@ class global_class extends db_connect
 
 
 
-
-public function AssignSched_OverLoad($sched_id, $subject_id, $sectionId, $roomCode, $typeOfWorks, $subtStartTimeAssign, $subtEndTimeAssign, $overload_work)
-{
-    // Step 1: Check for conflicts in the same schedule and room
-    $conflictQuery = "
-        SELECT 1 
-        FROM tblworkschedule
-        WHERE ws_schedule_id = '$sched_id' 
-          AND ws_roomCode = '$roomCode'
-          AND (
-            (ws_subtStartTimeAssign <= '$subtEndTimeAssign' AND ws_subtEndTimeAssign > '$subtStartTimeAssign') OR
-            (ws_subtStartTimeAssign < '$subtEndTimeAssign' AND ws_subtEndTimeAssign >= '$subtStartTimeAssign') OR
-            (ws_subtStartTimeAssign >= '$subtStartTimeAssign' AND ws_subtEndTimeAssign <= '$subtEndTimeAssign')
-          )
-    ";
-    $conflictResult = $this->conn->query($conflictQuery);
-
-    if ($conflictResult->num_rows > 0) {
-        echo "Conflict with existing schedule in the same room."; // Error
-        return false;
-    }
-
-    // Step 2: Fetch schedule details and calculate remaining minutes
-    $scheduleQuery = "
-        SELECT 
-            sched_start_Hrs, sched_end_Hrs,
-            IFNULL(TIMESTAMPDIFF(MINUTE, sched_start_Hrs, sched_end_Hrs), 0) AS total_minutes_per_day,
-            IFNULL(
-                (SELECT SUM(TIMESTAMPDIFF(MINUTE, ws_subtStartTimeAssign, ws_subtEndTimeAssign))
-                 FROM tblworkschedule
-                 WHERE ws_schedule_id = tblschedule.sched_id
-                 GROUP BY ws_schedule_id), 0
-            ) AS total_minutes_workschedule
-        FROM tblschedule
-        WHERE sched_id = '$sched_id'
-    ";
-    $scheduleResult = $this->conn->query($scheduleQuery);
-
-    if ($scheduleResult->num_rows > 0) {
-        $schedule = $scheduleResult->fetch_assoc();
-
-        $sched_start_Hrs = $schedule['sched_start_Hrs'];
-        $sched_end_Hrs = $schedule['sched_end_Hrs'];
-        $total_minutes_per_day = $schedule['total_minutes_per_day'];
-        $total_minutes_workschedule = $schedule['total_minutes_workschedule'];
-
-        // Step 3: Calculate remaining minutes and the new work's duration
-        $remaining_minutes = $total_minutes_per_day - $total_minutes_workschedule;
-        $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
-
-        // Validate time range and remaining minutes
-        if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
-            if ($new_work_minutes <= $remaining_minutes) {
-                // Step 4: Insert the new overload work schedule
-                $status = 'pending';
-                $insertQuery = "
-                    INSERT INTO tblworkschedule 
-                    (ws_schedule_id, ws_sectionId, ws_roomCode, ws_CurriculumID, ws_subtStartTimeAssign, ws_subtEndTimeAssign, ws_typeOfWork, ws_ol_request_status, ws_status) 
-                    VALUES ('$sched_id', '$sectionId', '$roomCode', '$subject_id', '$subtStartTimeAssign', '$subtEndTimeAssign', '$typeOfWorks', '$status', '$overload_work')
-                ";
-                if ($this->conn->query($insertQuery)) {
-                    echo "200"; // Success
+    public function AssignSched_OverLoad($sched_id, $subject_id, $sectionId, $roomCode, $typeOfWorks, $subtStartTimeAssign, $subtEndTimeAssign, $overload_work)
+    {
+        // Step 1: Check for conflicts
+        $conflictQuery = "
+            SELECT 1 
+            FROM tblworkschedule ws
+            WHERE 
+                ws.ws_schedule_id = '$sched_id'
+                AND (
+                    -- Conflict in the same room
+                    (ws.ws_roomCode = '$roomCode' 
+                     AND (
+                         ws.ws_subtStartTimeAssign < '$subtEndTimeAssign' AND ws.ws_subtEndTimeAssign > '$subtStartTimeAssign'
+                     )
+                    )
+                    OR
+                    -- Conflict in a different room for the same schedule ID
+                    (ws.ws_roomCode != '$roomCode'
+                     AND (
+                         ws.ws_subtStartTimeAssign < '$subtEndTimeAssign' AND ws.ws_subtEndTimeAssign > '$subtStartTimeAssign'
+                     )
+                    )
+                )
+        ";
+        $conflictResult = $this->conn->query($conflictQuery);
+    
+        if ($conflictResult->num_rows > 0) {
+            echo "Conflict with an existing schedule."; // Error
+            return false;
+        }
+    
+        // Step 2: Fetch schedule details and calculate remaining minutes
+        $scheduleQuery = "
+            SELECT 
+                sched_start_Hrs, sched_end_Hrs,
+                TIMESTAMPDIFF(MINUTE, sched_start_Hrs, sched_end_Hrs) AS total_minutes_per_day,
+                COALESCE(
+                    (SELECT SUM(TIMESTAMPDIFF(MINUTE, ws.ws_subtStartTimeAssign, ws.ws_subtEndTimeAssign))
+                     FROM tblworkschedule ws
+                     WHERE ws.ws_schedule_id = tblschedule.sched_id
+                     GROUP BY ws.ws_schedule_id), 0
+                ) AS total_minutes_workschedule
+            FROM tblschedule
+            WHERE sched_id = '$sched_id'
+        ";
+        $scheduleResult = $this->conn->query($scheduleQuery);
+    
+        if ($scheduleResult->num_rows > 0) {
+            $schedule = $scheduleResult->fetch_assoc();
+    
+            $sched_start_Hrs = $schedule['sched_start_Hrs'];
+            $sched_end_Hrs = $schedule['sched_end_Hrs'];
+            $total_minutes_per_day = $schedule['total_minutes_per_day'];
+            $total_minutes_workschedule = $schedule['total_minutes_workschedule'];
+    
+            // Step 3: Calculate remaining minutes and the new work's duration
+            $remaining_minutes = $total_minutes_per_day - $total_minutes_workschedule;
+            $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
+    
+            // Validate time range and remaining minutes
+            if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
+                if ($new_work_minutes <= $remaining_minutes) {
+                    // Step 4: Insert the new overload work schedule
+                    $status = 'pending';
+                    $insertQuery = "
+                        INSERT INTO tblworkschedule 
+                        (ws_schedule_id, ws_sectionId, ws_roomCode, ws_CurriculumID, ws_subtStartTimeAssign, ws_subtEndTimeAssign, ws_typeOfWork, ws_ol_request_status, ws_status) 
+                        VALUES ('$sched_id', '$sectionId', '$roomCode', '$subject_id', '$subtStartTimeAssign', '$subtEndTimeAssign', '$typeOfWorks', '$status', '$overload_work')
+                    ";
+                    if ($this->conn->query($insertQuery)) {
+                        echo "200"; // Success
+                    } else {
+                        echo "Error: " . $this->conn->error; // Log the error
+                        return false;
+                    }
                 } else {
-                    echo "Error: " . $this->conn->error; // Log the error
+                    echo "Work schedule exceeds available time for this day."; // Error
                     return false;
                 }
             } else {
-                echo "Work schedule exceeds available time for this day."; // Error
+                echo "Work schedule is out of the allowed class time range."; // Error
                 return false;
             }
         } else {
-            echo "Work schedule is out of the allowed class time range."; // Error
+            echo "Schedule not found."; // Error: No matching schedule found
             return false;
         }
-    } else {
-        echo "Schedule not found."; // Error: No matching schedule found
-        return false;
     }
-}
+    
 
     
 
