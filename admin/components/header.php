@@ -71,6 +71,11 @@ $db = new global_class();
             <a class="nav-link" href="curriculum.php">Curriculum</a>
           </li>
 
+
+          <li class="nav-item">
+            <a class="nav-link" href="report.php">Reports</a>
+          </li>
+
           <!-- Teachers Dropdown in Navbar -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarTeachersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
