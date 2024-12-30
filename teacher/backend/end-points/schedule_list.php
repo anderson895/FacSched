@@ -14,7 +14,7 @@
                                             $end_time = date('h:i A', strtotime($workschedule['ws_subtEndTimeAssign']));
 
                                             if($workschedule['ws_ol_request_status'] =="pending"){
-                                                $card_color="bg-warning";
+                                                $card_color="bg-warning togglerUpdateReq_status";
                                                 $label="<h6 class='text-danger d-flex justify-content-start'>Overload</h6>";
                                             }else if($workschedule['ws_ol_request_status'] =="accept"){
                                                 $card_color="bg-success text-white";

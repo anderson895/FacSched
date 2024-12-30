@@ -190,7 +190,7 @@ include "components/header.php";
                      // Fetch the list of days already taken by the teacher
                      $fetch_all_Subject = $db->fetch_all_Subject();
                      foreach ($fetch_all_Subject as $subject):?>
-                    <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?></option>
+                    <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?> ( <?=$subject['hours']?> hours)</option>
                     <?php endforeach; ?>
                 </select>
             </div>

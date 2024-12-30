@@ -1,0 +1,8 @@
+set Room code all caps
+set occupied room where same room code and time and day
+(set validation don't accept schedule when the schedule time is not finished)
+
+
+count all the teaching hours
+count all the other work (admin work, off campus work)
+count all overload
