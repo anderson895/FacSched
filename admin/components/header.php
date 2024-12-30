@@ -28,10 +28,14 @@ $db = new global_class();
 
   <!-- Sidebar -->
   <div class="sidebar" id="sidebar">
-    <div class="mb-4"></div>
+    
+    <div class="mb-4"><br></div>
+    <div class="mb-4"><br></div>
+
     <a href="index.php">Dashboard</a>
     <a href="section.php">Sections</a>
     <a href="curriculum.php">Curriculum</a>
+    <a href="report.php">Reports</a>
     
     <!-- Teachers Dropdown -->
     <ul class="navbar-nav">
