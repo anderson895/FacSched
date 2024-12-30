@@ -10,7 +10,7 @@ include "components/header.php";
         <input type="text" id="searchInput" class="form-control rounded-pill shadow-sm" placeholder="Search by Teacher's Name">
     </div>
 
-    <!-- Cards Container -->
+   <!-- Cards Container -->
 <div class="container my-5">
     <div class="row">
         <?php 
@@ -30,33 +30,35 @@ include "components/header.php";
                    $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
                    $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
                    $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule hours
-                   
+                   $total_offcampus_work_time = explode(',', $schedule['total_offcampus_work_time']); // Off-campus work time
+                   $total_admin_work_time = explode(',', $schedule['total_admin_work_time']); // Admin work time
+                    
                    foreach ($days as $index => $day):
                        // Extract sched_id and day from sched_ids_per_day
                        list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
-                   
+                       
                        // Split the schedule times (start and end)
                        $time_range = explode('-', $times[$index]);
                        $start_time = $time_range[0];
                        $end_time = $time_range[1];
-                   
+                       
                        // Calculate total hours
                        $start_timestamp = strtotime($start_time);
                        $end_timestamp = strtotime($end_time);
                        $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
-                   
+                       
                        // Calculate total scheduled hours in minutes
                        $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
-                   
+                       
                        // Get corresponding work schedule hours (default to 0 if not available)
                        $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
-                   
+                       
                        // Calculate remaining minutes
                        $remaining_minutes = $total_minutes - $work_schedule_minutes;
-                   
+                       
                        // Convert remaining minutes to hours (optional: you can also keep it in minutes if preferred)
                        $remaining_hours = round($remaining_minutes / 60, 2); // Convert to hours
-                   
+                       
                        // Check if remaining time should be displayed in hours or minutes
                        if ($remaining_hours >= 1) {
                            // If remaining hours are 1 or more, display hours
@@ -75,22 +77,18 @@ include "components/header.php";
                     <!-- Assigned Subjects and Hours -->
                     <ul class="list-group mb-3">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Total Scheduled Hours:</strong> <?= $total_hours ?> hrs
+                           Total Scheduled Hours: <i><?= $total_hours ?> hrs</i>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <strong>Remaining Hrs:</strong> <?= $remaining_hours >= 1 ? "$remaining_hours hour(s)" : "$remaining_minutes minute(s)"; ?>
+                            Remaining Hrs: <i><?= $remaining_hours >= 1 ? "$remaining_hours hour(s)" : "$remaining_minutes minute(s)"; ?></i>
                         </li>
-
+                        <!-- Display Off-campus work time -->
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="container">
-                                <?php 
-                                include "backend/end-points/schedule_list.php";
-                                ?>
-                                
-                              
-                            </div>
-
-                            
+                            Off-campus Work: <i><?= isset($total_offcampus_work_time[$index]) ? round($total_offcampus_work_time[$index] / 60, 2) . ' hrs' : '0 hrs'; ?></i>
+                        </li>
+                        <!-- Display Admin work time -->
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Admin Work: <i><?= isset($total_admin_work_time[$index]) ? round($total_admin_work_time[$index] / 60, 2) . ' hrs' : '0 hrs'; ?></i>
                         </li>
                     </ul>
 
@@ -116,6 +114,7 @@ include "components/header.php";
         <?php endforeach; ?>
     </div>
 </div>
+
 
 
 
@@ -181,10 +180,10 @@ include "components/header.php";
         <form id="frmAssign">
             <div class="mb-3">
                 <h6>Total Remaining Hrs : <span class='remaining_hours'></span></h6>
-                <input hidden type="text" id="sched_id" name="sched_id">
+                <input hidden type="text" id="sched_id" name="sched_id" required>
 
                 <label for="subject_id" class="form-label">Subject Name</label>
-                <select class="form-control" id="subject_id" name="subject_id">
+                <select class="form-control" id="subject_id" name="subject_id" required>
                     <option value="" disabled selected>Select subject name</option>
                     <?php 
                      // Fetch the list of days already taken by the teacher
@@ -196,7 +195,7 @@ include "components/header.php";
             </div>
             <div class="mb-3">
                 <label for="subjectCode" class="form-label">Section</label>
-                <select class="form-control" id="sectionId" name="sectionId">
+                <select class="form-control" id="sectionId" name="sectionId" required>
                     <option value="" disabled selected>Select Section</option>
                     <?php
                     $fetch_all_Section = $db->fetch_all_Section();
@@ -207,21 +206,21 @@ include "components/header.php";
             </div>
             <div class="mb-3">
                 <label for="roomCode" class="form-label">Room code</label>
-                <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
+                <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code" required>
             </div>
 
             <div class="mb-3">
-                <input hidden type="text" id="typeOfWorks" name="typeOfWorks" value="Teaching Work">
+                <input hidden type="text" id="typeOfWorks" name="typeOfWorks" value="Teaching Work" required>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="subtStartTimeAssign" class="form-label">Subject Start Time</label>
-                    <input type="time" class="form-control" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time">
+                    <input type="time" class="form-control" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time" required>
                 </div>
                 <div class="col-md-6">
                     <label for="subtEndTimeAssign" class="form-label">Subject End Time</label>
-                    <input type="time" class="form-control" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time">
+                    <input type="time" class="form-control" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time" required>
                 </div>
             </div>
 
@@ -260,19 +259,19 @@ include "components/header.php";
 
 
                 <div class="mb-3">
-                    <input hidden type="text" name="typeOfWorks" value="Teaching Work">
+                    <input hidden type="text" name="typeOfWorks" value="Teaching Work" required>
                 </div>
 
-                <input hidden type="text" id="sched_id_OverLoad" name="sched_id">
+                <input hidden type="text" id="sched_id_OverLoad" name="sched_id" required>
                 <div hidden class="mb-3">
                     <label for="overload_work" class="form-label">WS_STATUS</label>
-                    <input type="text" class="form-control" name="overload_work" value="overload_work">
+                    <input type="text" class="form-control" name="overload_work" value="overload_work" required>
                 </div>
 
 
                 <div class="mb-3">
                         <label for="subjectName" class="form-label">Subject Name</label>
-                        <select class="form-control" id="subjectName" name="subject_id">
+                        <select class="form-control" id="subjectName" name="subject_id" required>
                             <option value="" disabled selected>Select subject name</option>
                             <?php 
                             // Fetch the list of days already taken by the teacher
@@ -284,7 +283,7 @@ include "components/header.php";
                     </div>
                     <div class="mb-3">
                         <label for="subjectCode" class="form-label" >Section</label>
-                        <select class="form-control" id="subjectCode" name="sectionId">
+                        <select class="form-control" id="subjectCode" name="sectionId" required>
                             <option value="" disabled selected>Select Section</option>
                             <?php
                             $fetch_all_Section = $db->fetch_all_Section();
@@ -295,18 +294,18 @@ include "components/header.php";
                     </div>
                     <div class="mb-3">
                         <label for="roomCode" class="form-label" >Room Code</label>
-                        <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code">
+                        <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code" required>
                     </div>
 
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="subtStartTimeAssign_OverLoad" class="form-label">Subject Start Time</label>
-                            <input type="time" class="form-control" id="subtStartTimeAssign_OverLoad" name="subtStartTimeAssign" placeholder="Enter Start Time">
+                            <input type="time" class="form-control" id="subtStartTimeAssign_OverLoad" name="subtStartTimeAssign" placeholder="Enter Start Time" required>
                         </div>
                         <div class="col-md-6">
                             <label for="subtEndTimeAssign_OverLoad" class="form-label">Subject End Time</label>
-                            <input type="time" class="form-control" id="subtEndTimeAssign_OverLoad" name="subtEndTimeAssign" placeholder="Enter End Time">
+                            <input type="time" class="form-control" id="subtEndTimeAssign_OverLoad" name="subtEndTimeAssign" placeholder="Enter End Time" required>
                         </div>
                     </div>
 

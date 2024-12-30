@@ -1,4 +1,4 @@
-set Room code all caps
+set Room code set all caps
 set occupied room where same room code and time and day
 (set validation don't accept schedule when the schedule time is not finished)
 

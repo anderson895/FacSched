@@ -628,6 +628,36 @@ public function AssignSched_OverLoad($sched_id, $subject_id, $sectionId, $roomCo
         '0'  -- Default to 0 if there are no entries in tblworkschedule or tblotherworkschedule
     ) AS total_minutes_workschedule,
 
+    -- Calculate total off-campus work time (in minutes) for each day
+    IFNULL(
+        GROUP_CONCAT(
+            IFNULL(
+                (SELECT 
+                    SUM(TIMESTAMPDIFF(MINUTE, ows_subtStartTimeAssign, ows_subtEndTimeAssign))
+                 FROM tblotherworkschedule o
+                 WHERE o.ows_schedule_id = tblschedule.sched_id AND o.ows_typeOfWork = 'off campus work'
+                 GROUP BY o.ows_schedule_id), 0
+            ) 
+            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
+        ),
+        '0'  -- Default to 0 if there are no off-campus work entries
+    ) AS total_offcampus_work_time,
+
+    -- Calculate total admin work time (in minutes) for each day
+    IFNULL(
+        GROUP_CONCAT(
+            IFNULL(
+                (SELECT 
+                    SUM(TIMESTAMPDIFF(MINUTE, ows_subtStartTimeAssign, ows_subtEndTimeAssign))
+                 FROM tblotherworkschedule o
+                 WHERE o.ows_schedule_id = tblschedule.sched_id AND o.ows_typeOfWork = 'admin work'
+                 GROUP BY o.ows_schedule_id), 0
+            ) 
+            ORDER BY FIELD(tblschedule.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
+        ),
+        '0'  -- Default to 0 if there are no admin work entries
+    ) AS total_admin_work_time,
+
     -- Calculate remaining minutes per day by subtracting total work schedule time (tblworkschedule + tblotherworkschedule) from total scheduled time
     IFNULL(
         GROUP_CONCAT(
@@ -655,6 +685,7 @@ FROM tblschedule
 LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
 WHERE tblfacultymember.teacher_status = 1
 GROUP BY tblschedule.sched_teacher_id;
+
 
 
         ");
