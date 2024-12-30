@@ -35,7 +35,6 @@ $db = new global_class();
     <a href="index.php">Dashboard</a>
     <a href="section.php">Sections</a>
     <a href="curriculum.php">Curriculum</a>
-    <a href="report.php">Reports</a>
     
     <!-- Teachers Dropdown -->
     <ul class="navbar-nav">
@@ -76,10 +75,6 @@ $db = new global_class();
           </li>
 
 
-          <li class="nav-item">
-            <a class="nav-link" href="report.php">Reports</a>
-          </li>
-
           <!-- Teachers Dropdown in Navbar -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="navbarTeachersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -100,4 +95,4 @@ $db = new global_class();
   </nav>
 
   <!-- Main Content -->
-  <div class="content">
+  <div class="content ">

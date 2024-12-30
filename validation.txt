@@ -6,3 +6,7 @@ set occupied room where same room code and time and day
 count all the teaching hours
 count all the other work (admin work, off campus work)
 count all overload
+
+
+
+bawal same day, same time kahit different room where teacher_id

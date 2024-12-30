@@ -21,7 +21,14 @@ include "components/header.php";
             <div class="card shadow-sm border-0">
                 <div class="card-body">
                     <!-- Display Teacher's Name -->
-                    <h5 class="card-title text-primary fw-bold"><?= ucfirst($schedule['teacher_name']) ?></h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title text-primary fw-bold"><?= ucfirst($schedule['teacher_name']) ?></h5>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="bi bi-eye"></i> View
+                        </button>
+
+                    </div>
+
 
                     <!-- Process Days, Times, and Sched IDs -->
                     <?php 
@@ -70,7 +77,7 @@ include "components/header.php";
 
                     ?>
                     <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">
-                        <span class="text-muted fw-semibold"><?= ucfirst($day) ?> (Sched ID: <?= $sched_id ?>):</span>
+                        <span class="text-muted fw-semibold"><?= ucfirst($day) ?> </span>
                         <span class="text-muted"><?= date('h:i A', strtotime($start_time)) ?> - <?= date('h:i A', strtotime($end_time)) ?></span>
                     </div>
 
