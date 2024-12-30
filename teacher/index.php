@@ -332,19 +332,20 @@ include "components/header.php";
       </div>
 
         <div class="modal-body text-center">
-            <h3>Are you sure you want to accept the overload?</h3>
+            <h6>Are you sure you want to accept the overload?</h6>
             <input hidden type="text" id="ws_id">
         </div>
         <div class="modal-footer">
         <div class="mt-4">
-                      <button type="button"  class="btnUpdateReq_status btn btn-primary" data-ActionStatus="decline">
-                                    <span class="btnSpinner spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
-                                    Decline
-                        </button>
-                      <button type="submit" class="btnUpdateReq_status btn btn-primary" data-ActionStatus="accept">
+                <button type="submit" class="btnUpdateReq_status btn btn-primary" data-ActionStatus="accept">
                                     <span class="btnSpinner spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
                                     Accept
                </button>
+                <button type="button"  class="btnUpdateReq_status btn btn-danger" data-ActionStatus="decline">
+                                    <span class="btnSpinner spinner-border spinner-border-sm" style="display:none;" role="status" aria-hidden="true"></span>
+                                    Decline
+                 </button>
+                     
 
             </div>
            
