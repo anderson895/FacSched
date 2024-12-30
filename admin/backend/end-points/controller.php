@@ -103,7 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $sched_id = $_POST['sched_id'];
           $subject_id = $_POST['subject_id'];
           $sectionId = $_POST['sectionId'];
-          $roomCode = $_POST['roomCode'];
+          $roomCode = strtoupper($_POST['roomCode']);
+
           $typeOfWorks = $_POST['typeOfWorks'];
           $subtStartTimeAssign = $_POST['subtStartTimeAssign'];
           $subtEndTimeAssign = $_POST['subtEndTimeAssign'];
@@ -119,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $overload_work = $_POST['overload_work'];
           $subject_id = $_POST['subject_id'];
           $sectionId = $_POST['sectionId'];
-          $roomCode = $_POST['roomCode'];
+          $roomCode = strtoupper($_POST['roomCode']);
           $typeOfWorks = $_POST['typeOfWorks'];
           $subtStartTimeAssign = $_POST['subtStartTimeAssign'];
           $subtEndTimeAssign = $_POST['subtEndTimeAssign'];
