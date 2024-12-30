@@ -90,6 +90,17 @@ include "components/header.php";
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             Admin Work: <i><?= isset($total_admin_work_time[$index]) ? round($total_admin_work_time[$index] / 60, 2) . ' hrs' : '0 hrs'; ?></i>
                         </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="container">
+                                <?php 
+                                include "backend/end-points/schedule_list.php";
+                                ?>
+                                
+                              
+                            </div>
+
+                            
+                        </li>
                     </ul>
 
                     <!-- Action Buttons -->
