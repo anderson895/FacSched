@@ -5,6 +5,21 @@ include('backend/class.php');
 $db = new global_class();
 
 
+
+if (isset($_SESSION['teacher_id'])) {
+  $result = $db->check_account($_SESSION['teacher_id']);
+
+  if (!empty($result)) {
+    
+  } else {
+     header('location: ../teacher.php');
+  }
+} else {
+ header('location: ../teacher.php');
+}
+
+
+
 $teacherDetails = $db->fetch_teacher_detail($_SESSION['teacher_id']);
 $teacher = $teacherDetails->fetch_assoc();
 

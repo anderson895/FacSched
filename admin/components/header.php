@@ -3,6 +3,26 @@ session_start();
 include('backend/class.php');
 
 $db = new global_class();
+
+
+
+
+
+if (isset($_SESSION['admin_id'])) {
+  $result = $db->check_account($_SESSION['admin_id']);
+
+  if (!empty($result)) {
+    
+  } else {
+     header('location: ../admin.php');
+  }
+} else {
+ header('location: ../admin.php');
+}
+
+
+
+
 ?>
 
 <head>

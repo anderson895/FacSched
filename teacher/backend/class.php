@@ -303,7 +303,19 @@ class global_class extends db_connect
 
         
 
-
+        public function check_account($user_id ) {
+            $query = "SELECT * FROM tblfacultymember WHERE teacher_id = $user_id";
+            $result = $this->conn->query($query);
+    
+            $items = [];
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $items[] = $row;
+                }
+            }
+            return $items; 
+        }
+    
 
 
 
