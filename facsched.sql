@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 29, 2024 at 03:57 PM
+-- Generation Time: Jan 04, 2025 at 07:46 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -115,7 +115,7 @@ CREATE TABLE `tblfacultymember` (
 INSERT INTO `tblfacultymember` (`teacher_id`, `ID_code`, `fname`, `mname`, `lname`, `designation`, `totalweekly_hrs`, `Password`, `teacher_status`) VALUES
 (1, '0002', 'Joshua', 'Raymundo', 'Padilla', 'Instructor II', '40', '0002', 1),
 (2, '0003', 'Juan', '', 'Dela cruz', 'Part Time', NULL, 'Dela cruz', 0),
-(3, '0004', 'andy', '', 'padilla', 'Instructor II', NULL, 'padilla', 1),
+(3, '0004', 'andy', '', 'padilla', 'Instructor II', '40', 'padilla', 1),
 (4, '0005', 'Joan', '', 'Panimbangon', 'Part Time', '12', 'Panimbangon', 1),
 (5, '0006', 'Mary Loi', '', 'Ricalde', 'Instructor I', '40', 'Ricalde', 1),
 (6, '0007', 'April', '', 'De Leon', 'Asst. Prof I', '30', 'De Leon', 1),
@@ -138,14 +138,6 @@ CREATE TABLE `tblotherworkschedule` (
   `ows_typeOfWork` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tblotherworkschedule`
---
-
-INSERT INTO `tblotherworkschedule` (`ows_id`, `ows_schedule_id`, `ows_location`, `ows_work_description`, `ows_subtStartTimeAssign`, `ows_subtEndTimeAssign`, `ows_typeOfWork`) VALUES
-(5, 6, 'Gate', 'Gate Cleaning', '10:00:00', '12:00:00', 'off campus work'),
-(8, 1, 'comlab 1', 'lab cleaning', '09:36:00', '10:34:00', 'off campus work');
-
 -- --------------------------------------------------------
 
 --
@@ -166,24 +158,18 @@ CREATE TABLE `tblschedule` (
 --
 
 INSERT INTO `tblschedule` (`sched_id`, `sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`, `sched_status`) VALUES
-(1, 3, 'monday', '08:34:00', '10:34:00', 'normal'),
-(3, 3, 'tuesday', '08:37:00', '22:41:00', 'normal'),
-(4, 3, 'friday', '09:52:00', '22:52:00', 'normal'),
-(5, 1, 'thursday', '09:00:00', '15:00:00', 'normal'),
-(6, 1, 'monday', '08:46:00', '20:46:00', 'normal'),
-(7, 1, 'wednesday', '07:47:00', '17:00:00', 'normal'),
-(8, 1, 'tuesday', '09:51:00', '21:51:00', 'normal'),
-(9, 5, 'wednesday', '08:00:00', '16:00:00', 'normal'),
-(10, 5, 'monday', '08:00:00', '16:00:00', 'normal'),
-(11, 5, 'tuesday', '08:00:00', '16:00:00', 'normal'),
-(12, 5, 'thursday', '08:00:00', '16:00:00', 'normal'),
-(13, 5, 'friday', '08:00:00', '16:00:00', 'normal'),
-(16, 4, 'monday', '07:00:00', '19:00:00', 'normal'),
-(17, 6, 'monday', '06:00:00', '17:48:00', 'normal'),
-(18, 7, 'monday', '07:15:00', '16:15:00', 'normal'),
-(19, 7, 'friday', '08:00:00', '16:00:00', 'normal'),
-(20, 7, 'wednesday', '07:00:00', '19:00:00', 'normal'),
-(21, 7, 'thursday', '21:00:00', '22:00:00', 'normal');
+(22, 3, 'monday', '07:00:00', '17:00:00', 'normal'),
+(23, 3, 'tuesday', '07:00:00', '16:00:00', 'normal'),
+(24, 3, 'friday', '11:00:00', '19:00:00', 'normal'),
+(25, 3, 'saturday', '07:00:00', '13:00:00', 'normal'),
+(28, 3, 'wednesday', '07:00:00', '14:00:00', 'normal'),
+(29, 1, 'monday', '07:00:00', '17:00:00', 'normal'),
+(30, 1, 'tuesday', '08:00:00', '18:00:00', 'normal'),
+(31, 1, 'wednesday', '07:00:00', '17:00:00', 'normal'),
+(32, 1, 'saturday', '07:00:00', '17:00:00', 'normal'),
+(33, 6, 'monday', '10:00:00', '19:00:00', 'normal'),
+(34, 6, 'tuesday', '07:00:00', '17:00:00', 'normal'),
+(35, 6, 'friday', '10:00:00', '15:00:00', 'normal');
 
 -- --------------------------------------------------------
 
@@ -234,12 +220,15 @@ CREATE TABLE `tblworkschedule` (
 --
 
 INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_status`) VALUES
-(15, 5, 3, 'room 1', 3, '22:00:00', '23:30:00', 'Teaching Work', NULL, 'regular_work'),
-(16, 5, 3, 'room 123', 4, '00:30:00', '01:30:00', 'Teaching Work', NULL, 'regular_work'),
-(17, 5, 3, 'room 999', 4, '17:00:00', '17:30:00', 'Teaching Work', NULL, 'regular_work'),
-(18, 16, 3, 'room 999', 4, '07:30:00', '08:30:00', 'Teaching Work', NULL, 'regular_work'),
-(21, 1, 3, 'room 101', 3, '08:35:00', '09:35:00', 'Teaching Work', NULL, 'regular_work'),
-(23, 1, 5, 'room 1', 5, '11:00:00', '16:00:00', 'Teaching Work', 'pending', 'overload_work');
+(45, 29, 3, 'ROOM 101', 3, '07:00:00', '10:00:00', 'Teaching Work', NULL, 'regular_work'),
+(47, 29, 5, 'ROOM 101', 4, '10:30:00', '11:00:00', 'Teaching Work', NULL, 'regular_work'),
+(54, 29, 3, 'ROOM 101', 4, '11:30:00', '12:00:00', 'Teaching Work', 'decline', 'overload_work'),
+(61, 22, 3, 'ROOM 102', 3, '07:00:00', '10:00:00', 'Teaching Work', NULL, 'regular_work'),
+(65, 22, 3, 'ROOM 103', 3, '11:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work'),
+(66, 22, 3, '101', 3, '13:00:00', '15:00:00', 'Teaching Work', NULL, 'regular_work'),
+(67, 22, 3, '101', 3, '15:01:00', '17:00:00', 'Teaching Work', 'pending', 'overload_work'),
+(68, 23, 3, 'ROOM 101', 3, '07:00:00', '10:00:00', 'Teaching Work', NULL, 'regular_work'),
+(69, 35, 3, 'ROOM 101', 3, '10:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work');
 
 --
 -- Indexes for dumped tables
@@ -293,7 +282,9 @@ ALTER TABLE `tblsection`
 --
 ALTER TABLE `tblworkschedule`
   ADD PRIMARY KEY (`ws_id`),
-  ADD KEY `ws_schedule_id` (`ws_schedule_id`);
+  ADD KEY `ws_schedule_id` (`ws_schedule_id`),
+  ADD KEY `ws_CurriculumID` (`ws_CurriculumID`),
+  ADD KEY `ws_sectionId` (`ws_sectionId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -327,13 +318,13 @@ ALTER TABLE `tblfacultymember`
 -- AUTO_INCREMENT for table `tblotherworkschedule`
 --
 ALTER TABLE `tblotherworkschedule`
-  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
 --
 ALTER TABLE `tblschedule`
-  MODIFY `sched_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `sched_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `tblsection`
@@ -345,7 +336,7 @@ ALTER TABLE `tblsection`
 -- AUTO_INCREMENT for table `tblworkschedule`
 --
 ALTER TABLE `tblworkschedule`
-  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- Constraints for dumped tables
@@ -361,7 +352,9 @@ ALTER TABLE `tblschedule`
 -- Constraints for table `tblworkschedule`
 --
 ALTER TABLE `tblworkschedule`
-  ADD CONSTRAINT `tblworkschedule_ibfk_1` FOREIGN KEY (`ws_schedule_id`) REFERENCES `tblschedule` (`sched_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `tblworkschedule_ibfk_1` FOREIGN KEY (`ws_schedule_id`) REFERENCES `tblschedule` (`sched_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tblworkschedule_ibfk_2` FOREIGN KEY (`ws_CurriculumID`) REFERENCES `tblcurriculum` (`subject_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tblworkschedule_ibfk_3` FOREIGN KEY (`ws_sectionId`) REFERENCES `tblsection` (`sectionId`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
