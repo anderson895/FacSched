@@ -23,9 +23,12 @@ include "components/header.php";
                     <!-- Display Teacher's Name -->
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <h5 class="card-title text-primary fw-bold"><?= ucfirst($schedule['teacher_name']) ?></h5>
-                        <button class="btn btn-primary btn-sm">
-                            <i class="bi bi-eye"></i> View
-                        </button>
+                        <a href="view_schedule.php?teacher_id=<?= $schedule['sched_teacher_id'] ?>">
+                            <button class="btn btn-primary btn-sm">
+                                <i class="bi bi-eye"></i> View
+                            </button>
+                        </a>
+                        
 
                     </div>
 
