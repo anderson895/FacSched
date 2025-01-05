@@ -35,8 +35,99 @@ class global_class extends db_connect
     }
 
 
-    public function view_schedule($teacher_id)
-{
+    public function view_OtherSchedule($teacher_id){
+        // Access the connection from the parent class
+        $conn = $this->conn;
+    
+        // Fetch earliest and latest time for the teacher's schedule
+        $sql_time = "
+            SELECT 
+                MIN(tws.ows_subtStartTimeAssign) AS min_start_time, 
+                MAX(tws.ows_subtEndTimeAssign) AS max_end_time
+            FROM tblotherworkschedule tws
+            JOIN tblschedule ts ON ts.sched_id = tws.ows_schedule_id
+            WHERE ts.sched_teacher_id = $teacher_id
+        ";
+        $result_time = $conn->query($sql_time);
+    
+        if ($result_time && $result_time->num_rows > 0) {
+            $row_time = $result_time->fetch_assoc();
+            $min_start_time = strtotime($row_time['min_start_time']);
+            $max_end_time = strtotime($row_time['max_end_time']);
+        } else {
+            die("No schedule found for the specified teacher.");
+        }
+    
+        // Generate hourly time slots (based on start and end times)
+        $time_slots = [];
+        $current_time = $min_start_time;
+    
+        while ($current_time < $max_end_time) {
+            $start_time = date("g:i A", $current_time); // Human-readable start time
+            $end_time = date("g:i A", $current_time + 3600); // Human-readable end time
+            $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
+            $current_time += 3600;
+        }
+    
+        // Fetch the schedule details for the teacher without the subject and section part
+        $sql_schedule = "
+        SELECT 
+            ts.sched_day, 
+            tws.ows_subtStartTimeAssign, 
+            tws.ows_subtEndTimeAssign, 
+            tws.ows_typeOfWork, 
+            tws.ows_location AS room,
+            tws.ows_work_description  -- Include the work description here
+        FROM tblschedule ts
+        JOIN tblotherworkschedule tws ON ts.sched_id = tws.ows_schedule_id
+        WHERE ts.sched_teacher_id = $teacher_id
+        ORDER BY 
+            FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+            tws.ows_subtStartTimeAssign
+        ";
+    
+        $result_schedule = $conn->query($sql_schedule);
+    
+        if (!$result_schedule) {
+            die("Error fetching schedule: " . $conn->error);
+        }
+    
+        // Organize schedule data by day and time
+        $schedule = [];
+        while ($row_schedule = $result_schedule->fetch_assoc()) {
+            $day = ucfirst($row_schedule['sched_day']);
+            $start_time = strtotime($row_schedule['ows_subtStartTimeAssign']);
+            $end_time = strtotime($row_schedule['ows_subtEndTimeAssign']);
+            
+            // Format the start and end times into human-readable format
+            $formatted_start_time = date('g:i A', $start_time);  // Format: hh:mm AM/PM
+            $formatted_end_time = date('g:i A', $end_time);      // Format: hh:mm AM/PM
+            
+            $schedule[$day][] = [
+                'start_time' => $start_time,
+                'end_time' => $end_time,
+                'work' => $row_schedule['ows_typeOfWork'],
+                'room' => $row_schedule['room'],
+                'work_description' => $row_schedule['ows_work_description'],
+                'formatted_start_time' => $formatted_start_time,
+                'formatted_end_time' => $formatted_end_time
+            ];
+        }
+    
+        // Return the schedule and time slots
+        return [
+            'schedule' => $schedule,
+            'time_slots' => $time_slots
+        ]; // This will be used in the front-end for rendering the schedule.
+    }
+    
+    
+    
+
+
+
+    public function view_AcademicSchedule($teacher_id)
+    {
     // Access the connection from the parent class
     $conn = $this->conn;
 
