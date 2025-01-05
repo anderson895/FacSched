@@ -138,7 +138,8 @@ class global_class extends db_connect
             MAX(tws.ws_subtEndTimeAssign) AS max_end_time
         FROM tblworkschedule tws
         JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
-        WHERE ts.sched_teacher_id = $teacher_id
+        WHERE ts.sched_teacher_id = $teacher_id 
+        AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept')
     ";
     $result_time = $conn->query($sql_time);
 
