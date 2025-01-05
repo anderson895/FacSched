@@ -1,95 +1,14 @@
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "facsched";
+<?php 
+include "components/header.php";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$teacher_id = $_GET['teacher_id'];
 
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Get teacher_id from $_GET with validation
-$teacher_id = isset($_GET['teacher_id']) ? intval($_GET['teacher_id']) : 0;
-
-if ($teacher_id === 0) {
-    die("Invalid or missing teacher_id.");
-}
-
-// Fetch earliest and latest time for the teacher's schedule
-$sql_time = $conn->prepare("
-    SELECT 
-        MIN(tws.ws_subtStartTimeAssign) AS min_start_time, 
-        MAX(tws.ws_subtEndTimeAssign) AS max_end_time
-    FROM tblworkschedule tws
-    JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
-    WHERE ts.sched_teacher_id = ?
-");
-$sql_time->bind_param("i", $teacher_id);
-$sql_time->execute();
-$result_time = $sql_time->get_result();
-
-if ($result_time->num_rows > 0) {
-    $row_time = $result_time->fetch_assoc();
-    $min_start_time = strtotime($row_time['min_start_time']);
-    $max_end_time = strtotime($row_time['max_end_time']);
-} else {
-    die("No schedule found for the specified teacher.");
-}
-
-// Generate hourly time slots
-$time_slots = [];
-$current_time = $min_start_time;
-
-while ($current_time < $max_end_time) {
-    $start_time = date("g:i A", $current_time);
-    $end_time = date("g:i A", $current_time + 3600);
-    $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
-    $current_time += 3600;
-}
-
-// Fetch the schedule details for the teacher
-$sql_schedule = $conn->prepare("
-    SELECT 
-        ts.sched_day, 
-        tws.ws_subtStartTimeAssign, 
-        tws.ws_subtEndTimeAssign, 
-        tws.ws_typeOfWork, 
-        tws.ws_roomCode, 
-        tc.subject_name, 
-        CONCAT(tsc.course, ' ', tsc.section) AS section
-    FROM tblschedule ts
-    JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
-    JOIN tblcurriculum tc ON tc.subject_id = tws.ws_CurriculumID
-    JOIN tblsection tsc ON tsc.sectionId = tws.ws_sectionId
-    WHERE ts.sched_teacher_id = ?
-    ORDER BY 
-        FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
-        tws.ws_subtStartTimeAssign
-");
-$sql_schedule->bind_param("i", $teacher_id);
-$sql_schedule->execute();
-$result_schedule = $sql_schedule->get_result();
-
-// Organize schedule data by day and time
-$schedule = [];
-while ($row_schedule = $result_schedule->fetch_assoc()) {
-    $day = ucfirst($row_schedule['sched_day']);
-    $start_time = strtotime($row_schedule['ws_subtStartTimeAssign']);
-    $end_time = strtotime($row_schedule['ws_subtEndTimeAssign']);
-    $schedule[$day][] = [
-        'start_time' => $start_time,
-        'end_time' => $end_time,
-        'work' => $row_schedule['ws_typeOfWork'],
-        'room' => $row_schedule['ws_roomCode'],
-        'subject_name' => $row_schedule['subject_name'],
-        'section' => $row_schedule['section']
-    ];
-}
+$view_schedule = $db->view_schedule($teacher_id);  
+$teacher = $db->getTeacherInfo($teacher_id);  
+$teacherName = ucfirst($teacher[0]['fname']) . ' ' . $teacher[0]['mname'] . ' ' . $teacher[0]['lname'];
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,7 +19,7 @@ while ($row_schedule = $result_schedule->fetch_assoc()) {
 </head>
 <body>
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Faculty Schedule for Teacher ID: <?= htmlspecialchars($teacher_id) ?></h2>
+    <h2 class="text-center mb-4">Faculty Schedule for Teacher : <?= $teacherName; ?></h2>
     <div class="table-responsive">
         <table class="table table-bordered">
             <thead class="table-dark">
@@ -117,8 +36,11 @@ while ($row_schedule = $result_schedule->fetch_assoc()) {
             </thead>
             <tbody>
                 <?php
+                // Assuming $view_schedule is an array with 'schedule' and 'time_slots'
                 // Track time slots covered by merged cells for each day
                 $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
+                $schedule = $view_schedule['schedule'];  // Get schedule data
+                $time_slots = $view_schedule['time_slots'];  // Get time slots data
 
                 foreach ($time_slots as $slot_index => $slot): ?>
                     <tr>

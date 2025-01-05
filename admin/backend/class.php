@@ -10,6 +10,122 @@ class global_class extends db_connect
     }
 
 
+    public function getTeacherInfo($teacher_id){
+        $query = "
+            SELECT *
+            FROM tblfacultymember as teacher
+            WHERE teacher.teacher_id  = '$teacher_id'
+        ";
+    
+        $result = $this->conn->query($query);
+    
+        if ($result) {
+            if ($result->num_rows > 0) {
+                $schedules = $result->fetch_all(MYSQLI_ASSOC);
+                $result->free();
+                return $schedules;
+            } else {
+                $result->free();
+                return [];
+            }
+        } else {
+            return false;
+        }
+
+    }
+
+
+    public function view_schedule($teacher_id)
+{
+    // Validate the teacher_id
+    $teacher_id = intval($teacher_id);
+    if ($teacher_id === 0) {
+        die("Invalid or missing teacher_id.");
+    }
+
+    // Access the connection from the parent class
+    $conn = $this->conn;
+
+    // Fetch earliest and latest time for the teacher's schedule
+    $sql_time = "
+        SELECT 
+            MIN(tws.ws_subtStartTimeAssign) AS min_start_time, 
+            MAX(tws.ws_subtEndTimeAssign) AS max_end_time
+        FROM tblworkschedule tws
+        JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
+        WHERE ts.sched_teacher_id = $teacher_id
+    ";
+    $result_time = $conn->query($sql_time);
+
+    if ($result_time && $result_time->num_rows > 0) {
+        $row_time = $result_time->fetch_assoc();
+        $min_start_time = strtotime($row_time['min_start_time']);
+        $max_end_time = strtotime($row_time['max_end_time']);
+    } else {
+        die("No schedule found for the specified teacher.");
+    }
+
+    // Generate hourly time slots
+    $time_slots = [];
+    $current_time = $min_start_time;
+
+    while ($current_time < $max_end_time) {
+        $start_time = date("g:i A", $current_time);
+        $end_time = date("g:i A", $current_time + 3600);
+        $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
+        $current_time += 3600;
+    }
+
+    // Fetch the schedule details for the teacher
+    $sql_schedule = "
+        SELECT 
+            ts.sched_day, 
+            tws.ws_subtStartTimeAssign, 
+            tws.ws_subtEndTimeAssign, 
+            tws.ws_typeOfWork, 
+            tws.ws_roomCode, 
+            tc.subject_name, 
+            CONCAT(tsc.course, ' ', tsc.section) AS section
+        FROM tblschedule ts
+        JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
+        JOIN tblcurriculum tc ON tc.subject_id = tws.ws_CurriculumID
+        JOIN tblsection tsc ON tsc.sectionId = tws.ws_sectionId
+        WHERE ts.sched_teacher_id = $teacher_id
+        ORDER BY 
+            FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+            tws.ws_subtStartTimeAssign
+    ";
+    $result_schedule = $conn->query($sql_schedule);
+
+    if (!$result_schedule) {
+        die("Error fetching schedule: " . $conn->error);
+    }
+
+    // Organize schedule data by day and time
+    $schedule = [];
+    while ($row_schedule = $result_schedule->fetch_assoc()) {
+        $day = ucfirst($row_schedule['sched_day']);
+        $start_time = strtotime($row_schedule['ws_subtStartTimeAssign']);
+        $end_time = strtotime($row_schedule['ws_subtEndTimeAssign']);
+        $schedule[$day][] = [
+            'start_time' => $start_time,
+            'end_time' => $end_time,
+            'work' => $row_schedule['ws_typeOfWork'],
+            'room' => $row_schedule['ws_roomCode'],
+            'subject_name' => $row_schedule['subject_name'],
+            'section' => $row_schedule['section']
+        ];
+    }
+
+    // Return the schedule and time slots
+    return [
+        'schedule' => $schedule,
+        'time_slots' => $time_slots
+    ]; // This will be used in the front-end for rendering the schedule.
+}
+
+
+
 
     public function check_account($user_id ) {
         $query = "SELECT * FROM admin WHERE admin_id = $user_id";
