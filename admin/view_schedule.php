@@ -116,34 +116,48 @@ while ($row_schedule = $result_schedule->fetch_assoc()) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($time_slots as $slot): ?>
+                <?php
+                // Track time slots covered by merged cells for each day
+                $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
+
+                foreach ($time_slots as $slot_index => $slot): ?>
                     <tr>
                         <td class="fw-bold"><?= $slot['label'] ?></td>
-                        <?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as $day): ?>
+                        <?php foreach (array_keys($day_trackers) as $day): ?>
                             <?php
-                            $merged = false; // Flag for tracking merged cells
+                            // Skip rendering if current time slot is covered
+                            if ($day_trackers[$day] > 0) {
+                                $day_trackers[$day]--; // Decrease tracker for remaining slots
+                                continue;
+                            }
+
+                            // Check if there is a schedule matching this time slot
+                            $merged = false;
                             foreach ($schedule[$day] ?? [] as $key => $entry) {
                                 $entry_start = $entry['start_time'];
                                 $entry_end = $entry['end_time'];
 
-                                // Check if the current time slot matches the schedule entry
                                 if ($entry_start >= $slot['start'] && $entry_start < $slot['start'] + 3600) {
-                                    // Calculate the rowspan based on overlapping time slots
+                                    // Calculate rowspan for the merged cell
                                     $rowspan = ceil(($entry_end - $entry_start) / 3600);
+
                                     echo "<td rowspan='$rowspan'>";
                                     echo "<div>{$entry['room']}</div>";
                                     echo "<div>{$entry['subject_name']}</div>";
                                     echo "<div>{$entry['section']}</div>";
                                     echo "</td>";
 
-                                    // Remove the processed schedule entry to avoid duplication
+                                    // Mark subsequent time slots as covered
+                                    $day_trackers[$day] = $rowspan - 1;
+
+                                    // Remove the processed schedule entry
                                     unset($schedule[$day][$key]);
                                     $merged = true;
                                     break;
                                 }
                             }
 
-                            // Render empty cell if no schedule matches this time slot
+                            // If no schedule matches, skip rendering this time slot
                             if (!$merged) {
                                 echo "<td></td>";
                             }
