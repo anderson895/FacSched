@@ -9,15 +9,6 @@ $teacherName = ucfirst($teacher[0]['fname']) . ' ' . $teacher[0]['mname'] . ' ' 
 
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faculty Schedule</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
 <div class="container mt-5">
     <h2 class="text-center mb-4">Faculty Schedule for Teacher : <?= $teacherName; ?></h2>
     <div class="table-responsive">
@@ -36,8 +27,6 @@ $teacherName = ucfirst($teacher[0]['fname']) . ' ' . $teacher[0]['mname'] . ' ' 
             </thead>
             <tbody>
                 <?php
-                // Assuming $view_schedule is an array with 'schedule' and 'time_slots'
-                // Track time slots covered by merged cells for each day
                 $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
                 $schedule = $view_schedule['schedule'];  // Get schedule data
                 $time_slots = $view_schedule['time_slots'];  // Get time slots data
@@ -64,6 +53,7 @@ $teacherName = ucfirst($teacher[0]['fname']) . ' ' . $teacher[0]['mname'] . ' ' 
                                     $rowspan = ceil(($entry_end - $entry_start) / 3600);
 
                                     echo "<td rowspan='$rowspan'>";
+                                    echo "<div>Semester {$entry['semester']}</div>";
                                     echo "<div>{$entry['room']}</div>";
                                     echo "<div>{$entry['subject_name']}</div>";
                                     echo "<div>{$entry['section']}</div>";
@@ -91,6 +81,14 @@ $teacherName = ucfirst($teacher[0]['fname']) . ' ' . $teacher[0]['mname'] . ' ' 
         </table>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+
+
+
+<?php 
+include "components/footer.php";
+?>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>

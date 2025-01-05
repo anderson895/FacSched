@@ -211,6 +211,11 @@ include "components/header.php";
                     <?php endforeach; ?>
                 </select>
             </div>
+
+
+
+
+            
             <div class="mb-3">
                 <label for="subjectCode" class="form-label">Section</label>
                 <select class="form-control" id="sectionId" name="sectionId" required>

@@ -37,12 +37,6 @@ class global_class extends db_connect
 
     public function view_schedule($teacher_id)
 {
-    // Validate the teacher_id
-    $teacher_id = intval($teacher_id);
-    if ($teacher_id === 0) {
-        die("Invalid or missing teacher_id.");
-    }
-
     // Access the connection from the parent class
     $conn = $this->conn;
 
@@ -64,7 +58,6 @@ class global_class extends db_connect
     } else {
         die("No schedule found for the specified teacher.");
     }
-
     // Generate hourly time slots
     $time_slots = [];
     $current_time = $min_start_time;
@@ -85,6 +78,7 @@ class global_class extends db_connect
             tws.ws_typeOfWork, 
             tws.ws_roomCode, 
             tc.subject_name, 
+            tc.semester, 
             CONCAT(tsc.course, ' ', tsc.section) AS section
         FROM tblschedule ts
         JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
@@ -113,7 +107,8 @@ class global_class extends db_connect
             'work' => $row_schedule['ws_typeOfWork'],
             'room' => $row_schedule['ws_roomCode'],
             'subject_name' => $row_schedule['subject_name'],
-            'section' => $row_schedule['section']
+            'section' => $row_schedule['section'],
+            'semester' => $row_schedule['semester']
         ];
     }
 
@@ -621,8 +616,8 @@ class global_class extends db_connect
             $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
     
             // Validate time range and remaining minutes
-            if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
-                if ($new_work_minutes <= $remaining_minutes) {
+            // if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
+            //     if ($new_work_minutes <= $remaining_minutes) {
                     // Step 4: Insert the new overload work schedule
                     $status = 'pending';
                     $insertQuery = "
@@ -636,14 +631,14 @@ class global_class extends db_connect
                         echo "Error: " . $this->conn->error; // Log the error
                         return false;
                     }
-                } else {
-                    echo "Work schedule exceeds available time for this day."; // Error
-                    return false;
-                }
-            } else {
-                echo "Work schedule is out of the allowed class time range."; // Error
-                return false;
-            }
+            //     } else {
+            //         echo "Work schedule exceeds available time for this day."; // Error
+            //         return false;
+            //     }
+            // } else {
+            //     echo "Work schedule is out of the allowed class time range."; // Error
+            //     return false;
+            // }
         } else {
             echo "Schedule not found."; // Error: No matching schedule found
             return false;
