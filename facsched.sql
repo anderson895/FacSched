@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 04, 2025 at 07:46 PM
+-- Generation Time: Jan 05, 2025 at 06:58 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -138,6 +138,13 @@ CREATE TABLE `tblotherworkschedule` (
   `ows_typeOfWork` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblotherworkschedule`
+--
+
+INSERT INTO `tblotherworkschedule` (`ows_id`, `ows_schedule_id`, `ows_location`, `ows_work_description`, `ows_subtStartTimeAssign`, `ows_subtEndTimeAssign`, `ows_typeOfWork`) VALUES
+(20, 29, 'English faculty', 'paper works', '10:30:00', '11:30:00', 'admin work');
+
 -- --------------------------------------------------------
 
 --
@@ -212,6 +219,7 @@ CREATE TABLE `tblworkschedule` (
   `ws_subtEndTimeAssign` time NOT NULL,
   `ws_typeOfWork` varchar(60) NOT NULL,
   `ws_ol_request_status` varchar(60) DEFAULT NULL,
+  `ws_sem` int(11) DEFAULT NULL,
   `ws_status` varchar(60) NOT NULL DEFAULT 'regular_work'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -219,16 +227,11 @@ CREATE TABLE `tblworkschedule` (
 -- Dumping data for table `tblworkschedule`
 --
 
-INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_status`) VALUES
-(45, 29, 3, 'ROOM 101', 3, '07:00:00', '10:00:00', 'Teaching Work', NULL, 'regular_work'),
-(47, 29, 5, 'ROOM 101', 4, '10:30:00', '11:00:00', 'Teaching Work', NULL, 'regular_work'),
-(54, 29, 3, 'ROOM 101', 4, '11:30:00', '12:00:00', 'Teaching Work', 'decline', 'overload_work'),
-(61, 22, 3, 'ROOM 102', 3, '07:00:00', '10:00:00', 'Teaching Work', NULL, 'regular_work'),
-(65, 22, 3, 'ROOM 103', 3, '11:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work'),
-(66, 22, 3, '101', 3, '13:00:00', '15:00:00', 'Teaching Work', NULL, 'regular_work'),
-(67, 22, 3, '101', 3, '15:01:00', '17:00:00', 'Teaching Work', 'pending', 'overload_work'),
-(68, 23, 3, 'ROOM 101', 3, '07:00:00', '10:00:00', 'Teaching Work', NULL, 'regular_work'),
-(69, 35, 3, 'ROOM 101', 3, '10:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work');
+INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_sem`, `ws_status`) VALUES
+(78, 29, 3, 'ROOM 101', 3, '07:00:00', '09:00:00', 'Teaching Work', NULL, NULL, 'regular_work'),
+(79, 29, 3, 'ROOM 101', 4, '09:00:00', '10:00:00', 'Teaching Work', NULL, NULL, 'regular_work'),
+(80, 30, 3, 'ROOM 101', 3, '08:00:00', '10:00:00', 'Teaching Work', NULL, NULL, 'regular_work'),
+(81, 31, 3, 'ROOM 101', 3, '06:00:00', '12:00:00', 'Teaching Work', 'accept', NULL, 'overload_work');
 
 --
 -- Indexes for dumped tables
@@ -262,7 +265,8 @@ ALTER TABLE `tblfacultymember`
 -- Indexes for table `tblotherworkschedule`
 --
 ALTER TABLE `tblotherworkschedule`
-  ADD PRIMARY KEY (`ows_id`);
+  ADD PRIMARY KEY (`ows_id`),
+  ADD KEY `ows_schedule_id` (`ows_schedule_id`);
 
 --
 -- Indexes for table `tblschedule`
@@ -318,7 +322,7 @@ ALTER TABLE `tblfacultymember`
 -- AUTO_INCREMENT for table `tblotherworkschedule`
 --
 ALTER TABLE `tblotherworkschedule`
-  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
@@ -336,11 +340,17 @@ ALTER TABLE `tblsection`
 -- AUTO_INCREMENT for table `tblworkschedule`
 --
 ALTER TABLE `tblworkschedule`
-  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `tblotherworkschedule`
+--
+ALTER TABLE `tblotherworkschedule`
+  ADD CONSTRAINT `tblotherworkschedule_ibfk_1` FOREIGN KEY (`ows_schedule_id`) REFERENCES `tblschedule` (`sched_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tblschedule`
