@@ -474,15 +474,32 @@ class global_class extends db_connect
                 )
             )
         ";
-    
+        
         $conflictResult = $this->conn->query($conflictQuery);
-    
+        
         if ($conflictResult->num_rows > 0) {
             echo "Conflict detected: The time range overlaps with an existing schedule."; // Error
             return false;
         }
     
-        // Step 2: Fetch schedule details and calculate remaining minutes
+        // Step 2: Check if the subject is already assigned to the same teacher on the same day
+        $teacherConflictQuery = "
+            SELECT 1
+            FROM tblschedule ts
+            JOIN tblworkschedule ws ON ws.ws_schedule_id = ts.sched_id
+            WHERE ts.sched_teacher_id = (SELECT sched_teacher_id FROM tblschedule WHERE sched_id = '$sched_id')
+            AND ts.sched_day = (SELECT sched_day FROM tblschedule WHERE sched_id = '$sched_id')
+            AND ws.ws_CurriculumID = '$subject_id'
+        ";
+        
+        $teacherConflictResult = $this->conn->query($teacherConflictQuery);
+        
+        if ($teacherConflictResult->num_rows > 0) {
+            echo "Conflict detected: The subject is already assigned to the teacher on the same day."; // Error
+            return false;
+        }
+        
+        // Step 3: Fetch schedule details and calculate remaining minutes
         $scheduleQuery = "
             SELECT 
                 ts.sched_day, ts.sched_start_Hrs, ts.sched_end_Hrs,
@@ -496,22 +513,22 @@ class global_class extends db_connect
             FROM tblschedule ts
             WHERE ts.sched_id = '$sched_id'
         ";
-    
+        
         $scheduleResult = $this->conn->query($scheduleQuery);
-    
+        
         if ($scheduleResult->num_rows > 0) {
             $schedule = $scheduleResult->fetch_assoc();
-    
+        
             $sched_day = $schedule['sched_day'];
             $sched_start_Hrs = $schedule['sched_start_Hrs'];
             $sched_end_Hrs = $schedule['sched_end_Hrs'];
             $total_minutes_per_day = $schedule['total_minutes_per_day'];
             $total_minutes_workschedule = $schedule['total_minutes_workschedule'];
-    
+        
             $remaining_minutes = $total_minutes_per_day - $total_minutes_workschedule;
             $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
-    
-            // Step 3: Validate the time range and remaining minutes
+        
+            // Step 4: Validate the time range and remaining minutes
             if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
                 if ($new_work_minutes <= $remaining_minutes) {
                     // Insert the new work schedule
@@ -538,6 +555,7 @@ class global_class extends db_connect
             return false;
         }
     }
+    
     
 
 
