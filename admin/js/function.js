@@ -14,6 +14,8 @@ function printOtherSchedule() {
     document.body.innerHTML = originalContents;
 }
 
+
+
 function filterBySection() {
     var selectedSection = document.getElementById('sectionFilter').value;
     var scheduleEntries = document.querySelectorAll('.schedule-entry');

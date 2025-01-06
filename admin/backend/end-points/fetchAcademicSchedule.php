@@ -1,4 +1,41 @@
-<?php
+<h2 class="text-center mb-4">Faculty Schedule for Teacher: <?= $teacherName; ?></h2>
+   <!-- Print Buttons -->
+   <div class="text-center mb-4">
+        <button onclick="printAcademicSchedule()" class="btn btn-primary">
+            <i class="bi bi-printer"></i> Print Academic Schedule
+        </button>
+    </div>
+    <!-- Filter Dropdown -->
+    <div class="mb-4">
+        <label for="sectionFilter" class="form-label">Filter by Section:</label>
+        <select id="sectionFilter" class="form-select" onchange="filterBySection()">
+            <option value="">All Sections</option>
+            <?php foreach ($sections as $section): ?>
+                <option value="<?= htmlspecialchars($section); ?>"><?= htmlspecialchars($section); ?></option>
+            <?php endforeach; ?>
+            <option value="No Section">Vacant Hours</option>
+        </select>
+    </div>
+
+ 
+
+    <!-- Academic Schedule Table -->
+    <div class="table-responsive">
+        <table class="table table-bordered" id="academicScheduleTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Time</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
                 $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
                 $academic_schedule = $view_AcademicSchedule['schedule'];
                 $time_slots = $view_AcademicSchedule['time_slots'];
@@ -47,3 +84,6 @@
                         <?php endforeach; ?>
                     </tr>
                 <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>

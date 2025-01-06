@@ -1,4 +1,27 @@
-<?php
+<h3 class="text-center mt-5">Other Work Schedule</h3>
+
+    <div class="text-center mb-4">
+        <button onclick="printOtherSchedule()" class="btn btn-secondary">
+            <i class="bi bi-printer"></i> Print Other Work Schedule
+        </button>
+
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered" id="otherWorkScheduleTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Time</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
                 $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
                 $other_schedule = $view_OtherSchedule['schedule'];
                 $time_slots = $view_OtherSchedule['time_slots'];
@@ -42,4 +65,7 @@
                             ?>
                         <?php endforeach; ?>
                     </tr>
-                <?php endforeach; ?>
+                <?php endforeach; ?>        
+            </tbody>
+        </table>
+    </div>
