@@ -5,19 +5,18 @@
             <i class="bi bi-printer"></i> Print Academic Schedule
         </button>
     </div>
-    <!-- Filter Dropdown -->
-    <div class="mb-4">
-        <label for="sectionFilter" class="form-label">Filter by Section:</label>
-        <select id="sectionFilter" class="form-select" onchange="filterBySection()">
-            <option value="">All Sections</option>
-            <?php foreach ($sections as $section): ?>
-                <option value="<?= htmlspecialchars($section); ?>"><?= htmlspecialchars($section); ?></option>
-            <?php endforeach; ?>
-            <option value="No Section">Vacant Hours</option>
-        </select>
-    </div>
 
- 
+  <!-- Filter Dropdown -->
+<div class="mb-4">
+    <label for="sectionFilter" class="form-label">Filter by Section:</label>
+    <select id="sectionFilter" class="form-select" onchange="filterBySection()">
+    <option value="">All Sections</option>
+    <?php foreach ($sections as $section): ?>
+        <option value="<?= htmlspecialchars($section); ?>"><?= htmlspecialchars($section); ?></option>
+    <?php endforeach; ?>
+</select>
+
+</div>
 
     <!-- Academic Schedule Table -->
     <div class="table-responsive">
@@ -41,7 +40,10 @@
                 $time_slots = $view_AcademicSchedule['time_slots'];
 
                 foreach ($time_slots as $slot_index => $slot): ?>
-                    <tr>
+                    <?php
+                    $row_covered = false; // Flag to track if the row is covered by a schedule
+                    ?>
+                    <tr style="<?= $row_covered ? 'background-color: #f2f2f2;' : ''; ?>">
                         <td class="fw-bold"><?= $slot['label']; ?></td>
                         <?php foreach (array_keys($day_trackers) as $day): ?>
                             <?php
@@ -60,8 +62,12 @@
 
                                 if ($entry_start >= $slot['start'] && $entry_start < $slot['start'] + 3600) {
                                     $rowspan = ceil(($entry_end - $entry_start) / 3600);
+
+                                    // Apply background color to the entire row if a schedule is present
+                                    $row_covered = true;
+
                                     echo "<td rowspan='$rowspan' class='schedule-entry' data-section='" . 
-                                         (isset($entry['section']) ? htmlspecialchars($entry['section']) : 'No Section') . "'>";
+                                         (isset($entry['section']) ? htmlspecialchars($entry['section']) : 'Vacant Hours') . "' style='background-color: #f2f2f2;'>";
                                     echo "<div>Semester {$entry['semester']}</div>";
                                     echo "<div>{$entry['room']}</div>";
                                     echo "<div>{$entry['section']}</div>";

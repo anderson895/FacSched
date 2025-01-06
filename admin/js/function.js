@@ -22,7 +22,7 @@ function filterBySection() {
 
     scheduleEntries.forEach(function(entry) {
         var entrySection = entry.getAttribute('data-section');
-        if (selectedSection === "" || entrySection === selectedSection || (selectedSection === "No Section" && entrySection === "No Section")) {
+        if (selectedSection === "" || entrySection === selectedSection || (selectedSection === "Vacant Hours" && entrySection === "Vacant Hours")) {
             entry.parentElement.style.display = '';
         } else {
             entry.parentElement.style.display = 'none';
