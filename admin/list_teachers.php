@@ -8,16 +8,26 @@ include "components/header.php";
 <div class="container mt-5">
     <h1>List of Teachers</h1>
 
-    <!-- Add Section Button with Icon -->
-    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
-        <i class="bi bi-plus-circle me-2"></i>Add Teachers
-    </button>
 
-    <!-- Search Input with Icon -->
-    <div class="input-group mb-3">
-        <span class="input-group-text"><i class="bi bi-search"></i></span>
-        <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+      <!-- Card for adding new section and search -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+             <!-- Add Section Button with Icon -->
+            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                <i class="bi bi-plus-circle me-2"></i>Add Teachers
+            </button>
+
+                <!-- Search Input with Icon -->
+            <div class="input-group mb-3">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+            </div>
+        </div>
     </div>
+
+  
+
+ 
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered" id="dataTable">
