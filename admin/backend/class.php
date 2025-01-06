@@ -168,6 +168,7 @@ class global_class extends db_connect
             tws.ws_subtStartTimeAssign, 
             tws.ws_subtEndTimeAssign, 
             tws.ws_typeOfWork, 
+            tws.ws_status, 
             tws.ws_roomCode, 
             tc.subject_name, 
             tc.semester, 
@@ -200,6 +201,7 @@ class global_class extends db_connect
             'room' => $row_schedule['ws_roomCode'],
             'subject_name' => $row_schedule['subject_name'],
             'section' => $row_schedule['section'],
+            'ws_status' => $row_schedule['ws_status'],
             'semester' => $row_schedule['semester']
         ];
     }
