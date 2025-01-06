@@ -21,7 +21,29 @@ class global_class extends db_connect
 
 
 
-
+    public function UpdateAccountSetting($teacher_id, $firstName, $middleName, $lastName, $password) {
+        // Start building the query
+        $query = "UPDATE `tblfacultymember` SET 
+            `fname` = '$firstName', `mname` = '$middleName', `lname` = '$lastName'";
+    
+        if (!empty($password)) {
+            $query .= ", `Password` = '$password'";
+        }
+        $query .= " WHERE `teacher_id` = '$teacher_id'";
+    
+       
+        // Execute the query
+        $result = $this->conn->query($query);
+    
+        // Debugging: Check if the result is correct
+        if ($result) {
+            echo "Account updated successfully."; // Success message
+        } else {
+            // Return error with the actual MySQL error
+            echo "Error executing the query: " . $this->conn->error;
+        }
+    }
+    
 
 
 

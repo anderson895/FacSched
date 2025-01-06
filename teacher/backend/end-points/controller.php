@@ -66,6 +66,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
 
 
+        }else if ($_POST['requestType'] == 'UpdateAccountSetting') {
+            $teacher_id = $_POST['teacher_id'];
+            $firstName = $_POST['firstName'];
+            $middleName = $_POST['middleName'];
+            $lastName = $_POST['lastName'];
+            $password = $_POST['password'];
+            $response = $db->UpdateAccountSetting($teacher_id,$firstName,$middleName,$lastName,$password);
+           
+            return $response;
+            
+
         }
 
     }

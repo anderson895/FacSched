@@ -1,4 +1,51 @@
 
+$("#frmUpdateAccountSetting").on("submit", function(e) {
+  e.preventDefault(); 
+  // Show the loading spinner
+
+
+  var newPassword =$('#newPassword').val()
+  var confirmNewPassword =$('#confirmNewPassword').val()
+
+
+
+  if(newPassword){
+      if(newPassword!=confirmNewPassword){
+
+          if(!confirmNewPassword){
+              alertify.error('Confirm New password');
+              return;
+          }
+
+          alertify.error('Password Not Match');
+          return;
+      }
+  }
+ 
+  var formData = new FormData(this);
+
+  formData.append("requestType", 'UpdateAccountSetting');  
+  $.ajax({
+      url: "backend/end-points/controller.php",
+      method: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function(response) {
+        console.log(response);
+          if (response) {
+              alertify.success("Update successfully!");
+              setTimeout(function() {
+                  location.reload();
+              }, 2000);
+          }
+      }
+      
+  });
+});
+
+
+
 
 
 
