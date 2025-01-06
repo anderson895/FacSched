@@ -39,6 +39,10 @@ if (isset($_SESSION['admin_id'])) {
  <!-- ApexCharts CSS -->
  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
    <!-- Google Fonts for a more modern feel -->
+
+
+   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.css" integrity="sha512-MpdEaY2YQ3EokN6lCD6bnWMl5Gwk7RjBbpKLovlrH6X+DRokrPRAF3zQJl1hZUiLXfo2e9MrOt+udOnHCAmi5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />

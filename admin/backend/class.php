@@ -10,6 +10,60 @@ class global_class extends db_connect
     }
 
 
+
+
+
+
+
+
+
+
+
+
+
+    public function statistics() {
+        // Define the query to get the counts
+        $query = "
+            SELECT 
+                (SELECT COUNT(*) FROM tblcurriculum WHERE subject_status = '1') AS total_curriculum,
+                (SELECT COUNT(*) FROM tblsection WHERE section_status = 1) AS total_section,
+                (SELECT COUNT(*) FROM tblfacultymember WHERE teacher_status = '1') AS total_faculty
+        ";
+        
+        // Execute the query using MySQLi
+        $result = $this->conn->query($query);
+        
+        if ($result) {
+            // Fetch the result as an associative array
+            $data = $result->fetch_assoc();
+            
+            // Create the response array
+            $response = [
+                'total_curriculum' => $data['total_curriculum'],
+                'total_section' => $data['total_section'],
+                'total_faculty' => $data['total_faculty']
+            ];
+            
+            // Return the response array
+            return $response;
+        } else {
+            return false; // If the query fails
+        }
+    }
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
     public function getTeacherInfo($teacher_id){
         $query = "
             SELECT *
