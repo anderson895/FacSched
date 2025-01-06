@@ -1,5 +1,21 @@
 $(document).ready(function() {
     // Initialize the chart
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     var options = {
         chart: {
             type: 'bar',
