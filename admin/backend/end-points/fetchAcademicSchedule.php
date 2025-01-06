@@ -1,4 +1,4 @@
-<h2 class="text-center mb-4">Faculty Schedule for Teacher: <?= $teacherName; ?></h2>
+<h2 class="text-center mb-4">Faculty Schedule for Teacher: <span id="teacherName"><?= $teacherName; ?></span></h2>
    <!-- Print Buttons -->
    <div class="text-center mb-4">
         <button onclick="printAcademicSchedule()" class="btn btn-primary">

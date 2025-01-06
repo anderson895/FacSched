@@ -1,13 +1,27 @@
 function printAcademicSchedule() {
-    var printContents = "<h2>Academic Schedule</h2>" + document.getElementById("academicScheduleTable").outerHTML;
+    // Capture the selected section and teacher's name
+    var selectedSection = document.getElementById("sectionFilter").value;
+    var sectionText = selectedSection ? "Section: " + selectedSection : "All Sections";
+    
+    // Ensure the teacher's name is captured correctly
+    var teacherName = document.getElementById("teacherName").textContent; // Corrected property
+
+    // Add teacher's name and section information to the printed content
+    var printContents = "<h6>Faculty Schedule for Teacher:   " + teacherName + "</h6>" + 
+                        "<hr><h3>" + sectionText + "</h3>" + 
+                        document.getElementById("academicScheduleTable").outerHTML;
+    
     var originalContents = document.body.innerHTML;
     document.body.innerHTML = printContents;
     window.print();
     document.body.innerHTML = originalContents;
 }
 
+
+
 function printOtherSchedule() {
-    var printContents = "<h2>Other Work Schedule</h2>" + document.getElementById("otherWorkScheduleTable").outerHTML;
+    var teacherName = document.getElementById("teacherName").textContent;
+    var printContents = "<h6>Faculty Schedule for Teacher:   " + teacherName + "</h6><hr><h2>Other Work Schedule</h2>" + document.getElementById("otherWorkScheduleTable").outerHTML;
     var originalContents = document.body.innerHTML;
     document.body.innerHTML = printContents;
     window.print();
