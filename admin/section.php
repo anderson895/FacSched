@@ -92,14 +92,28 @@ include "components/header.php";
             <input type="text" class="form-control" name="course" placeholder="" required>
             <label for="course" class="form-label">Course</label>
           </div>
+         
+         
           <div class="mb-3 form-floating">
-            <input type="text" class="form-control" name="year_level" placeholder="" required>
+            <select class="form-control" name="year_level" required>
+              <option value="" disabled selected>Select Year Level</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
             <label for="year_level" class="form-label">Year Level</label>
           </div>
+
+
+
           <div class="mb-3 form-floating">
             <input type="text" class="form-control" name="section" placeholder="" required>
             <label for="section" class="form-label">Section</label>
           </div>
+
+
+          
           <button type="submit" id="btnAddSection" class="btn btn-success">
             <i class="bi bi-plus-circle me-2"></i>Add Section
           </button>

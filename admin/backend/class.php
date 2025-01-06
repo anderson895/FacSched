@@ -580,7 +580,7 @@ class global_class extends db_connect
         FROM tblworkschedule ws
         JOIN tblschedule ts ON ts.sched_id = ws.ws_schedule_id
         WHERE ts.sched_day = (SELECT sched_day FROM tblschedule WHERE sched_id = '$sched_id')
-        AND ws.ws_CurriculumID = '$subject_id'
+        AND ws.ws_CurriculumID = '$subject_id' AND ws.ws_sectionId = '$sectionId'
     ";
 
     $subjectConflictResult = $this->conn->query($subjectConflictQuery);

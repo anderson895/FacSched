@@ -46,9 +46,6 @@ include "components/header.php";
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
         // Initialize ApexCharts with animation and customized color scheme
         var options = {
