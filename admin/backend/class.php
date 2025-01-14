@@ -200,93 +200,95 @@ class global_class extends db_connect
 
 
     public function view_AcademicSchedule($teacher_id)
-{
-    // Access the connection from the parent class
-    $conn = $this->conn;
-
-    // Fetch earliest and latest time for the teacher's schedule
-    $sql_time = "
-        SELECT 
-            MIN(tws.ws_subtStartTimeAssign) AS min_start_time, 
-            MAX(tws.ws_subtEndTimeAssign) AS max_end_time
-        FROM tblworkschedule tws
-        JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
-        WHERE ts.sched_teacher_id = $teacher_id 
-        AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept')
-    ";
-    $result_time = $conn->query($sql_time);
-
-    if ($result_time && $result_time->num_rows > 0) {
-        $row_time = $result_time->fetch_assoc();
-        $min_start_time = strtotime($row_time['min_start_time']);
-        $max_end_time = strtotime($row_time['max_end_time']);
-    } else {
-        die("No schedule found for the specified teacher.");
+    {
+        // Access the connection from the parent class
+        $conn = $this->conn;
+    
+        // Fetch earliest and latest time for the teacher's schedule
+        $sql_time = "
+            SELECT 
+                MIN(tws.ws_subtStartTimeAssign) AS min_start_time, 
+                MAX(tws.ws_subtEndTimeAssign) AS max_end_time
+            FROM tblworkschedule tws
+            JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
+            WHERE ts.sched_teacher_id = $teacher_id 
+            AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept')
+        ";
+        $result_time = $conn->query($sql_time);
+    
+        if ($result_time && $result_time->num_rows > 0) {
+            $row_time = $result_time->fetch_assoc();
+            $min_start_time = strtotime($row_time['min_start_time']);
+            $max_end_time = strtotime($row_time['max_end_time']);
+        } else {
+            die("No schedule found for the specified teacher.");
+        }
+    
+        // Generate 30-minute time slots
+        $time_slots = [];
+        $current_time = $min_start_time;
+    
+        while ($current_time < $max_end_time) {
+            $start_time = date("g:i A", $current_time);
+            $end_time = date("g:i A", $current_time + 1800); // Increment by 1800 seconds (30 minutes)
+            $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
+            $current_time += 1800; // Move to the next 30-minute slot
+        }
+    
+        // Fetch the schedule details for the teacher
+        $sql_schedule = "
+            SELECT 
+                ts.sched_day, 
+                tws.ws_subtStartTimeAssign, 
+                tws.ws_subtEndTimeAssign, 
+                tws.ws_typeOfWork, 
+                tws.ws_status, 
+                tws.ws_roomCode, 
+                tc.subject_name, 
+                tc.semester, 
+                tsc.year_level,
+                CONCAT(tsc.course, ' ', tsc.section) AS section
+            FROM tblschedule ts
+            JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
+            JOIN tblcurriculum tc ON tc.subject_id = tws.ws_CurriculumID
+            JOIN tblsection tsc ON tsc.sectionId = tws.ws_sectionId
+            WHERE ts.sched_teacher_id = $teacher_id
+            ORDER BY 
+                FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+                tws.ws_subtStartTimeAssign
+        ";
+        $result_schedule = $conn->query($sql_schedule);
+    
+        if (!$result_schedule) {
+            die("Error fetching schedule: " . $conn->error);
+        }
+    
+        // Organize schedule data by day and time
+        $schedule = [];
+        while ($row_schedule = $result_schedule->fetch_assoc()) {
+            $day = ucfirst($row_schedule['sched_day']);
+            $start_time = strtotime($row_schedule['ws_subtStartTimeAssign']);
+            $end_time = strtotime($row_schedule['ws_subtEndTimeAssign']);
+            $schedule[$day][] = [
+                'start_time' => $start_time,
+                'end_time' => $end_time,
+                'work' => $row_schedule['ws_typeOfWork'],
+                'room' => $row_schedule['ws_roomCode'],
+                'subject_name' => $row_schedule['subject_name'],
+                'section' => $row_schedule['section'],
+                'ws_status' => $row_schedule['ws_status'],
+                'year_level' => $row_schedule['year_level'],
+                'semester' => $row_schedule['semester']
+            ];
+        }
+    
+        // Return the schedule and time slots
+        return [
+            'schedule' => $schedule,
+            'time_slots' => $time_slots
+        ]; // This will be used in the front-end for rendering the schedule.
     }
-
-    // Generate 30-minute time slots
-    $time_slots = [];
-    $current_time = $min_start_time;
-
-    while ($current_time < $max_end_time) {
-        $start_time = date("g:i A", $current_time);
-        $end_time = date("g:i A", $current_time + 1800); // Add 1800 seconds (30 minutes)
-        $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
-        $current_time += 1800; // Increment by 30 minutes
-    }
-
-    // Fetch the schedule details for the teacher
-    $sql_schedule = "
-        SELECT 
-            ts.sched_day, 
-            tws.ws_subtStartTimeAssign, 
-            tws.ws_subtEndTimeAssign, 
-            tws.ws_typeOfWork, 
-            tws.ws_status, 
-            tws.ws_roomCode, 
-            tc.subject_name, 
-            tc.semester, 
-            CONCAT(tsc.course, ' ', tsc.section) AS section
-        FROM tblschedule ts
-        JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
-        JOIN tblcurriculum tc ON tc.subject_id = tws.ws_CurriculumID
-        JOIN tblsection tsc ON tsc.sectionId = tws.ws_sectionId
-        WHERE ts.sched_teacher_id = $teacher_id
-        ORDER BY 
-            FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
-            tws.ws_subtStartTimeAssign
-    ";
-    $result_schedule = $conn->query($sql_schedule);
-
-    if (!$result_schedule) {
-        die("Error fetching schedule: " . $conn->error);
-    }
-
-    // Organize schedule data by day and time
-    $schedule = [];
-    while ($row_schedule = $result_schedule->fetch_assoc()) {
-        $day = ucfirst($row_schedule['sched_day']);
-        $start_time = strtotime($row_schedule['ws_subtStartTimeAssign']);
-        $end_time = strtotime($row_schedule['ws_subtEndTimeAssign']);
-        $schedule[$day][] = [
-            'start_time' => $start_time,
-            'end_time' => $end_time,
-            'work' => $row_schedule['ws_typeOfWork'],
-            'room' => $row_schedule['ws_roomCode'],
-            'subject_name' => $row_schedule['subject_name'],
-            'section' => $row_schedule['section'],
-            'ws_status' => $row_schedule['ws_status'],
-            'semester' => $row_schedule['semester']
-        ];
-    }
-
-    // Return the schedule and time slots
-    return [
-        'schedule' => $schedule,
-        'time_slots' => $time_slots
-    ]; // This will be used in the front-end for rendering the schedule.
-}
-
+    
 
 
 
@@ -621,6 +623,13 @@ class global_class extends db_connect
     
     public function AssignSched($sched_id, $subject_id, $sectionId, $roomCode, $typeOfWorks, $subtStartTimeAssign, $subtEndTimeAssign)
 {
+    // Step 0: Validate time interval
+    $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
+    if ($new_work_minutes % 30 !== 0) {
+        echo "Invalid time interval: Time range must be in whole hours or 30-minute intervals."; // Error
+        return false;
+    }
+
     // Step 1: Check for conflicts in the same room and day
     $conflictQuery = "
         SELECT 1
@@ -694,7 +703,6 @@ class global_class extends db_connect
         $total_minutes_workschedule = $schedule['total_minutes_workschedule'];
 
         $remaining_minutes = $total_minutes_per_day - $total_minutes_workschedule;
-        $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
 
         // Step 4: Validate the time range and remaining minutes
         if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
@@ -723,6 +731,7 @@ class global_class extends db_connect
         return false;
     }
 }
+
 
     
     
