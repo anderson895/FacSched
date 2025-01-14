@@ -22,6 +22,28 @@ $('#subject_id').on('change', function () {
 
 
 
+$('#subjectName').on('change', function () {
+  // Get the designated year level of the selected subject
+  const selectedYearLevel = $(this).find(':selected').data('designated_year_level');
+
+  // Loop through all options in the Section dropdown
+  $('#subjectCode option').each(function () {
+      const sectionYearLevel = $(this).data('year-level');
+
+      // Show or hide sections based on the match
+      if (sectionYearLevel == selectedYearLevel || !selectedYearLevel) {
+          $(this).show(); // Show matching sections
+      } else {
+          $(this).hide(); // Hide non-matching sections
+      }
+  });
+
+  // Reset the Section dropdown to its default state
+  $('#subjectCode').val('').trigger('change');
+});
+
+
+
 
 
 

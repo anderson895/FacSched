@@ -301,28 +301,33 @@ include "components/header.php";
 
 
                 <div class="mb-3">
-                        <label for="subjectName" class="form-label">Subject Name</label>
-                        <select class="form-control" id="subjectName" name="subject_id" required>
-                            <option value="" disabled selected>Select subject name</option>
-                            <?php 
-                            // Fetch the list of days already taken by the teacher
-                            $fetch_all_Subject = $db->fetch_all_Subject();
-                            foreach ($fetch_all_Subject as $subject):?>
-                            <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="subjectCode" class="form-label" >Section</label>
-                        <select class="form-control" id="subjectCode" name="sectionId" required>
-                            <option value="" disabled selected>Select Section</option>
-                            <?php
-                            $fetch_all_Section = $db->fetch_all_Section();
-                            foreach ($fetch_all_Section as $section):?>
-                            <option value="<?=$section['sectionId']?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                    <label for="subjectName" class="form-label">Subject Name</label>
+                    <select class="form-control" id="subjectName" name="subject_id" required>
+                        <option value="" disabled selected>Select subject name</option>
+                        <?php 
+                        $fetch_all_Subject = $db->fetch_all_Subject();
+                        foreach ($fetch_all_Subject as $subject): ?>
+                            <option value="<?=$subject['subject_id']?>" data-designated_year_level="<?=$subject['designated_year_level']?>"><?=$subject['subject_name']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="subjectCode" class="form-label">Section</label>
+                    <select class="form-control" id="subjectCode" name="sectionId" required>
+                        <option value="" disabled selected>Select Section</option>
+                        <?php
+                        $fetch_all_Section = $db->fetch_all_Section();
+                        foreach ($fetch_all_Section as $section): 
+                            // Extract numeric value from year levels like '1st', '2nd', etc.
+                            $numeric_year_level = (int) filter_var($section['year_level'], FILTER_SANITIZE_NUMBER_INT);
+                        ?>
+                            <option value="<?=$section['sectionId']?>" data-year-level="<?=$numeric_year_level?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+
+
                     <div class="mb-3">
                         <label for="roomCode" class="form-label" >Room Code</label>
                         <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code" required>

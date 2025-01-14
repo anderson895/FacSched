@@ -200,7 +200,7 @@ class global_class extends db_connect
 
 
     public function view_AcademicSchedule($teacher_id)
-    {
+{
     // Access the connection from the parent class
     $conn = $this->conn;
 
@@ -223,15 +223,16 @@ class global_class extends db_connect
     } else {
         die("No schedule found for the specified teacher.");
     }
-    // Generate hourly time slots
+
+    // Generate 30-minute time slots
     $time_slots = [];
     $current_time = $min_start_time;
 
     while ($current_time < $max_end_time) {
         $start_time = date("g:i A", $current_time);
-        $end_time = date("g:i A", $current_time + 3600);
+        $end_time = date("g:i A", $current_time + 1800); // Add 1800 seconds (30 minutes)
         $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
-        $current_time += 3600;
+        $current_time += 1800; // Increment by 30 minutes
     }
 
     // Fetch the schedule details for the teacher
@@ -285,6 +286,7 @@ class global_class extends db_connect
         'time_slots' => $time_slots
     ]; // This will be used in the front-end for rendering the schedule.
 }
+
 
 
 
