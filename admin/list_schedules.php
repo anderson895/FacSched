@@ -196,7 +196,10 @@ include "components/header.php";
       </div>
       <div class="modal-body">
         <form id="frmAssign">
-            <div class="mb-3">
+            
+        
+        
+        <div class="mb-3">
                 <h6>Total Remaining Hrs : <span class='remaining_hours'></span></h6>
                 <input hidden type="text" id="sched_id" name="sched_id" required>
 
@@ -204,29 +207,34 @@ include "components/header.php";
                 <select class="form-control" id="subject_id" name="subject_id" required>
                     <option value="" disabled selected>Select subject name</option>
                     <?php 
-                     // Fetch the list of days already taken by the teacher
-                     $fetch_all_Subject = $db->fetch_all_Subject();
-                     foreach ($fetch_all_Subject as $subject):?>
-                    <option value="<?=$subject['subject_id']?>"><?=$subject['subject_name']?> ( <?=$subject['hours']?> hours)</option>
+                    $fetch_all_Subject = $db->fetch_all_Subject();
+                    foreach ($fetch_all_Subject as $subject): 
+                        $semester_ordinalFormat = $db->formatOrdinal($subject['semester']);
+                        ?>
+                        <option value="<?=$subject['subject_id']?>" data-designated_year_level="<?=$subject['designated_year_level']?>"><?=$subject['subject_name']?> (<?=$subject['hours']?> hours)- <?=$semester_ordinalFormat?> </option>
                     <?php endforeach; ?>
                 </select>
             </div>
 
-
-
-
-            
             <div class="mb-3">
                 <label for="subjectCode" class="form-label">Section</label>
                 <select class="form-control" id="sectionId" name="sectionId" required>
                     <option value="" disabled selected>Select Section</option>
                     <?php
                     $fetch_all_Section = $db->fetch_all_Section();
-                     foreach ($fetch_all_Section as $section):?>
-                    <option value="<?=$section['sectionId']?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
+                    foreach ($fetch_all_Section as $section): 
+                        // Map year levels like '1st', '2nd' to numeric values
+                        $numeric_year_level = (int) filter_var($section['year_level'], FILTER_SANITIZE_NUMBER_INT);
+                    ?>
+                        <option value="<?=$section['sectionId']?>" data-year-level="<?=$numeric_year_level?>"><?=$section['course']?>,<?=$section['section']?>,<?=$section['year_level']?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
+
+
+
+
+
             <div class="mb-3">
                 <label for="roomCode" class="form-label">Room code</label>
                 <input type="text" class="form-control" name="roomCode" placeholder="Enter Room code" required>

@@ -52,7 +52,26 @@ class global_class extends db_connect
     }
     
     
+
+
+
+
+    public function formatOrdinal($number) {
+        $suffix = 'th Sem';
     
+        // Special cases for 1, 2, and 3 (but not 11, 12, 13)
+        if ($number % 100 < 11 || $number % 100 > 13) {
+            switch ($number % 10) {
+                case 1: $suffix = 'st Sem'; break;
+                case 2: $suffix = 'nd Sem'; break;
+                case 3: $suffix = 'rd Sem'; break;
+            }
+        }
+    
+        return $number . $suffix;
+    }
+    
+ 
     
 
 
