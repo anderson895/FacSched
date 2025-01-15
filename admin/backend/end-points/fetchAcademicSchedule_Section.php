@@ -1,8 +1,8 @@
-<h2 class="text-center mb-4">Schedule for : <span id="teacherName"><?= $sectionDetails; ?></span></h2>
+<h2 class="text-center mb-4">Schedule for : <span id="SectionName"><?= $sectionDetails; ?></span></h2>
 
 <!-- Print Buttons -->
 <div class="text-center mb-4">
-    <button onclick="printAcademicSchedule()" class="btn btn-primary">
+    <button onclick="printAcademicSchedule_Section()" class="btn btn-primary">
         <i class="bi bi-printer"></i> Print Academic Schedule
     </button>
 </div>
@@ -32,7 +32,7 @@ if ($noScheduleFound) {
     ?>
     <!-- Academic Schedule Table -->
     <div class="table-responsive">
-        <table class="table table-bordered" id="academicScheduleTable">
+        <table class="table table-bordered" id="academicScheduleTable_Section">
             <thead class="table-dark">
                 <tr>
                     <th>Time</th>
