@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 05, 2025 at 06:58 PM
+-- Generation Time: Jan 15, 2025 at 03:03 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -78,17 +78,21 @@ CREATE TABLE `tblcurriculum` (
   `hours` int(11) NOT NULL,
   `semester` int(11) NOT NULL,
   `designated_year_level` int(11) NOT NULL,
-  `subject_status` int(11) NOT NULL DEFAULT 1 COMMENT '0=archive,1=exist'
+  `subject_status` int(11) NOT NULL DEFAULT 1 COMMENT '0=archive,1=exist',
+  `subject_date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblcurriculum`
 --
 
-INSERT INTO `tblcurriculum` (`subject_id`, `subject_code`, `subject_name`, `lab_num`, `lec_num`, `hours`, `semester`, `designated_year_level`, `subject_status`) VALUES
-(3, 'CP2', 'Capstone ', 1, 0, 3, 2, 4, 1),
-(4, 'ITH', 'Science', 1, 0, 3, 1, 3, 1),
-(5, 'PE1', 'PE2', 0, 1, 2, 1, 4, 1);
+INSERT INTO `tblcurriculum` (`subject_id`, `subject_code`, `subject_name`, `lab_num`, `lec_num`, `hours`, `semester`, `designated_year_level`, `subject_status`, `subject_date_added`) VALUES
+(3, 'CP2', 'Capstone  2', 1, 0, 3, 2, 4, 1, '2025-01-15 00:05:40'),
+(4, 'ITH', 'Science', 1, 0, 3, 1, 3, 1, '2025-01-15 00:05:40'),
+(5, 'PE1', 'PE2', 0, 1, 2, 1, 4, 1, '2025-01-15 00:05:40'),
+(6, 'CP1', 'capstone 1', 1, 0, 5, 1, 2, 1, '2023-01-15 00:05:40'),
+(7, 'PE2', 'Physical Education 2', 0, 1, 2, 2, 2, 1, '2024-01-15 00:05:40'),
+(8, 'MTH', 'mathematics', 0, 2, 5, 1, 2, 1, '2025-01-15 00:26:46');
 
 -- --------------------------------------------------------
 
@@ -113,11 +117,11 @@ CREATE TABLE `tblfacultymember` (
 --
 
 INSERT INTO `tblfacultymember` (`teacher_id`, `ID_code`, `fname`, `mname`, `lname`, `designation`, `totalweekly_hrs`, `Password`, `teacher_status`) VALUES
-(1, '0002', 'Joshua', 'Raymundo', 'Padilla', 'Instructor II', '40', '0002', 1),
+(1, '0002', 'gerald', '', 'anderson', 'Instructor II', '40', 'anderson', 1),
 (2, '0003', 'Juan', '', 'Dela cruz', 'Part Time', NULL, 'Dela cruz', 0),
-(3, '0004', 'andy', '', 'padilla', 'Instructor II', '40', 'padilla', 1),
+(3, '0004', 'robin', '', 'padilla', 'Instructor II', '40', 'padilla', 1),
 (4, '0005', 'Joan', '', 'Panimbangon', 'Part Time', '12', 'Panimbangon', 1),
-(5, '0006', 'Mary Loi', '', 'Ricalde', 'Instructor I', '40', 'Ricalde', 1),
+(5, '0006', 'Mary Loi', '', 'Ricalde', 'Instructor I', '40', 'Ricalde', 0),
 (6, '0007', 'April', '', 'De Leon', 'Asst. Prof I', '30', 'De Leon', 1),
 (7, '00010', 'james', '', 'bungay', 'Instructor I', '30', 'bungay', 1),
 (8, '0008', 'juan ', '', 'delacruz', 'Dean', '40', 'delacruz', 1);
@@ -137,13 +141,6 @@ CREATE TABLE `tblotherworkschedule` (
   `ows_subtEndTimeAssign` time NOT NULL,
   `ows_typeOfWork` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tblotherworkschedule`
---
-
-INSERT INTO `tblotherworkschedule` (`ows_id`, `ows_schedule_id`, `ows_location`, `ows_work_description`, `ows_subtStartTimeAssign`, `ows_subtEndTimeAssign`, `ows_typeOfWork`) VALUES
-(20, 29, 'English faculty', 'paper works', '10:30:00', '11:30:00', 'admin work');
 
 -- --------------------------------------------------------
 
@@ -201,7 +198,10 @@ INSERT INTO `tblsection` (`sectionId`, `course`, `year_level`, `section`, `secti
 (2, 'BSIT', '1st year', 'B', 0),
 (3, 'BSIT', '2nd year', 'A', 1),
 (4, 'BSIT', '1st year', 'K', 0),
-(5, 'BSIT', '4th Year', 'A', 1);
+(5, 'BSIT', '4th Year', 'A', 1),
+(6, 'BSIT', '2nd Year', 'B', 1),
+(7, 'BSCS', '1st Year', 'A', 1),
+(8, 'BSIT', '3rd Year', 'C', 1);
 
 -- --------------------------------------------------------
 
@@ -219,7 +219,6 @@ CREATE TABLE `tblworkschedule` (
   `ws_subtEndTimeAssign` time NOT NULL,
   `ws_typeOfWork` varchar(60) NOT NULL,
   `ws_ol_request_status` varchar(60) DEFAULT NULL,
-  `ws_sem` int(11) DEFAULT NULL,
   `ws_status` varchar(60) NOT NULL DEFAULT 'regular_work'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -227,11 +226,12 @@ CREATE TABLE `tblworkschedule` (
 -- Dumping data for table `tblworkschedule`
 --
 
-INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_sem`, `ws_status`) VALUES
-(78, 29, 3, 'ROOM 101', 3, '07:00:00', '09:00:00', 'Teaching Work', NULL, NULL, 'regular_work'),
-(79, 29, 3, 'ROOM 101', 4, '09:00:00', '10:00:00', 'Teaching Work', NULL, NULL, 'regular_work'),
-(80, 30, 3, 'ROOM 101', 3, '08:00:00', '10:00:00', 'Teaching Work', NULL, NULL, 'regular_work'),
-(81, 31, 3, 'ROOM 101', 3, '06:00:00', '12:00:00', 'Teaching Work', 'accept', NULL, 'overload_work');
+INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_status`) VALUES
+(100, 34, 3, 'ROOM 1', 6, '07:00:00', '11:00:00', 'Teaching Work', NULL, 'regular_work'),
+(101, 35, 3, 'ROOM 1', 6, '10:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work'),
+(102, 22, 3, 'ROOM 1', 6, '07:00:00', '11:00:00', 'Teaching Work', NULL, 'regular_work'),
+(103, 29, 6, 'ROOM 2', 7, '07:00:00', '09:00:00', 'Teaching Work', NULL, 'regular_work'),
+(104, 29, 3, 'ROOM 1', 7, '11:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work');
 
 --
 -- Indexes for dumped tables
@@ -310,7 +310,7 @@ ALTER TABLE `designation`
 -- AUTO_INCREMENT for table `tblcurriculum`
 --
 ALTER TABLE `tblcurriculum`
-  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tblfacultymember`
@@ -322,7 +322,7 @@ ALTER TABLE `tblfacultymember`
 -- AUTO_INCREMENT for table `tblotherworkschedule`
 --
 ALTER TABLE `tblotherworkschedule`
-  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
@@ -334,13 +334,13 @@ ALTER TABLE `tblschedule`
 -- AUTO_INCREMENT for table `tblsection`
 --
 ALTER TABLE `tblsection`
-  MODIFY `sectionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `sectionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tblworkschedule`
 --
 ALTER TABLE `tblworkschedule`
-  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
+  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- Constraints for dumped tables
