@@ -27,7 +27,7 @@
                                 >Update</button>
 
                                 <button class="btn btn-danger btn-sm removeTeacher" data-teacher_id="<?=$teacher['teacher_id']?>">Remove</button>
-                                
+                                <a href="view_schedule.php?teacher_id=<?=$teacher['teacher_id']?>"><button class="btn btn-success btn-sm">Schedule</button></a>
 
                         </div>
                     </td>

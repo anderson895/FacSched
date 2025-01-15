@@ -1,11 +1,35 @@
 <h3 class="text-center mt-5">Other Work Schedule</h3>
 
-    <div class="text-center mb-4">
-        <button onclick="printOtherSchedule()" class="btn btn-secondary">
-            <i class="bi bi-printer"></i> Print Other Work Schedule
-        </button>
+<div class="text-center mb-4">
+    <button onclick="printOtherSchedule()" class="btn btn-secondary">
+        <i class="bi bi-printer"></i> Print Other Work Schedule
+    </button>
+</div>
 
-    </div>
+<?php
+// Check if there are any records in the schedule
+$other_schedule = $view_OtherSchedule['schedule'];
+$time_slots = $view_OtherSchedule['time_slots'];
+
+// Flag to check if there are any records
+$noRecordsFound = true; 
+
+// Loop through time slots to check if there is any data
+foreach ($time_slots as $slot_index => $slot) {
+    foreach (array_keys($other_schedule) as $day) {
+        if (!empty($other_schedule[$day])) {
+            $noRecordsFound = false;
+            break 2; // Exit both loops if records are found
+        }
+    }
+}
+
+// If no records found, display a message
+if ($noRecordsFound) {
+    echo '<div class="alert alert-warning text-center">No records found for Other Work Schedule</div>';
+} else {
+    // Display the table if there are records
+    ?>
     <div class="table-responsive">
         <table class="table table-bordered" id="otherWorkScheduleTable">
             <thead class="table-dark">
@@ -23,8 +47,6 @@
             <tbody>
             <?php
                 $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
-                $other_schedule = $view_OtherSchedule['schedule'];
-                $time_slots = $view_OtherSchedule['time_slots'];
 
                 foreach ($time_slots as $slot_index => $slot): ?>
                     <tr>
@@ -44,7 +66,7 @@
                                 if ($entry_start >= $slot['start'] && $entry_start < $slot['start'] + 3600) {
                                     $rowspan = ceil(($entry_end - $entry_start) / 3600);
 
-                                    $work=ucfirst($entry['work']);
+                                    $work = ucfirst($entry['work']);
                                     echo "<td rowspan='$rowspan' class='schedule-entry' data-section='" . 
                                          (isset($entry['section']) ? htmlspecialchars($entry['section']) : 'No Section') . "'>";
                                     echo "<div>{$work}</div>";
@@ -69,3 +91,4 @@
             </tbody>
         </table>
     </div>
+<?php } ?>
