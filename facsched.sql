@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 15, 2025 at 03:03 AM
+-- Generation Time: Jan 15, 2025 at 06:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -117,7 +117,7 @@ CREATE TABLE `tblfacultymember` (
 --
 
 INSERT INTO `tblfacultymember` (`teacher_id`, `ID_code`, `fname`, `mname`, `lname`, `designation`, `totalweekly_hrs`, `Password`, `teacher_status`) VALUES
-(1, '0002', 'gerald', '', 'anderson', 'Instructor II', '40', 'anderson', 1),
+(1, '0002', 'gerald', '', 'anderson', 'Instructor II', '40', '0002', 1),
 (2, '0003', 'Juan', '', 'Dela cruz', 'Part Time', NULL, 'Dela cruz', 0),
 (3, '0004', 'robin', '', 'padilla', 'Instructor II', '40', 'padilla', 1),
 (4, '0005', 'Joan', '', 'Panimbangon', 'Part Time', '12', 'Panimbangon', 1),
@@ -142,6 +142,13 @@ CREATE TABLE `tblotherworkschedule` (
   `ows_typeOfWork` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblotherworkschedule`
+--
+
+INSERT INTO `tblotherworkschedule` (`ows_id`, `ows_schedule_id`, `ows_location`, `ows_work_description`, `ows_subtStartTimeAssign`, `ows_subtEndTimeAssign`, `ows_typeOfWork`) VALUES
+(26, 38, 'faculty', 'paper works', '12:00:00', '14:00:00', 'admin work');
+
 -- --------------------------------------------------------
 
 --
@@ -154,26 +161,27 @@ CREATE TABLE `tblschedule` (
   `sched_day` varchar(60) NOT NULL,
   `sched_start_Hrs` time NOT NULL,
   `sched_end_Hrs` time NOT NULL,
-  `sched_status` varchar(60) NOT NULL DEFAULT 'normal'
+  `sched_status` varchar(60) NOT NULL DEFAULT 'normal',
+  `sched_date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblschedule`
 --
 
-INSERT INTO `tblschedule` (`sched_id`, `sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`, `sched_status`) VALUES
-(22, 3, 'monday', '07:00:00', '17:00:00', 'normal'),
-(23, 3, 'tuesday', '07:00:00', '16:00:00', 'normal'),
-(24, 3, 'friday', '11:00:00', '19:00:00', 'normal'),
-(25, 3, 'saturday', '07:00:00', '13:00:00', 'normal'),
-(28, 3, 'wednesday', '07:00:00', '14:00:00', 'normal'),
-(29, 1, 'monday', '07:00:00', '17:00:00', 'normal'),
-(30, 1, 'tuesday', '08:00:00', '18:00:00', 'normal'),
-(31, 1, 'wednesday', '07:00:00', '17:00:00', 'normal'),
-(32, 1, 'saturday', '07:00:00', '17:00:00', 'normal'),
-(33, 6, 'monday', '10:00:00', '19:00:00', 'normal'),
-(34, 6, 'tuesday', '07:00:00', '17:00:00', 'normal'),
-(35, 6, 'friday', '10:00:00', '15:00:00', 'normal');
+INSERT INTO `tblschedule` (`sched_id`, `sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`, `sched_status`, `sched_date_added`) VALUES
+(22, 3, 'monday', '07:00:00', '17:00:00', 'normal', '2025-01-15 03:56:22'),
+(23, 3, 'tuesday', '07:00:00', '16:00:00', 'normal', '2025-01-15 03:56:22'),
+(24, 3, 'friday', '11:00:00', '19:00:00', 'normal', '2025-01-15 03:56:22'),
+(25, 3, 'saturday', '07:00:00', '13:00:00', 'normal', '2025-01-15 03:56:22'),
+(28, 3, 'wednesday', '07:00:00', '14:00:00', 'normal', '2025-01-15 03:56:22'),
+(30, 1, 'tuesday', '08:00:00', '18:00:00', 'normal', '2025-01-15 03:56:22'),
+(31, 1, 'wednesday', '07:00:00', '17:00:00', 'normal', '2025-01-15 03:56:22'),
+(32, 1, 'saturday', '07:00:00', '17:00:00', 'normal', '2025-01-15 03:56:22'),
+(33, 6, 'monday', '10:00:00', '19:00:00', 'normal', '2025-01-15 03:56:22'),
+(34, 6, 'tuesday', '07:00:00', '17:00:00', 'normal', '2025-01-15 03:56:22'),
+(35, 6, 'friday', '10:00:00', '15:00:00', 'normal', '2025-01-15 03:56:22'),
+(38, 1, 'monday', '07:00:00', '17:00:00', 'normal', '2024-01-15 05:22:34');
 
 -- --------------------------------------------------------
 
@@ -201,7 +209,8 @@ INSERT INTO `tblsection` (`sectionId`, `course`, `year_level`, `section`, `secti
 (5, 'BSIT', '4th Year', 'A', 1),
 (6, 'BSIT', '2nd Year', 'B', 1),
 (7, 'BSCS', '1st Year', 'A', 1),
-(8, 'BSIT', '3rd Year', 'C', 1);
+(8, 'BSIT', '3rd Year', 'C', 1),
+(10, 'BSIT', '2nd Year', 'Z', 1);
 
 -- --------------------------------------------------------
 
@@ -227,11 +236,9 @@ CREATE TABLE `tblworkschedule` (
 --
 
 INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_status`) VALUES
-(100, 34, 3, 'ROOM 1', 6, '07:00:00', '11:00:00', 'Teaching Work', NULL, 'regular_work'),
-(101, 35, 3, 'ROOM 1', 6, '10:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work'),
-(102, 22, 3, 'ROOM 1', 6, '07:00:00', '11:00:00', 'Teaching Work', NULL, 'regular_work'),
-(103, 29, 6, 'ROOM 2', 7, '07:00:00', '09:00:00', 'Teaching Work', NULL, 'regular_work'),
-(104, 29, 3, 'ROOM 1', 7, '11:00:00', '12:00:00', 'Teaching Work', NULL, 'regular_work');
+(110, 38, 5, 'ROOM 1', 3, '07:00:00', '11:30:00', 'Teaching Work', NULL, 'regular_work'),
+(111, 38, 5, 'ROOM 1', 3, '14:30:00', '17:00:00', 'Teaching Work', 'accept', 'overload_work'),
+(112, 30, 5, 'ROOM 1', 3, '08:00:00', '10:00:00', 'Teaching Work', 'accept', 'overload_work');
 
 --
 -- Indexes for dumped tables
@@ -322,25 +329,25 @@ ALTER TABLE `tblfacultymember`
 -- AUTO_INCREMENT for table `tblotherworkschedule`
 --
 ALTER TABLE `tblotherworkschedule`
-  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `ows_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `tblschedule`
 --
 ALTER TABLE `tblschedule`
-  MODIFY `sched_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `sched_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `tblsection`
 --
 ALTER TABLE `tblsection`
-  MODIFY `sectionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `sectionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tblworkschedule`
 --
 ALTER TABLE `tblworkschedule`
-  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
+  MODIFY `ws_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 
 --
 -- Constraints for dumped tables
