@@ -1,4 +1,25 @@
 
+$(document).ready(function() {
+  // Event listener for when the "Schedule" button is clicked
+  $('.viewSchedule').on('click', function() {
+      var sectionId = $(this).data('sectionid');
+
+      // Make an AJAX request to fetch the schedule for this section (or if you have static data, just set it here)
+      $.ajax({
+          url: "backend/end-points/controller.php",
+          type: 'GET',
+          data: { sectionId: sectionId, viewSchedule: viewSchedule},
+          success: function(response) {
+              // Assuming the response contains the schedule details
+              $('#scheduleDetails').html(response); // Insert the response into the modal body
+              $('#scheduleModal').modal('show');  // Show the modal
+          },
+          error: function() {
+              $('#scheduleDetails').html('<p>Error loading schedule. Please try again later.</p>');
+          }
+      });
+  });
+});
 
 
 

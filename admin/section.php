@@ -30,8 +30,8 @@ include "components/header.php";
                         <tr>
                             <th>Section ID</th>
                             <th style="min-width: 150px;">Course</th>
-                            <th>Year Level</th>
                             <th>Section</th>
+                            <th>Year Level</th>
                             <th style="width: 100px;">Action</th>
                         </tr>
                     </thead>

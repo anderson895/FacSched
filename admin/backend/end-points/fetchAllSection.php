@@ -9,8 +9,8 @@
                 <tr>
                     <td class="p-2"><?= $section['sectionId']; ?></td>
                     <td class="p-2"><?= $section['course']; ?></td>
-                    <td class="p-2"><?= $section['year_level']; ?></td>
                     <td class="p-2"><?= $section['section']; ?></td>
+                    <td class="p-2"><?= $section['year_level']; ?></td>
                     <td class="p-2">
                         <div class="d-flex gap-2">
                             <button class="btn btn-primary btn-sm updateProductToggler" data-bs-toggle="modal" data-bs-target="#updateSectionModal"
@@ -19,8 +19,8 @@
                                 data-section="<?=$section['section']?>"
                                 data-sectionid="<?=$section['sectionId']?>"
                                 >Update</button>
-
                                 <button class="btn btn-danger btn-sm removeSection" data-sectionid="<?=$section['sectionId']?>">Remove</button>
+                                <a href="view_Section_schedule.php?sectionId=<?=$section['sectionId']?>"><button class="btn btn-success btn-sm">Schedule</button></a>
 
                         </div>
                     </td>
@@ -34,3 +34,16 @@
                     </tr>
                 <?php } ?>
               
+
+
+
+
+
+
+
+
+
+
+
+
+                
