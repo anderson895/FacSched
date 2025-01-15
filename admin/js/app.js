@@ -469,7 +469,7 @@ $("#addSectionForm").submit(function (e) {
           $('.spinner').hide();
           $('#btnAddSection').prop('disabled', false);
           console.log(response); 
-          alertify.error(response.message);
+          alertify.error(response);
         }
       },
       error: function () {

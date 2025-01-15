@@ -537,20 +537,42 @@ ORDER BY
 
 
 
-        public function addSection($course, $year_level, $section)
+    public function addSection($course, $year_level, $section)
     {
+        // Check if the section already exists
+        $checkQuery = $this->conn->prepare("SELECT COUNT(*) FROM `tblsection` WHERE `course` = ? AND `year_level` = ? AND `section` = ?");
+        if ($checkQuery === false) {
+            return false;
+        }
+        
+        $checkQuery->bind_param("sss", $course, $year_level, $section);
+        $checkQuery->execute();
+        $checkQuery->bind_result($count);
+        $checkQuery->fetch();
+        $checkQuery->close();
+        
+        // If the section already exists, return an error message
+        if ($count > 0) {
+            echo "Section already exists.";
+            return false;
+        }
+    
+        // If the section does not exist, insert it
         $query = $this->conn->prepare("INSERT INTO `tblsection` (`course`, `year_level`, `section`) VALUES (?, ?, ?)");
         if ($query === false) {
             return false; 
         }
+        
         $query->bind_param("sss", $course, $year_level, $section);
         if ($query->execute()) {
             echo "200"; // Success
         } else {
             return false;
         }
+        
         $query->close();
     }
+    
 
 
 
