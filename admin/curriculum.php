@@ -29,32 +29,14 @@ include "components/header.php";
   
 
     <!-- Card Container for Data -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered" id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>Subject code</th>
-                            <th style="min-width: 150px;">Subject name</th>
-                            <th>Lab</th>
-                            <th>Lec</th>
-                            <th>Hrs</th>
-                            <th>Sem</th>
-                            <th>Year level</th>
-                            <th style="width: 100px;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php include "backend/end-points/fetchAllsubject.php"; ?>
-                    </tbody>
-                </table>
-                <div id="noResultsMessage" class="alert alert-warning" style="display: none;">
-                    No search results found.
-                </div>
-            </div>
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="table-responsive" >
+            <?php include "backend/end-points/fetchAllsubject.php"?>
         </div>
     </div>
+</div>
+
 
     <!-- Pagination Controls -->
     <nav aria-label="Page navigation">
@@ -182,4 +164,4 @@ include "components/footer.php";
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/displayTable.js"></script>
+<script src="js/filter_sec_yrLevel.js"></script>
