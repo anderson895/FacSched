@@ -102,7 +102,7 @@ class global_class extends db_connect
     
         // Step 2: Calculate the total hours already scheduled for the teacher
         $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(HOUR, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_hours 
-            FROM `tblschedule` WHERE `sched_teacher_id` = ?");
+            FROM `tblschedule` WHERE `sched_teacher_id` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ");
         $query->bind_param("s", $teacher_id);
         $query->execute();
         $result = $query->get_result();
@@ -138,7 +138,7 @@ class global_class extends db_connect
     {
         // Step 1: Check for schedule overlap (same logic as before)
         $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
-            WHERE `sched_teacher_id` = ? AND `sched_day` = ? 
+            WHERE `sched_teacher_id` = ? AND `sched_day` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
             AND ((`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?) 
             OR (`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?))");
             
@@ -175,7 +175,7 @@ class global_class extends db_connect
     
         // Step 4: Get the teacher's current total scheduled hours
         $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(HOUR, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_hours 
-            FROM `tblschedule` WHERE `sched_teacher_id` = ?");
+            FROM `tblschedule` WHERE `sched_teacher_id` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ");
         $query->bind_param("s", $teacher_id);
         $query->execute();
         $result = $query->get_result();
@@ -303,7 +303,7 @@ class global_class extends db_connect
         {
             $takenDays = [];
             $query = $this->conn->prepare("SELECT `sched_day` FROM `tblschedule` 
-                WHERE `sched_teacher_id` = ?");
+                WHERE `sched_teacher_id` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ");
             $query->bind_param("s", $teacher_id);
             
             // Execute the query
@@ -344,7 +344,7 @@ class global_class extends db_connect
 
         public function fetch_schedule($teacher_id)
         {
-            $query = "SELECT * FROM `tblschedule` WHERE `sched_teacher_id` = $teacher_id";
+            $query = "SELECT * FROM `tblschedule` WHERE `sched_teacher_id` = $teacher_id AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ";
             
             $result = $this->conn->query($query); 
             
@@ -377,7 +377,7 @@ class global_class extends db_connect
             LEFT JOIN tblworkschedule ON tblschedule.sched_id = tblworkschedule.ws_schedule_id
             LEFT JOIN tblsection ON tblsection.sectionId = tblworkschedule.ws_sectionId
             LEFT JOIN tblcurriculum ON tblcurriculum.subject_id = tblworkschedule.ws_CurriculumID
-            WHERE tblschedule.sched_id = '$sched_id'
+            WHERE tblschedule.sched_id = '$sched_id' AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
         ";
     
         $result = $this->conn->query($query);
@@ -404,7 +404,7 @@ class global_class extends db_connect
             SELECT *
             FROM tblschedule
             LEFT JOIN tblotherworkschedule ON tblschedule.sched_id = tblotherworkschedule.ows_schedule_id
-            WHERE tblschedule.sched_id = '$sched_id'
+            WHERE tblschedule.sched_id = '$sched_id' AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
         ";
     
         $result = $this->conn->query($query);

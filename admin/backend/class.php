@@ -171,7 +171,7 @@ class global_class extends db_connect
                 MAX(tws.ows_subtEndTimeAssign) AS max_end_time
             FROM tblotherworkschedule tws
             JOIN tblschedule ts ON ts.sched_id = tws.ows_schedule_id
-            WHERE ts.sched_teacher_id = $teacher_id
+            WHERE ts.sched_teacher_id = $teacher_id AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
         ";
         $result_time = $conn->query($sql_time);
     
@@ -205,7 +205,7 @@ class global_class extends db_connect
             tws.ows_work_description  -- Include the work description here
         FROM tblschedule ts
         JOIN tblotherworkschedule tws ON ts.sched_id = tws.ows_schedule_id
-        WHERE ts.sched_teacher_id = $teacher_id
+        WHERE ts.sched_teacher_id = $teacher_id AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
         ORDER BY 
             FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
             tws.ows_subtStartTimeAssign
@@ -265,7 +265,7 @@ class global_class extends db_connect
             FROM tblworkschedule tws
             JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
             WHERE ts.sched_teacher_id = $teacher_id 
-            AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept')
+            AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept') AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
         ";
         $result_time = $conn->query($sql_time);
     
@@ -305,7 +305,7 @@ class global_class extends db_connect
             JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
             JOIN tblcurriculum tc ON tc.subject_id = tws.ws_CurriculumID
             JOIN tblsection tsc ON tsc.sectionId = tws.ws_sectionId
-            WHERE ts.sched_teacher_id = $teacher_id
+            WHERE ts.sched_teacher_id = $teacher_id AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
             ORDER BY 
                 FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
                 tws.ws_subtStartTimeAssign
@@ -362,7 +362,7 @@ class global_class extends db_connect
             FROM tblworkschedule tws
             JOIN tblschedule ts ON ts.sched_id = tws.ws_schedule_id
             WHERE tws.ws_sectionId = $sectionId 
-            AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept')
+            AND (ws_ol_request_status IS NULL OR ws_ol_request_status = 'accept') AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
         ";
         $result_time = $conn->query($sql_time);
     
@@ -404,7 +404,7 @@ JOIN tblworkschedule tws ON ts.sched_id = tws.ws_schedule_id
 JOIN tblcurriculum tc ON tc.subject_id = tws.ws_CurriculumID
 JOIN tblsection tsc ON tsc.sectionId = tws.ws_sectionId
 JOIN tblfacultymember teacher ON teacher.teacher_id = ts.sched_teacher_id 
-WHERE tws.ws_sectionId = $sectionId
+WHERE tws.ws_sectionId = $sectionId AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
 ORDER BY 
     FIELD(ts.sched_day, 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
     tws.ws_subtStartTimeAssign;
@@ -808,35 +808,45 @@ ORDER BY
         return false;
     }
 
-    // Step 1: Check for conflicts in the same room and day
+    // Step 1: Fetch the day for the given schedule
+    $getSchedDayQuery = "SELECT sched_day FROM tblschedule WHERE sched_id = '$sched_id'";
+    $dayResult = $this->conn->query($getSchedDayQuery);
+    $schedDay = $dayResult->fetch_row()[0];
+
+    // Step 2: Check for conflicts in the same room and day
     $conflictQuery = "
         SELECT 1
         FROM tblworkschedule ws
         JOIN tblschedule ts ON ts.sched_id = ws.ws_schedule_id
         WHERE (
-            -- Conflict for the same room
+            -- Conflict for the same room and day
             (ws.ws_roomCode = '$roomCode' 
-             AND ts.sched_day = (SELECT sched_day FROM tblschedule WHERE sched_id = '$sched_id') 
-             AND (
-                 ws.ws_subtStartTimeAssign < '$subtEndTimeAssign' AND ws.ws_subtEndTimeAssign > '$subtStartTimeAssign'
-             )
-            ) OR
+            AND ts.sched_day = '$schedDay' 
+            AND (
+                ws.ws_subtStartTimeAssign < '$subtEndTimeAssign' 
+                AND ws.ws_subtEndTimeAssign > '$subtStartTimeAssign'
+            )
+            ) 
+            OR
             -- Conflict for the same ws_schedule_id, different room
             (ws.ws_roomCode != '$roomCode' 
-             AND ws.ws_schedule_id = '$sched_id'
-             AND (
-                 ws.ws_subtStartTimeAssign < '$subtEndTimeAssign' AND ws.ws_subtEndTimeAssign > '$subtStartTimeAssign'
-             )
+            AND ws.ws_schedule_id = '$sched_id'
+            AND (
+                ws.ws_subtStartTimeAssign < '$subtEndTimeAssign' 
+                AND ws.ws_subtEndTimeAssign > '$subtStartTimeAssign'
+            )
             )
         )
+        AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
     ";
-    
+
     $conflictResult = $this->conn->query($conflictQuery);
-    
+
     if ($conflictResult->num_rows > 0) {
         echo "Conflict detected: The time range overlaps with an existing schedule."; // Error
         return false;
     }
+
 
     // Step 2: Check if the subject is already assigned on the same day
     $subjectConflictQuery = "
@@ -844,7 +854,7 @@ ORDER BY
         FROM tblworkschedule ws
         JOIN tblschedule ts ON ts.sched_id = ws.ws_schedule_id
         WHERE ts.sched_day = (SELECT sched_day FROM tblschedule WHERE sched_id = '$sched_id')
-        AND ws.ws_CurriculumID = '$subject_id' AND ws.ws_sectionId = '$sectionId'
+        AND ws.ws_CurriculumID = '$subject_id' AND ws.ws_sectionId = '$sectionId' AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
     ";
 
     $subjectConflictResult = $this->conn->query($subjectConflictQuery);
@@ -936,6 +946,7 @@ ORDER BY
         $conflictQuery = "
             SELECT 1 
             FROM tblworkschedule ws
+            JOIN tblschedule ts ON ts.sched_id = ws.ws_schedule_id
             WHERE 
                 ws.ws_schedule_id = '$sched_id'
                 AND (
@@ -953,6 +964,7 @@ ORDER BY
                      )
                     )
                 )
+                AND YEAR(ts.sched_date_added) = YEAR(CURDATE()) 
         ";
         $conflictResult = $this->conn->query($conflictQuery);
     
@@ -969,7 +981,7 @@ ORDER BY
                 COALESCE(
                     (SELECT SUM(TIMESTAMPDIFF(MINUTE, ws.ws_subtStartTimeAssign, ws.ws_subtEndTimeAssign))
                      FROM tblworkschedule ws
-                     WHERE ws.ws_schedule_id = tblschedule.sched_id
+                     WHERE ws.ws_schedule_id = tblschedule.sched_id AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
                      GROUP BY ws.ws_schedule_id), 0
                 ) AS total_minutes_workschedule
             FROM tblschedule
@@ -989,9 +1001,7 @@ ORDER BY
             $remaining_minutes = $total_minutes_per_day - $total_minutes_workschedule;
             $new_work_minutes = (strtotime($subtEndTimeAssign) - strtotime($subtStartTimeAssign)) / 60;
     
-            // Validate time range and remaining minutes
-            // if (strtotime($subtStartTimeAssign) >= strtotime($sched_start_Hrs) && strtotime($subtEndTimeAssign) <= strtotime($sched_end_Hrs)) {
-            //     if ($new_work_minutes <= $remaining_minutes) {
+           
                     // Step 4: Insert the new overload work schedule
                     $status = 'pending';
                     $insertQuery = "
@@ -1005,14 +1015,7 @@ ORDER BY
                         echo "Error: " . $this->conn->error; // Log the error
                         return false;
                     }
-            //     } else {
-            //         echo "Work schedule exceeds available time for this day."; // Error
-            //         return false;
-            //     }
-            // } else {
-            //     echo "Work schedule is out of the allowed class time range."; // Error
-            //     return false;
-            // }
+           
         } else {
             echo "Schedule not found."; // Error: No matching schedule found
             return false;
@@ -1042,7 +1045,7 @@ ORDER BY
                      GROUP BY w.ows_schedule_id), 0
                 ) AS total_minutes_workschedule
             FROM tblschedule
-            WHERE sched_id = ?
+            WHERE sched_id = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
         ");
         $query->bind_param("s", $sched_id);
         
@@ -1207,7 +1210,7 @@ ORDER BY
     ) AS remaining_hours_per_day
 FROM tblschedule
 LEFT JOIN tblfacultymember ON tblschedule.sched_teacher_id = tblfacultymember.teacher_id
-WHERE tblfacultymember.teacher_status = 1
+WHERE tblfacultymember.teacher_status = 1 AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
 GROUP BY tblschedule.sched_teacher_id;
 
 
