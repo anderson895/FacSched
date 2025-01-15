@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 15, 2025 at 06:32 AM
+-- Generation Time: Jan 15, 2025 at 07:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -79,6 +79,7 @@ CREATE TABLE `tblcurriculum` (
   `semester` int(11) NOT NULL,
   `designated_year_level` int(11) NOT NULL,
   `subject_status` int(11) NOT NULL DEFAULT 1 COMMENT '0=archive,1=exist',
+  `subject_sy` varchar(60) NOT NULL,
   `subject_date_added` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -86,13 +87,13 @@ CREATE TABLE `tblcurriculum` (
 -- Dumping data for table `tblcurriculum`
 --
 
-INSERT INTO `tblcurriculum` (`subject_id`, `subject_code`, `subject_name`, `lab_num`, `lec_num`, `hours`, `semester`, `designated_year_level`, `subject_status`, `subject_date_added`) VALUES
-(3, 'CP2', 'Capstone  2', 1, 0, 3, 2, 4, 1, '2025-01-15 00:05:40'),
-(4, 'ITH', 'Science', 1, 0, 3, 1, 3, 1, '2025-01-15 00:05:40'),
-(5, 'PE1', 'PE2', 0, 1, 2, 1, 4, 1, '2025-01-15 00:05:40'),
-(6, 'CP1', 'capstone 1', 1, 0, 5, 1, 2, 1, '2023-01-15 00:05:40'),
-(7, 'PE2', 'Physical Education 2', 0, 1, 2, 2, 2, 1, '2024-01-15 00:05:40'),
-(8, 'MTH', 'mathematics', 0, 2, 5, 1, 2, 1, '2025-01-15 00:26:46');
+INSERT INTO `tblcurriculum` (`subject_id`, `subject_code`, `subject_name`, `lab_num`, `lec_num`, `hours`, `semester`, `designated_year_level`, `subject_status`, `subject_sy`, `subject_date_added`) VALUES
+(12, 'cap1', 'capstone 1', 1, 0, 4, 2, 3, 1, '2025-2026', '2025-01-15 06:08:01'),
+(13, 'cap 2', 'capstone 2', 0, 2, 4, 2, 4, 1, '2025-2026', '2025-01-15 06:08:35'),
+(14, 'PE', 'physical education', 0, 3, 2, 1, 1, 1, '2025-2026', '2025-01-15 06:08:58'),
+(15, 'PSTAT', 'statistics', 0, 3, 2, 2, 2, 1, '2024-2025', '2025-01-15 06:09:23'),
+(16, 'ENG1', 'english 1', 0, 3, 2, 1, 2, 1, '2022-2023', '2025-01-15 06:20:07'),
+(17, 'PT1', 'python programming', 3, 0, 3, 2, 2, 1, '2025-2026', '2025-01-15 06:10:53');
 
 -- --------------------------------------------------------
 
@@ -232,15 +233,6 @@ CREATE TABLE `tblworkschedule` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `tblworkschedule`
---
-
-INSERT INTO `tblworkschedule` (`ws_id`, `ws_schedule_id`, `ws_sectionId`, `ws_roomCode`, `ws_CurriculumID`, `ws_subtStartTimeAssign`, `ws_subtEndTimeAssign`, `ws_typeOfWork`, `ws_ol_request_status`, `ws_status`) VALUES
-(110, 38, 5, 'ROOM 1', 3, '07:00:00', '11:30:00', 'Teaching Work', NULL, 'regular_work'),
-(111, 38, 5, 'ROOM 1', 3, '14:30:00', '17:00:00', 'Teaching Work', 'accept', 'overload_work'),
-(112, 30, 5, 'ROOM 1', 3, '08:00:00', '10:00:00', 'Teaching Work', 'accept', 'overload_work');
-
---
 -- Indexes for dumped tables
 --
 
@@ -317,7 +309,7 @@ ALTER TABLE `designation`
 -- AUTO_INCREMENT for table `tblcurriculum`
 --
 ALTER TABLE `tblcurriculum`
-  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `subject_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tblfacultymember`
