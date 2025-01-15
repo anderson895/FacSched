@@ -247,11 +247,11 @@ include "components/header.php";
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="subtStartTimeAssign" class="form-label">Subject Start Time</label>
-                    <input type="time" class="form-control" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time" required>
+                    <input type="time" class="form-control subtStartTimeAssign" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time" required>
                 </div>
                 <div class="col-md-6">
                     <label for="subtEndTimeAssign" class="form-label">Subject End Time</label>
-                    <input type="time" class="form-control" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time" required>
+                    <input type="time" class="form-control subtEndTimeAssign" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time" required>
                 </div>
             </div>
 
@@ -337,11 +337,11 @@ include "components/header.php";
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="subtStartTimeAssign_OverLoad" class="form-label">Subject Start Time</label>
-                            <input type="time" class="form-control" id="subtStartTimeAssign_OverLoad" name="subtStartTimeAssign" placeholder="Enter Start Time" required>
+                            <input type="time" class="form-control subtStartTimeAssign_OverLoad" id="subtStartTimeAssign_OverLoad" name="subtStartTimeAssign" placeholder="Enter Start Time" required>
                         </div>
                         <div class="col-md-6">
                             <label for="subtEndTimeAssign_OverLoad" class="form-label">Subject End Time</label>
-                            <input type="time" class="form-control" id="subtEndTimeAssign_OverLoad" name="subtEndTimeAssign" placeholder="Enter End Time" required>
+                            <input type="time" class="form-control subtEndTimeAssign_OverLoad" id="subtEndTimeAssign_OverLoad" name="subtEndTimeAssign" placeholder="Enter End Time" required>
                         </div>
                     </div>
 
@@ -412,11 +412,11 @@ include "components/header.php";
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="subtStartTimeAssign" class="form-label">Subject Start Time</label>
-                    <input type="time" class="form-control" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time">
+                    <input type="time" class="form-control subtStartTimeAssign_other" id="subtStartTimeAssign" name="subtStartTimeAssign" placeholder="Enter Start Time">
                 </div>
                 <div class="col-md-6">
                     <label for="subtEndTimeAssign" class="form-label">Subject End Time</label>
-                    <input type="time" class="form-control" id="subtEndTimeAssign" name="subtEndTimeAssign" placeholder="Enter End Time">
+                    <input type="time" class="form-control subtEndTimeAssign_other" id="subtEndTimeAssign_other" name="subtEndTimeAssign" placeholder="Enter End Time">
                 </div>
             </div>
 

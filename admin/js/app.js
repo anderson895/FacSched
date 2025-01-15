@@ -1,4 +1,3 @@
-
 $('#subject_id').on('change', function () {
   // Get the selected subject's designated year level
   const selectedYearLevel = $(this).find(':selected').data('designated_year_level');
@@ -19,9 +18,6 @@ $('#subject_id').on('change', function () {
   $('#sectionId').val('').trigger('change');
 });
 
-
-
-
 $('#subjectName').on('change', function () {
   // Get the designated year level of the selected subject
   const selectedYearLevel = $(this).find(':selected').data('designated_year_level');
@@ -41,6 +37,47 @@ $('#subjectName').on('change', function () {
   // Reset the Section dropdown to its default state
   $('#subjectCode').val('').trigger('change');
 });
+
+// Trigger the change event manually after the page loads to filter based on initial selections
+$(document).ready(function() {
+
+
+  function validateTimeInput(inputId) {
+      $('.' + inputId).on('input', function() {
+          var value = $(this).val();
+          var parts = value.split(':');
+          
+          if (parts.length === 2) {
+              var hours = parts[0];
+              var minutes = parts[1];
+              
+              // If minutes are not 00 or 30, reset to nearest valid time (00)
+              if (minutes !== '00' && minutes !== '30') {
+                  $(this).val(hours + ':00'); // Reset to full hour
+              }
+          }
+      });
+  }
+
+  // Apply validation to both start and end time inputs
+  validateTimeInput('subtStartTimeAssign');
+  validateTimeInput('subtEndTimeAssign');
+ 
+  validateTimeInput('subtStartTimeAssign_OverLoad');
+  validateTimeInput('subtEndTimeAssign_OverLoad');
+
+  validateTimeInput('subtStartTimeAssign_OverLoad');
+  validateTimeInput('subtEndTimeAssign_OverLoad');
+
+  validateTimeInput('subtStartTimeAssign_other');
+  validateTimeInput('subtEndTimeAssign_other');
+
+
+
+  $('#subject_id').trigger('change');
+  $('#subjectName').trigger('change');
+});
+
 
 
 
