@@ -199,7 +199,14 @@ include "components/header.php";
             
         
         
-        <div class="mb-3">
+        <?php 
+            // Get the current school year
+            $current_school_year = date('Y') . '-' . (date('Y') + 1); // Example: 2024-2025
+
+            $fetch_all_Subject = $db->fetch_all_Subject();
+            ?>
+
+            <div class="mb-3">
                 <h6>Total Remaining Hrs : <span class='remaining_hours'></span></h6>
                 <input hidden type="text" id="sched_id" name="sched_id" required>
 
@@ -207,14 +214,19 @@ include "components/header.php";
                 <select class="form-control" id="subject_id" name="subject_id" required>
                     <option value="" disabled selected>Select subject name</option>
                     <?php 
-                    $fetch_all_Subject = $db->fetch_all_Subject();
                     foreach ($fetch_all_Subject as $subject): 
                         $semester_ordinalFormat = $db->formatOrdinal($subject['semester']);
-                        ?>
-                        <option value="<?=$subject['subject_id']?>" data-designated_year_level="<?=$subject['designated_year_level']?>"><?=$subject['subject_name']?> (<?=$subject['hours']?> hours)- <?=$semester_ordinalFormat?> </option>
-                    <?php endforeach; ?>
+                        
+                        // Only show subjects that match the current school year
+                        if ($subject['subject_sy'] == $current_school_year): ?>
+                            <option value="<?=$subject['subject_id']?>" data-schoolyear="<?=$subject['subject_sy']?>" data-designated_year_level="<?=$subject['designated_year_level']?>">
+                                <?=$subject['subject_name']?> (<?=$subject['hours']?> hours)- <?=$semester_ordinalFormat?> 
+                            </option>
+                        <?php endif;
+                    endforeach; ?>
                 </select>
             </div>
+
 
             <div class="mb-3">
                 <label for="subjectCode" class="form-label">Section</label>

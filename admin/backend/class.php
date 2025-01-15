@@ -461,16 +461,16 @@ ORDER BY
     }
 
 
-    public function addSubject($subjectCode, $subjectName, $lab, $lec, $hrs, $Sem, $yrlvl) {
+    public function addSubject($subjectCode, $subjectName, $lab, $lec, $hrs, $Sem, $yrlvl,$sy) {
         // Prepare the SQL query
         $query = $this->conn->prepare(
-            "INSERT INTO TblCurriculum (subject_code, subject_name, lab_num, lec_num, hours, semester, designated_year_level) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)"
+            "INSERT INTO TblCurriculum (subject_code, subject_name, lab_num, lec_num, hours, semester, designated_year_level,subject_sy) 
+            VALUES (?, ?, ?, ?, ?, ?, ?,?)"
         );
         if ($query === false) {
             return false;
         }
-        $query->bind_param("ssssssi", $subjectCode, $subjectName, $lab, $lec, $hrs, $Sem, $yrlvl);
+        $query->bind_param("ssssssis", $subjectCode, $subjectName, $lab, $lec, $hrs, $Sem, $yrlvl,$sy);
     
         // Execute the query
         if ($query->execute()) {
@@ -659,35 +659,37 @@ ORDER BY
 
 
 
-    public function updateSubject($subjectId, $subjectCode, $subject_name, $lab_num, $lec_num, $hours, $semester, $designated_year_level)
-    {
-        // Prepare the SQL update query
-        $query = $this->conn->prepare("UPDATE `tblcurriculum` 
-                                        SET `subject_code` = ?, 
-                                            `subject_name` = ?, 
-                                            `lab_num` = ?, 
-                                            `lec_num` = ?, 
-                                            `hours` = ?, 
-                                            `semester` = ?, 
-                                            `designated_year_level` = ?
-                                        WHERE `subject_id` = ?");
-        
-        if ($query === false) {
-            return false;
-        }
+    public function updateSubject($subjectId, $subjectCode, $subject_name, $lab_num, $lec_num, $hours, $semester, $designated_year_level, $sy)
+{
+    // Prepare the SQL update query
+    $query = $this->conn->prepare("UPDATE `tblcurriculum` 
+                                    SET `subject_code` = ?, 
+                                        `subject_name` = ?, 
+                                        `lab_num` = ?, 
+                                        `lec_num` = ?, 
+                                        `hours` = ?, 
+                                        `semester` = ?, 
+                                        `designated_year_level` = ?,
+                                        `subject_sy` = ?
+                                    WHERE `subject_id` = ?");
     
-        // Bind the parameters to the prepared statement
-        $query->bind_param("sssssssi", $subjectCode, $subject_name, $lab_num, $lec_num, $hours, $semester, $designated_year_level, $subjectId);
-        
-        // Execute the query
-        if ($query->execute()) {
-            echo "200"; // Success
-        } else {
-            return false;
-        }
-    
-        $query->close();
+    if ($query === false) {
+        return false;
     }
+
+    // Bind the parameters to the prepared statement
+    $query->bind_param("ssssssssi", $subjectCode, $subject_name, $lab_num, $lec_num, $hours, $semester, $designated_year_level, $sy, $subjectId);
+
+    // Execute the query
+    if ($query->execute()) {
+        echo "200"; // Success
+    } else {
+        return false;
+    }
+
+    $query->close();
+}
+
     
 
     public function deleteSection($sectionId)

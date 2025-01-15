@@ -29,20 +29,12 @@
                 $subjects_by_school_year = [];
 
                 foreach ($fetch_all_Subject as $subject) {
-                    // Extract the year and month from subject_date_added
-                    $date_added = strtotime($subject['subject_date_added']);
-                    $month = date('m', $date_added);
-                    $year = date('Y', $date_added);
-
-                    // Determine school year
-                    if ($month >= 8) {  // August or later
-                        $school_year = $year . '-' . ($year + 1);
-                    } else {  // Before August
-                        $school_year = ($year - 1) . '-' . $year;
-                    }
+                   
+                    $date_added = $subject['subject_sy'];
+                   
 
                     // Group subjects by school year
-                    $subjects_by_school_year[$school_year][] = $subject;
+                    $subjects_by_school_year[$date_added][] = $subject;
                 }
 
                 // Sort subjects by school year in descending order (newest first)
@@ -119,6 +111,7 @@
                                                 data-hours="<?=$subject['hours']?>"
                                                 data-semester="<?=$subject['semester']?>"
                                                 data-designated_year_level="<?=$subject['designated_year_level']?>"
+                                                data-subject_sy="<?=$subject['subject_sy']?>"
                                                 >Update</button>
 
                                             <button class="btn btn-danger btn-sm removeSubject" data-subject_id="<?=$subject['subject_id']?>">Remove</button>

@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hrs = $_POST['hrs'];
             $Sem = $_POST['Sem'];
             $yrlvl = $_POST['yrlvl'];
-            $response = $db->addSubject($subjectCode, $subjectName,$lab,$lec,$hrs,$Sem,$yrlvl);
+            $sy = $_POST['sy'];
+            $response = $db->addSubject($subjectCode, $subjectName,$lab,$lec,$hrs,$Sem,$yrlvl,$sy);
 
           return $response;
 
@@ -45,8 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hours = $_POST['hours'];
             $semester = $_POST['semester'];
             $designated_year_level = $_POST['designated_year_level'];
+            $sy = $_POST['sy'];
 
-            $response = $db->updateSubject($subjectId, $subjectCode,$subject_name,$lab_num,$lec_num,$hours,$semester,$designated_year_level);
+            $response = $db->updateSubject($subjectId, $subjectCode,$subject_name,$lab_num,$lec_num,$hours,$semester,$designated_year_level,$sy);
 
           return $response;
 

@@ -1,5 +1,30 @@
 <?php 
 include "components/header.php";
+
+// Get the current year
+$current_year = date('Y');
+
+// Calculate the current school year (e.g., 2024-2025)
+$current_school_year = $current_year . '-' . ($current_year + 1);
+
+// Define how many past school years you want to show (e.g., show up to 5 past years)
+$past_years_count = 5; // Show 5 previous school years
+
+// Generate school years dynamically
+$school_years = [];
+
+for ($i = 0; $i <= $past_years_count; $i++) {
+    $start_year = $current_year - $i;
+    $end_year = $start_year + 1;
+    $school_years[] = $start_year . '-' . $end_year;
+}
+
+// Sort the array so the current school year is at the top
+usort($school_years, function($a, $b) use ($current_school_year) {
+    if ($a == $current_school_year) return -1; // Move the current school year to the top
+    if ($b == $current_school_year) return 1;
+    return strcmp($b, $a); // Sort the rest in descending order
+});
 ?>
 
 <div class="container mt-5">
@@ -54,6 +79,9 @@ include "components/header.php";
       </div>
       <div class="modal-body">
         <form id="addSubjectForm">
+
+        
+
           <div class="mb-3 form-floating">
             <input type="text" class="form-control" name="subjectCode" placeholder="" required>
             <label for="subjectCode" class="form-label">Subject code</label>
@@ -92,6 +120,20 @@ include "components/header.php";
             </select>
             <label for="yrlvl" class="form-label">Year Level</label>
           </div>
+
+          <div class="mb-3 form-floating">
+              <select class="form-select" name="sy" id="sy" required>
+                  <option value="" disabled selected>Select School Year</option>
+                  <?php 
+                  // Loop through the school years and create options
+                  foreach ($school_years as $sy): ?>
+                      <option value="<?=$sy?>" <?= ($sy == $current_school_year) ? 'selected' : '' ?>><?=$sy?></option>
+                  <?php endforeach; ?>
+              </select>
+              <label for="sy" class="form-label">School Year</label>
+          </div>
+
+
           <button type="submit" id="btnAddSubject" class="btn btn-success">
             <i class="bi bi-plus-circle me-2"></i>Add Subject
           </button>
@@ -150,6 +192,20 @@ include "components/header.php";
             </select>
             <label for="yrlvl" class="form-label">Year Level</label>
           </div>
+
+          <div class="mb-3 form-floating">
+              <select class="form-select" name="sy" id="subject_sy" required>
+                  <option value="" disabled selected>Select School Year</option>
+                  <?php 
+                  // Loop through the school years and create options
+                  foreach ($school_years as $sy): ?>
+                      <option value="<?=$sy?>" <?= ($sy == $current_school_year) ? 'selected' : '' ?>><?=$sy?></option>
+                  <?php endforeach; ?>
+              </select>
+              <label for="sy" class="form-label">School Year</label>
+          </div>
+
+
           <button type="submit" id="btnUpdateSection" class="btn btn-success">
             <i class="bi bi-plus-circle me-2"></i>Update Subject
           </button>

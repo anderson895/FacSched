@@ -780,6 +780,7 @@ $('.updateSubjectToggler').click(function (e) {
     var hours = $(this).data('hours');
     var semester = $(this).data('semester');
     var designated_year_level = $(this).data('designated_year_level');
+    var subject_sy = $(this).data('subject_sy');
 
     // Log the sectionId to ensure it's correct
     console.log(designated_year_level);
@@ -793,6 +794,7 @@ $('.updateSubjectToggler').click(function (e) {
     $('#hours').val(hours);
     $('#semester').val(semester);
     $('#designated_year_level').val(designated_year_level);
+    $('#subject_sy').val(subject_sy);
 
 });
 
