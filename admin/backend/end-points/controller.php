@@ -60,9 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           return $response;
 
 
-        }else if ($_POST['requestType'] == 'deleteSection') {
-          $sectionId = $_POST['sectionId'];
-          $response = $db->deleteSection($sectionId);
+        }else if ($_POST['requestType'] == 'deleteSubject') {
+          $subject_id = $_POST['subject_id'];
+          $response = $db->deleteSubject($subject_id);
 
         return $response;
 
