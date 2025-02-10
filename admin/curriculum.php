@@ -40,6 +40,9 @@ usort($school_years, function($a, $b) use ($current_school_year) {
             <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addSubjectModal">
                 <i class="bi bi-plus-circle me-2"></i>Add Subject
             </button>
+            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#importSubjectModal">
+                <i class="bi bi-plus-circle me-2"></i>Import
+            </button>
 
               <!-- Search Input with Icon -->
               <div class="input-group mb-3">
@@ -143,6 +146,47 @@ usort($school_years, function($a, $b) use ($current_school_year) {
   </div>
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Add Subject Modal -->
+<div class="modal fade" id="importSubjectModal" tabindex="-1" aria-labelledby="aaddSubjectModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content shadow-sm">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aaddSubjectModalLabel">Import CSV FILE</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addImportForm" enctype="multipart/form-data">
+          <div class="mb-3 form-floating">
+            <input type="file" name="Datafile" id="Datafile" accept=".csv, text/csv">
+          </div>
+          <button type="submit" id="btnImportDataFile" class="btn btn-success">
+            <i class="bi bi-plus-circle me-2"></i>Import
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
 <!-- Update Subject Modal -->
 <div class="modal fade" id="updateSubjectModal" tabindex="-1" aria-labelledby="updateSubjectModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -218,6 +262,7 @@ usort($school_years, function($a, $b) use ($current_school_year) {
 <?php 
 include "components/footer.php";
 ?>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+<script src="js/importCsv.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/filter_sec_yrLevel.js"></script>

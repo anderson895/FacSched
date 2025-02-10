@@ -1,4 +1,10 @@
 
+
+
+
+
+
+
 $(document).ready(function() {
   // Event listener for when the "Schedule" button is clicked
   $('.viewSchedule').on('click', function() {
