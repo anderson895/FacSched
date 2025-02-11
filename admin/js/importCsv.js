@@ -3,6 +3,7 @@ $(document).ready(function() {
         event.preventDefault();
 
         var fileInput = $('#Datafile')[0].files[0]; // Get the file
+        $('#btnImportDataFile').prop('disabled', true);
 
         if (fileInput) {
             // Read and parse the CSV file using PapaParse
@@ -35,7 +36,8 @@ $(document).ready(function() {
                 skipEmptyLines: true
             });
         } else {
-            alert("Please select a file first.");
+            $('#btnImportDataFile').prop('disabled', false);
+            alertify.error("Please select a file first.");
         }
     });
 
