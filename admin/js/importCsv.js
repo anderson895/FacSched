@@ -47,14 +47,14 @@ $(document).ready(function() {
         
         data.forEach(function(row) {
             var subject = {
-                subject_code: row['subject code'], 
-                subject_name: row['subject name'],
-                lab: row['lab'],
-                lec: row['lec'],
-                hrs: row['hrs'],
-                sem: row['sem'],
-                year_level: row['year level'],
-                school_year: row['school year']
+                subject_code: row['Subject code'], 
+                subject_name: row['Subject name'],
+                lab: row['Lab'],
+                lec: row['Lec'],
+                hrs: row['Hrs'],
+                sem: row['Sem'],
+                year_level: row['Year level'],
+                school_year: row['School year']
             };
             jsonData.push(subject);
         });
