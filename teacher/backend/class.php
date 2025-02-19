@@ -82,7 +82,6 @@ class global_class extends db_connect
 
 
 
-
     public function GetAvailableHours($teacher_id)
     {
         // Step 1: Get the teacher's total weekly hours from tblfacultymember
@@ -93,7 +92,7 @@ class global_class extends db_connect
         
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $teacherWeeklyHours = (int)$row['totalweekly_hrs'];
+            $teacherWeeklyHours = (float)$row['totalweekly_hrs']; // Gamitin ang float para sa fractional hours
         } else {
             echo "Teacher not found";
             return false;
@@ -101,25 +100,34 @@ class global_class extends db_connect
         $query->close();
     
         // Step 2: Calculate the total hours already scheduled for the teacher
-        $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(HOUR, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_hours 
+        $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(MINUTE, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_minutes 
             FROM `tblschedule` WHERE `sched_teacher_id` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ");
         $query->bind_param("s", $teacher_id);
         $query->execute();
         $result = $query->get_result();
     
-        $currentScheduledHours = 0;
+        $currentScheduledMinutes = 0;
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
-            $currentScheduledHours = (int)$row['total_hours'];
+            $currentScheduledMinutes = (int)$row['total_minutes']; // Get total scheduled minutes
         }
         $query->close();
     
-        // Step 3: Calculate the remaining available hours
-        $remainingHours = $teacherWeeklyHours - $currentScheduledHours;
+        // Step 3: Calculate the remaining available minutes
+        $remainingMinutes = ($teacherWeeklyHours * 60) - $currentScheduledMinutes;
     
-        // Step 4: Return the remaining available hours
-        return $remainingHours;
+        // Step 4: Convert to hours and minutes
+        $hours = floor($remainingMinutes / 60);
+        $minutes = $remainingMinutes % 60;
+    
+        // Step 5: Format the result
+        if ($minutes > 0) {
+            return "$hours hours and $minutes minutes";
+        } else {
+            return "$hours hours";
+        }
     }
+    
     
 
 

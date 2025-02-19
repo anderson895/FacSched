@@ -17,7 +17,7 @@ include "components/header.php";
    }
    
    if($remainingHours){ 
-    echo "<h6 class='text-info'>Remaining Available Hours: " . $remainingHours . "Hrs</h6>";
+    echo "<h6 class='text-info'>Remaining Available Hours: " . $remainingHours . "</h6>";
 
    }
 
