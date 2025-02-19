@@ -9,17 +9,40 @@ $(document).ready(function() {
             // Read and parse the CSV file using PapaParse
             Papa.parse(fileInput, {
                 complete: function(results) {
-                    // results.data contains all rows of data
+                    if (results.errors.length > 0) {
+                        alertify.error("CSV file has errors: " + results.errors[0].message);
+                        $('#btnImportDataFile').prop('disabled', false);
+                        return;
+                    }
+
+                    // Check if headers match expected format
+                    var requiredHeaders = ["Subject code", "Subject name", "Lab", "Lec", "Hrs", "Sem", "Year level", "School year"];
+                    var fileHeaders = results.meta.fields || Object.keys(results.data[0] || {});
+
+                    var missingHeaders = requiredHeaders.filter(header => !fileHeaders.includes(header));
+
+                    if (missingHeaders.length > 0) {
+                        alertify.error("Invalid CSV format. Missing headers: " + missingHeaders.join(", "));
+                        $('#btnImportDataFile').prop('disabled', false);
+                        return;
+                    }
+
                     var jsonData = formatCSVDataToJSON(results.data);
+
+                    if (jsonData.length === 0) {
+                        alertify.error("No valid subject rows found.");
+                        $('#btnImportDataFile').prop('disabled', false);
+                        return;
+                    }
 
                     // Now send the JSON data via AJAX
                     $.ajax({
                         url: 'backend/end-points/importCsv.php',
                         type: 'POST',
                         contentType: 'application/json',
-                        data: JSON.stringify(jsonData), // Send the actual JSON data here
+                        data: JSON.stringify(jsonData),
                         success: function(response) {
-                            alertify.success('Added Successful');
+                            alertify.success('Added Successfully');
 
                             setTimeout(function () {
                                 location.reload();
@@ -27,8 +50,8 @@ $(document).ready(function() {
                         },
                         error: function(xhr, status, error) {
                             console.error('Error importing data', error);
-                            console.log("Response Text: ", xhr.responseText); // Log the actual response
-                            alert('Error importing data');
+                            console.log("Response Text: ", xhr.responseText);
+                            alertify.error('Error importing data');
                         }
                     });
                 },
@@ -46,17 +69,19 @@ $(document).ready(function() {
         var jsonData = [];
         
         data.forEach(function(row) {
-            var subject = {
-                subject_code: row['Subject code'], 
-                subject_name: row['Subject name'],
-                lab: row['Lab'],
-                lec: row['Lec'],
-                hrs: row['Hrs'],
-                sem: row['Sem'],
-                year_level: row['Year level'],
-                school_year: row['School year']
-            };
-            jsonData.push(subject);
+            if (row['Subject code'] && row['Subject name']) { // Ensure required fields exist
+                var subject = {
+                    subject_code: row['Subject code'], 
+                    subject_name: row['Subject name'],
+                    lab: row['Lab'],
+                    lec: row['Lec'],
+                    hrs: row['Hrs'],
+                    sem: row['Sem'],
+                    year_level: row['Year level'],
+                    school_year: row['School year']
+                };
+                jsonData.push(subject);
+            }
         });
 
         return jsonData;
