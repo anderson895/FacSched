@@ -19,15 +19,15 @@ function printAcademicSchedule_Section() {
 
 function printAcademicSchedule() {
     // Capture the selected section and teacher's name
-    var selectedSection = document.getElementById("sectionFilter").value;
-    var sectionText = selectedSection ? "Section: " + selectedSection : "All Sections";
+    // var selectedSection = document.getElementById("sectionFilter").value;
+    // var sectionText = selectedSection ? "Section: " + selectedSection : "All Sections";
     
     // Ensure the teacher's name is captured correctly
     var teacherName = document.getElementById("teacherName").textContent; // Corrected property
 
     // Add teacher's name and section information to the printed content
     var printContents = "<h6>Faculty Schedule for Teacher:   " + teacherName + "</h6>" + 
-                        "<hr><h3>" + sectionText + "</h3>" + 
+                        // "<hr><h3>" + sectionText + "</h3>" + 
                         document.getElementById("academicScheduleTable").outerHTML;
     
     var originalContents = document.body.innerHTML;

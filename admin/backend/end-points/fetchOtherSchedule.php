@@ -1,10 +1,3 @@
-<h3 class="text-center mt-5">Other Work Schedule</h3>
-
-<div class="text-center mb-4">
-    <button onclick="printOtherSchedule()" class="btn btn-secondary">
-        <i class="bi bi-printer"></i> Print Other Work Schedule
-    </button>
-</div>
 
 <?php
 // Check if there are any records in the schedule
@@ -26,25 +19,12 @@ foreach ($time_slots as $slot_index => $slot) {
 
 // If no records found, display a message
 if ($noRecordsFound) {
-    echo '<div class="alert alert-warning text-center">No records found for Other Work Schedule</div>';
+    // echo '<div class="alert alert-warning text-center">No records found for Other Work Schedule</div>';
 } else {
     // Display the table if there are records
     ?>
     <div class="table-responsive">
-        <table class="table table-bordered" id="otherWorkScheduleTable">
-            <thead class="table-dark">
-                <tr>
-                    <th>Time</th>
-                    <th>Monday</th>
-                    <th>Tuesday</th>
-                    <th>Wednesday</th>
-                    <th>Thursday</th>
-                    <th>Friday</th>
-                    <th>Saturday</th>
-                    <th>Sunday</th>
-                </tr>
-            </thead>
-            <tbody>
+       
             <?php
                 $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
 

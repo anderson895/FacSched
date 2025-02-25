@@ -3,7 +3,7 @@
 <!-- Print Buttons -->
 <div class="text-center mb-4">
     <button onclick="printAcademicSchedule()" class="btn btn-primary">
-        <i class="bi bi-printer"></i> Print Academic Schedule
+        <i class="bi bi-printer"></i> Print Schedule
     </button>
 </div>
 
@@ -38,7 +38,7 @@ foreach ($time_slots as $slot_index => $slot) {
 
 // If no records found, display a message
 if ($noRecordsFound) {
-    echo '<div class="alert alert-warning text-center">No records found for Academic Schedule</div>';
+    // echo '<div class="alert alert-warning text-center">No records found for Academic Schedule</div>';
 } else {
     // Display the schedule table if records are found
     ?>
@@ -108,7 +108,6 @@ if ($noRecordsFound) {
                         <?php endforeach; ?>
                     </tr>
                 <?php endforeach; ?>
-            </tbody>
-        </table>
+            
     </div>
 <?php } ?>
