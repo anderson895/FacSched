@@ -275,11 +275,12 @@ class global_class extends db_connect
     
         while ($current_time < $max_end_time) {
             $start_time = date("g:i A", $current_time);
-            $next_time = min($current_time + 3600, $max_end_time); // Siguraduhin na hindi lalampas
+            $next_time = min($current_time + 1800, $max_end_time); // 1800 seconds = 30 minutes
             $end_time = date("g:i A", $next_time);
             $time_slots[] = ['start' => $current_time, 'label' => "$start_time - $end_time"];
             $current_time = $next_time;
         }
+        
                 
     
         // Fetch the schedule details for the teacher without the subject and section part

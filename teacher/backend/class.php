@@ -83,138 +83,186 @@ class global_class extends db_connect
 
 
     public function GetAvailableHours($teacher_id)
-    {
-        // Step 1: Get the teacher's total weekly hours from tblfacultymember
-        $query = $this->conn->prepare("SELECT totalweekly_hrs FROM `tblfacultymember` WHERE `teacher_id` = ?");
-        $query->bind_param("s", $teacher_id);
-        $query->execute();
-        $result = $query->get_result();
-        
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $teacherWeeklyHours = (float)$row['totalweekly_hrs']; // Gamitin ang float para sa fractional hours
-        } else {
-            echo "Teacher not found";
-            return false;
-        }
-        $query->close();
+{
+    // Step 1: Get the teacher's total weekly hours from tblfacultymember
+    $query = $this->conn->prepare("SELECT totalweekly_hrs FROM `tblfacultymember` WHERE `teacher_id` = ?");
+    $query->bind_param("s", $teacher_id);
+    $query->execute();
+    $result = $query->get_result();
     
-        // Step 2: Calculate the total hours already scheduled for the teacher
-        $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(MINUTE, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_minutes 
-            FROM `tblschedule` WHERE `sched_teacher_id` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ");
-        $query->bind_param("s", $teacher_id);
-        $query->execute();
-        $result = $query->get_result();
-    
-        $currentScheduledMinutes = 0;
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $currentScheduledMinutes = (int)$row['total_minutes']; // Get total scheduled minutes
-        }
-        $query->close();
-    
-        // Step 3: Calculate the remaining available minutes
-        $remainingMinutes = ($teacherWeeklyHours * 60) - $currentScheduledMinutes;
-    
-        // Step 4: Convert to hours and minutes
-        $hours = floor($remainingMinutes / 60);
-        $minutes = $remainingMinutes % 60;
-    
-        // Step 5: Format the result
-        if ($minutes > 0) {
-            return "$hours hours and $minutes minutes";
-        } else {
-            return "$hours hours";
-        }
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $teacherWeeklyHours = (float)$row['totalweekly_hrs']; // Convert to float for fractional hours
+    } else {
+        echo "Teacher not found";
+        return false;
     }
-    
-    
+    $query->close();
 
+    // Step 2: Calculate the total scheduled minutes for the teacher
+    $query = $this->conn->prepare("
+        SELECT sched_start_Hrs, sched_end_Hrs 
+        FROM `tblschedule` 
+        WHERE `sched_teacher_id` = ? 
+        AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE())");
+    $query->bind_param("s", $teacher_id);
+    $query->execute();
+    $result = $query->get_result();
 
+    $currentScheduledMinutes = 0;
+    while ($row = $result->fetch_assoc()) {
+        $start = strtotime($row['sched_start_Hrs']);
+        $end = strtotime($row['sched_end_Hrs']);
 
+        // Define break time range
+        $breakStart = strtotime("12:00:00");
+        $breakEnd = strtotime("13:00:00");
 
+        // Calculate scheduled minutes
+        $diff = ($end - $start) / 60; // Convert to minutes
 
-
-
-
-
-
-
-
-
-    public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
-    {
-        // Step 1: Check for schedule overlap (same logic as before)
-        $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
-            WHERE `sched_teacher_id` = ? AND `sched_day` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
-            AND ((`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?) 
-            OR (`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?))");
-            
-        $query->bind_param("ssssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleStartTime, $scheduleEndTime, $scheduleEndTime);
-        $query->execute();
-        $result = $query->get_result();
-        
-        if ($result->num_rows > 0) {
-            echo "Schedule Date is Not Available";
-            $query->close();
-            return false;
+        // Subtract break time if overlapping
+        if ($start < $breakEnd && $end > $breakStart) {
+            $diff -= 60;
         }
-    
-        // Step 2: Get teacher's current total weekly hours
-        $query = $this->conn->prepare("SELECT totalweekly_hrs FROM `tblfacultymember` WHERE `teacher_id` = ?");
-        $query->bind_param("s", $teacher_id);
-        $query->execute();
-        $result = $query->get_result();
-        
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $teacherWeeklyHours = (int)$row['totalweekly_hrs'];
-        } else {
-            echo "Teacher not found";
-            return false;
-        }
-        $query->close();
-    
-        // Step 3: Calculate the total hours for the new schedule
-        $start = new DateTime($scheduleStartTime);
-        $end = new DateTime($scheduleEndTime);
-        $interval = $start->diff($end);
-        $newScheduleHours = $interval->h + ($interval->i / 60); // Convert to hours
-    
-        // Step 4: Get the teacher's current total scheduled hours
-        $query = $this->conn->prepare("SELECT SUM(TIMESTAMPDIFF(HOUR, `sched_start_Hrs`, `sched_end_Hrs`)) AS total_hours 
-            FROM `tblschedule` WHERE `sched_teacher_id` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) ");
-        $query->bind_param("s", $teacher_id);
-        $query->execute();
-        $result = $query->get_result();
-    
-        $currentScheduledHours = 0;
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $currentScheduledHours = (int)$row['total_hours'];
-        }
-        $query->close();
-    
-        // Step 5: Check if the total weekly hours will be exceeded
-        if (($currentScheduledHours + $newScheduleHours) > $teacherWeeklyHours) {
-            echo "Exceeds total weekly hours";
-            return false;
-        }
-    
-        // Step 6: If no overlap and total hours are within the limit, insert the new schedule
-        $query = $this->conn->prepare("INSERT INTO `tblschedule` (`sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`) 
-            VALUES (?, ?, ?, ?)");
-        if ($query === false) {
-            return false;
-        }
-        $query->bind_param("ssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime);
-        if ($query->execute()) {
-            echo "200"; // Success
-        } else {
-            return false;
-        }
-        $query->close();
+
+        $currentScheduledMinutes += max(0, $diff); // Ensure no negative values
     }
+    $query->close();
+
+    // Step 3: Calculate remaining available minutes
+    $remainingMinutes = ($teacherWeeklyHours * 60) - $currentScheduledMinutes;
+
+    // Step 4: Convert to hours and minutes
+    $hours = floor($remainingMinutes / 60);
+    $minutes = $remainingMinutes % 60;
+
+    // Step 5: Format the result
+    if ($minutes > 0) {
+        return "$hours hours and $minutes minutes";
+    } else {
+        return "$hours hours";
+    }
+}
+
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+public function SetSchedule($teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime)
+{
+    // Define break time
+    $breakStart = strtotime("12:00:00");
+    $breakEnd = strtotime("13:00:00");
+    $start = strtotime($scheduleStartTime);
+    $end = strtotime($scheduleEndTime);
+
+    // Step 1: Validate if the schedule is exactly 12:00 PM - 1:00 PM
+    if ($start == $breakStart && $end == $breakEnd) {
+        echo "Invalid Schedule: 12:00 PM - 1:00 PM is a break time.";
+        return false;
+    }
+
+    // Step 2: Check for schedule overlap
+    $query = $this->conn->prepare("SELECT * FROM `tblschedule` 
+        WHERE `sched_teacher_id` = ? AND `sched_day` = ? AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE()) 
+        AND ((`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?) 
+        OR (`sched_start_Hrs` < ? AND `sched_end_Hrs` > ?))");
+        
+    $query->bind_param("ssssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleStartTime, $scheduleEndTime, $scheduleEndTime);
+    $query->execute();
+    $result = $query->get_result();
+    
+    if ($result->num_rows > 0) {
+        echo "Schedule Date is Not Available";
+        $query->close();
+        return false;
+    }
+    $query->close();
+
+    // Step 3: Get teacher's total weekly hours
+    $query = $this->conn->prepare("SELECT totalweekly_hrs FROM `tblfacultymember` WHERE `teacher_id` = ?");
+    $query->bind_param("s", $teacher_id);
+    $query->execute();
+    $result = $query->get_result();
+    
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $teacherWeeklyHours = (int)$row['totalweekly_hrs'];
+    } else {
+        echo "Teacher not found";
+        return false;
+    }
+    $query->close();
+
+    // Step 4: Calculate the hours for the new schedule
+    $newScheduleHours = ($end - $start) / 3600;
+
+    // Subtract 1 hour if the schedule overlaps with the break time
+    if ($start < $breakEnd && $end > $breakStart) {
+        $newScheduleHours -= 1;
+    }
+
+    // Ensure non-negative hours
+    $newScheduleHours = max(0, $newScheduleHours);
+
+    // Step 5: Get the teacher's current total scheduled hours (excluding break)
+    $query = $this->conn->prepare("SELECT sched_start_Hrs, sched_end_Hrs 
+        FROM `tblschedule` WHERE `sched_teacher_id` = ? 
+        AND YEAR(tblschedule.sched_date_added) = YEAR(CURDATE())");
+    $query->bind_param("s", $teacher_id);
+    $query->execute();
+    $result = $query->get_result();
+
+    $currentScheduledHours = 0;
+    while ($row = $result->fetch_assoc()) {
+        $schedStart = strtotime($row['sched_start_Hrs']);
+        $schedEnd = strtotime($row['sched_end_Hrs']);
+
+        // Calculate duration in hours
+        $schedHours = ($schedEnd - $schedStart) / 3600;
+
+        // Subtract 1 hour if overlapping break time
+        if ($schedStart < $breakEnd && $schedEnd > $breakStart) {
+            $schedHours -= 1;
+        }
+
+        $currentScheduledHours += max(0, $schedHours);
+    }
+    $query->close();
+
+    // Step 6: Check if total weekly hours are exceeded
+    if (($currentScheduledHours + $newScheduleHours) > $teacherWeeklyHours) {
+        echo "Exceeds total weekly hours";
+        return false;
+    }
+
+    // Step 7: Insert the new schedule
+    $query = $this->conn->prepare("INSERT INTO `tblschedule` (`sched_teacher_id`, `sched_day`, `sched_start_Hrs`, `sched_end_Hrs`) 
+        VALUES (?, ?, ?, ?)");
+    if ($query === false) {
+        return false;
+    }
+    $query->bind_param("ssss", $teacher_id, $scheduleDay, $scheduleStartTime, $scheduleEndTime);
+    if ($query->execute()) {
+        echo "200"; // Success
+    } else {
+        return false;
+    }
+    $query->close();
+}
+
+
     
 
 

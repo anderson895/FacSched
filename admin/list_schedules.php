@@ -35,48 +35,97 @@ include "components/header.php";
 
                     <!-- Process Days, Times, and Sched IDs -->
                     <?php 
-                   $days = explode(',', $schedule['days']); // Days as an array
-                   $times = explode(',', $schedule['schedule_times']); // Times as an array
-                   $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
-                   $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
-                   $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule hours
-                   $total_offcampus_work_time = explode(',', $schedule['total_offcampus_work_time']); // Off-campus work time
-                   $total_admin_work_time = explode(',', $schedule['total_admin_work_time']); // Admin work time
+                //    $days = explode(',', $schedule['days']); // Days as an array
+                //    $times = explode(',', $schedule['schedule_times']); // Times as an array
+                //    $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
+                //    $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Schedule IDs as an array
+                //    $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule hours
+                //    $total_offcampus_work_time = explode(',', $schedule['total_offcampus_work_time']); // Off-campus work time
+                //    $total_admin_work_time = explode(',', $schedule['total_admin_work_time']); // Admin work time
                     
-                   foreach ($days as $index => $day):
-                       // Extract sched_id and day from sched_ids_per_day
-                       list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
+                //    foreach ($days as $index => $day):
+                //        // Extract sched_id and day from sched_ids_per_day
+                //        list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
                        
-                       // Split the schedule times (start and end)
-                       $time_range = explode('-', $times[$index]);
-                       $start_time = $time_range[0];
-                       $end_time = $time_range[1];
+                //        // Split the schedule times (start and end)
+                //        $time_range = explode('-', $times[$index]);
+                //        $start_time = $time_range[0];
+                //        $end_time = $time_range[1];
                        
-                       // Calculate total hours
-                       $start_timestamp = strtotime($start_time);
-                       $end_timestamp = strtotime($end_time);
-                       $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
+                //        // Calculate total hours
+                //        $start_timestamp = strtotime($start_time);
+                //        $end_timestamp = strtotime($end_time);
+                //        $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
                        
-                       // Calculate total scheduled hours in minutes
-                       $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
+                //        // Calculate total scheduled hours in minutes
+                //        $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
                        
-                       // Get corresponding work schedule hours (default to 0 if not available)
-                       $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
+                //        // Get corresponding work schedule hours (default to 0 if not available)
+                //        $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
                        
-                       // Calculate remaining minutes
-                       $remaining_minutes = $total_minutes - $work_schedule_minutes;
+                //        // Calculate remaining minutes
+                //        $remaining_minutes = $total_minutes - $work_schedule_minutes;
                        
-                       // Convert remaining minutes to hours (optional: you can also keep it in minutes if preferred)
-                       $remaining_hours = round($remaining_minutes / 60, 2); // Convert to hours
+                //        // Convert remaining minutes to hours (optional: you can also keep it in minutes if preferred)
+                //        $remaining_hours = round($remaining_minutes / 60, 2); // Convert to hours
                        
-                       // Check if remaining time should be displayed in hours or minutes
-                       if ($remaining_hours >= 1) {
-                           // If remaining hours are 1 or more, display hours
-                           $remaining_time = $remaining_hours . ' hour(s)';
-                       } else {
-                           // If remaining hours are less than 1, display minutes
-                           $remaining_time = $remaining_minutes . ' minute(s)';
-                       }
+                //        // Check if remaining time should be displayed in hours or minutes
+                //        if ($remaining_hours >= 1) {
+                //            // If remaining hours are 1 or more, display hours
+                //            $remaining_time = $remaining_hours . ' hour(s)';
+                //        } else {
+                //            // If remaining hours are less than 1, display minutes
+                //            $remaining_time = $remaining_minutes . ' minute(s)';
+                //        }
+                    ?>
+                    <?php 
+                    // NEW PROCESS EXCLUDE BREAKTIME
+                        $days = explode(',', $schedule['days']); // Days as an array
+                        $times = explode(',', $schedule['schedule_times']); // Times as an array
+                        $sched_ids_per_day = explode(',', $schedule['sched_ids_per_day']); // Schedule IDs as an array
+                        $remaining_hours_per_day = explode(',', $schedule['remaining_hours_per_day']); // Remaining hours per day
+                        $total_hours_workschedule = explode(',', $schedule['total_minutes_workschedule']); // Total work schedule minutes
+                        $total_offcampus_work_time = explode(',', $schedule['total_offcampus_work_time']); // Off-campus work time
+                        $total_admin_work_time = explode(',', $schedule['total_admin_work_time']); // Admin work time
+
+                        foreach ($days as $index => $day):
+                            // Extract sched_id and day
+                            list($sched_id, $sched_day) = explode(':', $sched_ids_per_day[$index]);
+                            
+                            // Split the schedule times (start and end)
+                            $time_range = explode('-', $times[$index]);
+                            $start_time = $time_range[0];
+                            $end_time = $time_range[1];
+
+                            // Convert times to timestamps
+                            $start_timestamp = strtotime($start_time);
+                            $end_timestamp = strtotime($end_time);
+
+                            // Define break time (12:00 PM - 1:00 PM)
+                            $break_start = strtotime("12:00:00");
+                            $break_end = strtotime("13:00:00");
+
+                            // Calculate total hours before deducting break time
+                            $total_hours = round(abs($end_timestamp - $start_timestamp) / 3600, 2); // Total hours
+                            $total_minutes = round(abs($end_timestamp - $start_timestamp) / 60, 2); // Total minutes
+
+                            // Deduct 1 hour (60 minutes) if the schedule overlaps with break time
+                            if ($start_timestamp < $break_end && $end_timestamp > $break_start) {
+                                $total_hours = max(0, $total_hours - 1);
+                                $total_minutes = max(0, $total_minutes - 60);
+                            }
+
+                            // Get corresponding work schedule minutes (default to 0 if not available)
+                            $work_schedule_minutes = isset($total_hours_workschedule[$index]) ? $total_hours_workschedule[$index] : 0;
+
+                            // Calculate remaining minutes after deducting work schedule
+                            $remaining_minutes = max(0, $total_minutes - $work_schedule_minutes);
+
+                            // Convert remaining minutes to hours
+                            $remaining_hours = round($remaining_minutes / 60, 2);
+
+                            // Display remaining time properly formatted
+                            $remaining_time = $remaining_hours >= 1 ? "$remaining_hours hour(s)" : "$remaining_minutes minute(s)";
 
                     ?>
                     <div class="d-flex justify-content-between mb-3 p-3 bg-light rounded">

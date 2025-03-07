@@ -1,25 +1,5 @@
-<h2 class="text-center mb-4">Faculty Schedule for Teacher: <span id="teacherName"><?= $teacherName; ?></span></h2>
-
-<!-- Print Buttons -->
-<div class="text-center mb-4">
-    <button onclick="printAcademicSchedule()" class="btn btn-primary">
-        <i class="bi bi-printer"></i> Print Schedule
-    </button>
-</div>
-
-<!-- Filter Dropdown -->
-<div class="mb-4">
-    <label for="sectionFilter" class="form-label">Filter by Section:</label>
-    <select id="sectionFilter" class="form-select" onchange="filterBySection()">
-        <option value="">All Sections</option>
-        <?php foreach ($sections as $section): ?>
-            <option value="<?= htmlspecialchars($section); ?>"><?= htmlspecialchars($section); ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
 
 <?php
-// Check if there are any records in the academic schedule
 $academic_schedule = $view_AcademicSchedule['schedule'];
 $time_slots = $view_AcademicSchedule['time_slots'];
 
@@ -36,34 +16,10 @@ foreach ($time_slots as $slot_index => $slot) {
     }
 }
 
-// If no records found, display a message
-if ($noRecordsFound) {
-    // echo '<div class="alert alert-warning text-center">No records found for Academic Schedule</div>';
-} else {
-    // Display the schedule table if records are found
-    ?>
-    <!-- Academic Schedule Table -->
-    <div class="table-responsive">
-        <table class="table table-bordered" id="academicScheduleTable">
-            <thead class="table-dark">
-                <tr>
-                    <th>Time</th>
-                    <th>Monday</th>
-                    <th>Tuesday</th>
-                    <th>Wednesday</th>
-                    <th>Thursday</th>
-                    <th>Friday</th>
-                    <th>Saturday</th>
-                    <th>Sunday</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php
-                $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
 
                 foreach ($time_slots as $slot_index => $slot): ?>
-                    <tr>
-                        <td class="fw-bold"><?= $slot['label']; ?></td>
+                    <tr >
+                        <td  class="fw-bold"><?= $slot['label']; ?></td>
                         <?php foreach (array_keys($day_trackers) as $day): ?>
                             <?php
                             if ($day_trackers[$day] > 0) {
@@ -84,7 +40,7 @@ if ($noRecordsFound) {
 
                                     // Apply background color to the entire row if a schedule is present
                                     echo "<td rowspan='$rowspan' class='schedule-entry' data-section='" . 
-                                         (isset($entry['section']) ? htmlspecialchars($entry['section']) : 'Vacant Hours') . "' style='background-color: #f2f2f2;'>";
+                                         (isset($entry['section']) ? htmlspecialchars($entry['section']) : 'Vacant Hours') . "' >";
 
                                     echo "<div>Semester {$entry['semester']}</div>";
                                     echo "<div>{$entry['room']}</div>";
@@ -109,5 +65,4 @@ if ($noRecordsFound) {
                     </tr>
                 <?php endforeach; ?>
             
-    </div>
-<?php } ?>
+ 

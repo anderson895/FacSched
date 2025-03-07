@@ -94,40 +94,53 @@ include "components/header.php";
                     </div>
                     <div class="card-body">
                     <div class="d-flex justify-content-end">
-    <button 
-        class="btn btn-primary btn-sm update-schedule-btn mb-3" 
-        data-bs-toggle="modal" 
-        data-bs-target="#updateScheduleModal" 
-        data-day="<?php echo $day; ?>" 
-        data-start="<?php echo $scheduleForDay['sched_start_Hrs']; ?>" 
-        data-end="<?php echo $scheduleForDay['sched_end_Hrs']; ?>"
-        data-sched_id="<?php echo $scheduleForDay['sched_id']; ?>"
-    >
-        <i class="bi bi-pencil-square"></i>
-    </button>
-</div>
+        <button 
+            class="btn btn-primary btn-sm update-schedule-btn mb-3" 
+            data-bs-toggle="modal" 
+            data-bs-target="#updateScheduleModal" 
+            data-day="<?php echo $day; ?>" 
+            data-start="<?php echo $scheduleForDay['sched_start_Hrs']; ?>" 
+            data-end="<?php echo $scheduleForDay['sched_end_Hrs']; ?>"
+            data-sched_id="<?php echo $scheduleForDay['sched_id']; ?>"
+        >
+            <i class="bi bi-pencil-square"></i>
+        </button>
+    </div>
 
                         <p id="schedule-<?php echo $day; ?>">
                             
-                            <?php 
-                            $startTime = date('h:i A', strtotime($scheduleForDay['sched_start_Hrs']));
-                            $endTime = date('h:i A', strtotime($scheduleForDay['sched_end_Hrs']));
+                        <?php 
+$startTime = date('h:i A', strtotime($scheduleForDay['sched_start_Hrs']));
+$endTime = date('h:i A', strtotime($scheduleForDay['sched_end_Hrs']));
 
-                            $start = strtotime($scheduleForDay['sched_start_Hrs']);
-                            $end = strtotime($scheduleForDay['sched_end_Hrs']);
-                            $diff = $end - $start;
+$start = strtotime($scheduleForDay['sched_start_Hrs']);
+$end = strtotime($scheduleForDay['sched_end_Hrs']);
 
-                            $hours = floor($diff / 3600);
-                            $minutes = floor(($diff % 3600) / 60);
+// Define break time range
+$breakStart = strtotime("12:00:00");
+$breakEnd = strtotime("13:00:00");
 
-                            echo "Start Time: " . $startTime . "<br>End Time: " . $endTime . "<br>";
+// Calculate the duration
+$diff = $end - $start;
 
-                            if ($minutes > 0) {
-                                echo "Total Hours: " . $hours . " hours " . $minutes . " minutes";
-                            } else {
-                                echo "Total Hours: " . $hours . " hours";
-                            }
-                            ?>
+// Check if the schedule overlaps with the break time
+if ($start < $breakEnd && $end > $breakStart) {
+    // Subtract one hour if the schedule includes the break
+    $diff -= 3600;
+}
+
+$hours = floor($diff / 3600);
+$minutes = floor(($diff % 3600) / 60);
+
+echo "Start Time: " . $startTime . "<br>End Time: " . $endTime . "<br>";
+
+if ($minutes > 0) {
+    echo "Total Hours: " . $hours . " hours " . $minutes . " minutes";
+} else {
+    echo "Total Hours: " . $hours . " hours";
+}
+?>
+
 
                             
                         </p>
