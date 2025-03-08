@@ -92,7 +92,6 @@ $sections = array_unique($sections);
 <script src="js/function.js"></script>
 
 <script>
-
 $(document).ready(function () {
     function sortTable() {
         let rows = $('#academicScheduleTable tbody tr').get();
@@ -104,9 +103,8 @@ $(document).ready(function () {
             return convertTo24Hour(timeA) - convertTo24Hour(timeB);
         });
 
-        $.each(rows, function (index, row) {
-            $('#academicScheduleTable tbody').append(row);
-        });
+        // Append all rows at once to improve performance
+        $('#academicScheduleTable tbody').append(rows);
     }
 
     function convertTo24Hour(timeStr) {
@@ -125,10 +123,28 @@ $(document).ready(function () {
 
         return hours * 60 + minutes;
     }
-    
 
-    sortTable(); // Tawagin agad para ma-sort pag-load ng page
+    let breakTimeAdded = false;  // Flag to track if break time is already added
+
+    // Merge break time rows and set the label
+    $('#academicScheduleTable tbody tr').each(function () {
+        let timeCell = $(this).find('td:first').text().trim();
+
+        // Check if it's the 12:00 PM - 12:30 PM or 12:30 PM - 1:00 PM slot
+        if ((timeCell === '12:00 PM - 12:30 PM' || timeCell === '12:30 PM - 1:00 PM') && !breakTimeAdded) {
+            // Merge both rows for the break time slot by adding rowspan="2" and "Break Time" label
+            $(this).find('td').slice(1).remove(); // Remove Monday-Sunday cells for the first row
+            $(this).append('<td colspan="7" rowspan="2" class="text-center">Break Time</td>'); // Add merged cell with label
+
+            // Remove the second row's Monday-Sunday cells (and ensure no extra "Break Time" is added)
+            $(this).next().find('td').slice(1).remove();  // Remove the second row's Monday-Sunday cells
+            breakTimeAdded = true;  // Set the flag to true to prevent further merging
+        }
+    });
+
+    sortTable(); // Call the sorting function to sort after merging rows
 });
+
 
 </script>
 
