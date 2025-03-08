@@ -28,7 +28,7 @@ function printAcademicSchedule() {
     // Add teacher's name and section information to the printed content
     var printContents = "<h6>Faculty Schedule for Teacher:   " + teacherName + "</h6>" + 
                         // "<hr><h3>" + sectionText + "</h3>" + 
-                        document.getElementById("academicScheduleTable").outerHTML;
+                        document.getElementById("scheduleTable").outerHTML;
     
     var originalContents = document.body.innerHTML;
     document.body.innerHTML = printContents;

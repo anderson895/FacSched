@@ -1,32 +1,24 @@
+<?php include "components/header.php"; ?>
 
 <?php
-include "components/header.php";
-
 $teacher_id = $_GET['teacher_id'];
-
-$view_AcademicSchedule = $db->view_AcademicSchedule($teacher_id);  // Query from tblworkschedule
-$view_OtherSchedule = $db->view_OtherSchedule($teacher_id);  // Query from tblotherworkschedule
-
-$teacher = $db->getTeacherInfo($teacher_id);  
+$teacher = $db->getTeacherInfo($teacher_id);
 $teacherName = ucfirst($teacher[0]['fname']) . ' ' . $teacher[0]['mname'] . ' ' . $teacher[0]['lname'];
 
 // Collect sections for filter dropdown
 $sections = [];
 
-// Extract sections from Academic Schedule
-foreach ($view_AcademicSchedule['schedule'] as $day => $entries) {
-    foreach ($entries as $entry) {
-        if (isset($entry['section'])) {
-            $sections[] = $entry['section'];
-        }
-    }
-}
+// Get data from PHP backend
+$view_AcademicSchedule = $db->view_AcademicSchedule($teacher_id);
+$view_OtherSchedule = $db->view_OtherSchedule($teacher_id);
 
-// Extract sections from Other Work Schedule
-foreach ($view_OtherSchedule['schedule'] as $day => $entries) {
-    foreach ($entries as $entry) {
-        if (isset($entry['section'])) {
-            $sections[] = $entry['section'];
+// Extract sections
+foreach ([$view_AcademicSchedule, $view_OtherSchedule] as $schedule) {
+    foreach ($schedule['schedule'] as $day => $entries) {
+        foreach ($entries as $entry) {
+            if (isset($entry['section'])) {
+                $sections[] = $entry['section'];
+            }
         }
     }
 }
@@ -34,54 +26,44 @@ foreach ($view_OtherSchedule['schedule'] as $day => $entries) {
 // Remove duplicate sections
 $sections = array_unique($sections);
 ?>
+
 <div class="container mt-5">
-<h2 class="text-center mb-4">Faculty Schedule for Teacher: <span id="teacherName"><?= $teacherName; ?></span></h2>
+    <h2 class="text-center mb-4">Faculty Schedule for Teacher: <span id="teacherName"><?= $teacherName; ?></span></h2>
 
-<!-- Print Buttons -->
-<div class="text-center mb-4">
-    <button onclick="printAcademicSchedule()" class="btn btn-primary">
-        <i class="bi bi-printer"></i> Print Schedule
-    </button>
-</div>
+    <div class="text-center mb-4">
+        <button onclick="printAcademicSchedule()" class="btn btn-primary">
+            <i class="bi bi-printer"></i> Print Schedule
+        </button>
+    </div>
 
-<!-- Filter Dropdown -->
-<div class="mb-4">
-    <label for="sectionFilter" class="form-label">Filter by Section:</label>
-    <select id="sectionFilter" class="form-select" onchange="filterBySection()">
-        <option value="">All Sections</option>
-        <?php foreach ($sections as $section): ?>
-            <option value="<?= htmlspecialchars($section); ?>"><?= htmlspecialchars($section); ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
+    <div class="mb-4">
+        <label for="sectionFilter" class="form-label">Filter by Section:</label>
+        <select id="sectionFilter" class="form-select" onchange="filterBySection()">
+            <option value="">All Sections</option>
+            <?php foreach ($sections as $section): ?>
+                <option value="<?= htmlspecialchars($section); ?>"><?= htmlspecialchars($section); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
-
-    <!-- Academic Schedule Table -->
     <div class="table-responsive">
-        <table class="table table-bordered" id="academicScheduleTable">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Time</th>
-                        <th>Monday</th>
-                        <th>Tuesday</th>
-                        <th>Wednesday</th>
-                        <th>Thursday</th>
-                        <th>Friday</th>
-                        <th>Saturday</th>
-                        <th>Sunday</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php 
-                    $day_trackers = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
-                    include "backend/end-points/fetchOtherSchedule.php";
-                    include "backend/end-points/fetchAcademicSchedule.php";
-                    
-                    ?>
-                </tbody>
-             </table>
-      
-           
+        <table class="table table-bordered" id="scheduleTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Time</th>
+                    <th>Monday</th>
+                    <th>Tuesday</th>
+                    <th>Wednesday</th>
+                    <th>Thursday</th>
+                    <th>Friday</th>
+                    <th>Saturday</th>
+                    <th>Sunday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be inserted here -->
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -91,20 +73,111 @@ $sections = array_unique($sections);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/function.js"></script>
 
+
 <script>
 $(document).ready(function () {
-    function sortTable() {
-        let rows = $('#academicScheduleTable tbody tr').get();
-
-        rows.sort(function (a, b) {
-            let timeA = $(a).find('td:first').text().trim();
-            let timeB = $(b).find('td:first').text().trim();
-
-            return convertTo24Hour(timeA) - convertTo24Hour(timeB);
+    function applyCellStyles() {
+        $('#scheduleTable tbody td.time-cell').css({
+            "background-color": "#e0f7fa",
+            "font-weight": "bold",
+            "text-align": "center"
         });
 
-        // Append all rows at once to improve performance
-        $('#academicScheduleTable tbody').append(rows);
+        $('.breaktime-row td').css({
+            "background-color": "#ffccbc",
+            "font-weight": "bold",
+            "text-align": "center"
+        });
+    }
+
+    fetchSchedules();
+
+    function fetchSchedules() {
+        $.ajax({
+            url: 'backend/end-points/fetchSchedules.php',
+            method: 'GET',
+            data: { teacher_id: '<?= $teacher_id; ?>' },
+            success: function(response) {
+                console.log(response);
+                
+                let schedules = response;
+                let html = '';
+
+                let breaktimeStart = null;
+                let breaktimeEnd = null;
+
+                schedules.forEach((schedule, index) => {
+                    let isBreaktime = (schedule.time === "12:00 PM - 12:30 PM" || schedule.time === "12:30 PM - 1:00 PM");
+
+                    if (isBreaktime) {
+                        if (!breaktimeStart) {
+                            breaktimeStart = schedule.time.split(" - ")[0]; // Start of break
+                        }
+                        breaktimeEnd = schedule.time.split(" - ")[1]; // Keep updating until end of break
+                    } else {
+                        if (breaktimeStart) {
+                            html += `<tr class="breaktime-row">
+                                <td class="time-cell">${breaktimeStart} - ${breaktimeEnd}</td>
+                                <td colspan="7" class="breaktime-label">BREAKTIME</td>
+                            </tr>`;
+                            breaktimeStart = null;
+                        }
+
+                        html += `<tr>
+                            <td class="time-cell">${schedule.time}</td>
+                            <td class="monday">${schedule.monday}</td>
+                            <td class="tuesday">${schedule.tuesday}</td>
+                            <td class="wednesday">${schedule.wednesday}</td>
+                            <td class="thursday">${schedule.thursday}</td>
+                            <td class="friday">${schedule.friday}</td>
+                            <td class="saturday">${schedule.saturday}</td>
+                            <td class="sunday">${schedule.sunday}</td>
+                        </tr>`;
+                    }
+                });
+
+                if (breaktimeStart) {
+                    html += `<tr class="breaktime-row">
+                        <td class="time-cell">${breaktimeStart} - ${breaktimeEnd}</td>
+                        <td colspan="7" class="breaktime-label">BREAKTIME</td>
+                    </tr>`;
+                }
+
+                $('#scheduleTable tbody').html(html);
+                mergeTableCells();
+                applyCellStyles();
+            }
+        });
+    }
+
+    function mergeTableCells() {
+        let days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
+        days.forEach(day => {
+            let prevCell = null;
+            let rowspan = 1;
+
+            $(`#scheduleTable tbody tr`).each(function () {
+                let currentRow = $(this);
+                
+                if (currentRow.hasClass('breaktime-row')) {
+                    prevCell = null; // Reset merging when a breaktime row is encountered
+                    rowspan = 1;
+                    return;
+                }
+
+                let currentCell = currentRow.find(`td.${day}`);
+
+                if (prevCell && prevCell.text() === currentCell.text() && prevCell.text().trim() !== "") {
+                    rowspan++;
+                    prevCell.attr("rowspan", rowspan);
+                    currentCell.hide();
+                } else {
+                    prevCell = currentCell;
+                    rowspan = 1;
+                }
+            });
+        });
     }
 
     function convertTo24Hour(timeStr) {
@@ -123,28 +196,8 @@ $(document).ready(function () {
 
         return hours * 60 + minutes;
     }
-
-    let breakTimeAdded = false;  // Flag to track if break time is already added
-
-    // Merge break time rows and set the label
-    $('#academicScheduleTable tbody tr').each(function () {
-        let timeCell = $(this).find('td:first').text().trim();
-
-        // Check if it's the 12:00 PM - 12:30 PM or 12:30 PM - 1:00 PM slot
-        if ((timeCell === '12:00 PM - 12:30 PM' || timeCell === '12:30 PM - 1:00 PM') && !breakTimeAdded) {
-            // Merge both rows for the break time slot by adding rowspan="2" and "Break Time" label
-            $(this).find('td').slice(1).remove(); // Remove Monday-Sunday cells for the first row
-            $(this).append('<td colspan="7" rowspan="2" class="text-center">Break Time</td>'); // Add merged cell with label
-
-            // Remove the second row's Monday-Sunday cells (and ensure no extra "Break Time" is added)
-            $(this).next().find('td').slice(1).remove();  // Remove the second row's Monday-Sunday cells
-            breakTimeAdded = true;  // Set the flag to true to prevent further merging
-        }
-    });
-
-    sortTable(); // Call the sorting function to sort after merging rows
 });
 
 
-</script>
 
+</script>
